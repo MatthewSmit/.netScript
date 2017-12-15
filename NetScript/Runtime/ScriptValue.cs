@@ -136,6 +136,7 @@ namespace NetScript.Runtime
             }
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             switch (type)

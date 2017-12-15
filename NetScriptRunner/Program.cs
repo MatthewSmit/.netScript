@@ -9,41 +9,133 @@ namespace NetScriptRunner
         private static void Main()
         {
 //            Test1();
-//            return;
-
 //            TestSpeed();
-//            return;
+//            TestCompat();
 
             BaseTest.
                 RunTest("language/statements/with/S12.10_A1.5_T1.js");
         }
 
+//        private static void TestCompat()
+//        {
+//            CompatTest("es5");
+//            CompatTest("es6");
+//            CompatTest("es2016plus");
+//            CompatTest("esintl");
+//            CompatTest("esnext");
+//            CompatTest("non-standard");
+//        }
+//
+//        private static void CompatTest(string es5)
+//        {
+//            var tests = JsonConvert.DeserializeObject<Dictionary<int, JObject>>(File.ReadAllText($@"C:\Work\compat-table\test_{es5}.json"));
+//            var results = new Dictionary<string, Dictionary<string, bool>>();
+//            Dictionary<string, bool> currentDictionary = null;
+//
+//            foreach (var test in tests.Values)
+//            {
+//                if (test["desc"].ToString().Length == 0)
+//                {
+//                    continue;
+//                }
+//
+//                var name = test["desc"].ToString().Substring(1).Trim();
+//                if (!test["tests"].HasValues)
+//                {
+//                    currentDictionary = new Dictionary<string, bool>();
+//                    results[name] = currentDictionary;
+//                }
+//                else
+//                {
+//                    var testCodes = test["tests"].Select(x => x.ToString()).ToArray();
+//                    bool[] result = {false};
+//
+//                    if (!string.Equals(name, "direct recursion", StringComparison.Ordinal) &&
+//                        !string.Equals(name, "mutual recursion", StringComparison.Ordinal))
+//                    {
+//                        var agent = new Agent();
+//                        agent.Global["test"] = agent.CreateUserFunction(arguments =>
+//                        {
+//                            result[0] = result[0] || agent.ToBoolean(arguments[0]);
+//                            return ScriptValue.Undefined;
+//                        });
+//
+//                        agent.Global["asyncPassed"] = agent.CreateUserFunction(arguments =>
+//                        {
+//                            result[0] = true;
+//                            return ScriptValue.Undefined;
+//                        });
+//
+//                        agent.Global["__createIterableObject"] = agent.CreateUserFunction(arguments =>
+//                        {
+//                            /*global.__createIterableObject = function (arr, methods) {
+//                              methods = methods || {};
+//                              if (typeof Symbol !== 'function' || !Symbol.iterator)
+//                                return {};
+//                              arr.length++;
+//                              var iterator = {
+//                                next: function() {
+//                                  return { value: arr.shift(), done: arr.length <= 0 };
+//                                },
+//                                'return': methods['return'],
+//                                'throw': methods['throw']
+//                              };
+//                              var iterable = {};
+//                              iterable[Symbol.iterator] = function(){ return iterator; };
+//                              return iterable;
+//                            };*/
+//
+//                            throw new NotImplementedException();
+//                        });
+//
+//                        try
+//                        {
+//                            foreach (var testCode in testCodes)
+//                            {
+//                                agent.QueueCode(testCode);
+//                                agent.RunAllJobs();
+//                            }
+//                        }
+//                        catch (Exception)
+//                        {
+//                            result[0] = false;
+//                        }
+//                    }
+//
+//                    Debug.Assert(currentDictionary != null, nameof(currentDictionary) + " != null");
+//                    currentDictionary[name] = result[0];
+//                }
+//            }
+//
+//            File.WriteAllText($"results_{es5}.json", JsonConvert.SerializeObject(results, Formatting.Indented));
+//        }
+
         private static void TestSpeed()
         {
-            var scriptAgent = new Agent();
-            scriptAgent.Global["load"] = scriptAgent.CreateCallbackObject(arguments =>
+            var agent = new Agent();
+            agent.Global["load"] = agent.CreateUserFunction(arguments =>
             {
                 var file = @"C:\Work\arewefastyet\benchmarks\octane\" + arguments[0].ToString();
-                return scriptAgent.RunFile(file);
+                return agent.RunFile(file);
             });
 
-            var performance = scriptAgent.Global["performance"] = scriptAgent.CreateObject();
-            performance["now"] = scriptAgent.CreateCallbackObject(arguments => { throw new NotImplementedException(); });
+            var performance = agent.Global["performance"] = agent.CreateObject();
+            performance["now"] = agent.CreateUserFunction(arguments => { throw new NotImplementedException(); });
 
-            scriptAgent.QueueFile(@"C:\Work\arewefastyet\benchmarks\octane\run.js");
-            scriptAgent.RunAllJobs();
+            agent.QueueFile(@"C:\Work\arewefastyet\benchmarks\octane\run.js");
+            agent.RunAllJobs();
         }
 
         private static void Test1()
         {
-            var scriptAgent = new Agent();
-            scriptAgent.Global["print"] = scriptAgent.CreateCallbackObject(arguments =>
+            var agent = new Agent();
+            agent.Global["print"] = agent.CreateUserFunction(arguments =>
             {
                 Console.WriteLine(arguments[0].ToString());
                 return ScriptValue.Undefined;
             });
-            scriptAgent.QueueCode(@"function foo({y: x = 42}) {}; foo({});");
-            scriptAgent.RunAllJobs();
+            agent.QueueCode(@"function foo({y: x = 42}) {}; foo({});");
+            agent.RunAllJobs();
         }
     }
 }

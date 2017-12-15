@@ -196,7 +196,7 @@ namespace NetScript.Walkers
 
                 var expressionReference = Walk(doWhileStatement.Test, context);
                 var expressionValue = agent.GetValue(expressionReference);
-                if (!Agent.ToBoolean(expressionValue))
+                if (!Agent.RealToBoolean(expressionValue))
                 {
                     return value;
                 }
@@ -276,7 +276,7 @@ namespace NetScript.Walkers
             var expressionReference = Walk(ifStatement.Test, context);
             var result = agent.GetValue(expressionReference);
 
-            var expressionValue = Agent.ToBoolean(result);
+            var expressionValue = Agent.RealToBoolean(result);
             if (expressionValue)
             {
                 return Walk(ifStatement.Consequent, context);
@@ -530,7 +530,7 @@ namespace NetScript.Walkers
             {
                 var expressionReference = Walk(whileStatement.Test, context);
                 var expressionValue = agent.GetValue(expressionReference);
-                if (!Agent.ToBoolean(expressionValue))
+                if (!Agent.RealToBoolean(expressionValue))
                 {
                     return value;
                 }
@@ -860,7 +860,7 @@ namespace NetScript.Walkers
             var agent = context.Realm.Agent;
 
             var testReference = Walk(conditionalExpression.Test, context);
-            var testValue = Agent.ToBoolean(agent.GetValue(testReference));
+            var testValue = Agent.RealToBoolean(agent.GetValue(testReference));
 
             var valueReference = Walk(testValue ? conditionalExpression.Consequent : conditionalExpression.Alternate, context);
             return agent.GetValue(valueReference);
@@ -942,7 +942,7 @@ namespace NetScript.Walkers
 
             var leftReference = Walk(logicalExpression.Left, context);
             var leftValue = agent.GetValue(leftReference);
-            var leftBool = Agent.ToBoolean(leftValue);
+            var leftBool = Agent.RealToBoolean(leftValue);
 
             if (logicalExpression.Operator == Operator.LogicalAnd && !leftBool ||
                 logicalExpression.Operator == Operator.LogicalOr && leftBool)
@@ -1075,7 +1075,7 @@ namespace NetScript.Walkers
                 case Operator.LogicalNot:
                 {
                     //https://tc39.github.io/ecma262/#sec-logical-not-operator-runtime-semantics-evaluation
-                    var oldValue = Agent.ToBoolean(agent.GetValue(reference));
+                    var oldValue = Agent.RealToBoolean(agent.GetValue(reference));
                     return !oldValue;
                 }
 
@@ -1594,7 +1594,7 @@ namespace NetScript.Walkers
                 {
                     var testReference = Walk(test, context);
                     var textValue = agent.GetValue(testReference);
-                    if (!Agent.ToBoolean(textValue))
+                    if (!Agent.RealToBoolean(textValue))
                         return value;
                 }
 
@@ -2135,7 +2135,7 @@ namespace NetScript.Walkers
             var instanceOfHandler = agent.GetMethod(target, agent.Realm.SymbolHasInstance);
             if (instanceOfHandler != ScriptValue.Undefined)
             {
-                return Agent.ToBoolean(agent.Call(instanceOfHandler, target, value));
+                return Agent.RealToBoolean(agent.Call(instanceOfHandler, target, value));
             }
 
             if (Agent.IsCallable(target))

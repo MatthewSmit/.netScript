@@ -54,7 +54,7 @@ namespace NetScript.Runtime
         internal bool IteratorComplete([NotNull] ScriptObject iteratorResult)
         {
             //https://tc39.github.io/ecma262/#sec-iteratorcomplete
-            return ToBoolean(iteratorResult.Get("done", iteratorResult));
+            return RealToBoolean(iteratorResult.Get("done", iteratorResult));
         }
 
         internal static ScriptValue IteratorValue([NotNull] ScriptObject iteratorResult)

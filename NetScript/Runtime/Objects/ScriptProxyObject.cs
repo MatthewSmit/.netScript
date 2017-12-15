@@ -64,7 +64,7 @@ namespace NetScript.Runtime.Objects
                 return ProxyTarget.Set(property, value, receiver);
             }
 
-            var booleanTrapResult = Agent.ToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget, property, value, receiver));
+            var booleanTrapResult = Agent.RealToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget, property, value, receiver));
             if (!booleanTrapResult)
             {
                 return false;

@@ -51,49 +51,52 @@ namespace NetScriptTest
             {
                 throw new NotImplementedException();
             }
-            else if (metadata.Module)
-            {
-                if (!metadata.NoStrict)
-                {
-                    var host = CreateTestAgent(harnessDirectory, metadata, true);
-                    host.QueueCode(testSource, fullName, true, true);
-                    host.RunAllJobs();
-                }
-                if (!metadata.OnlyStrict)
-                {
-                    var host = CreateTestAgent(harnessDirectory, metadata, false);
-                    host.QueueCode(testSource, fullName, true);
-                    host.RunAllJobs();
-                }
-            }
             else if (metadata.Async)
             {
                 if (!metadata.NoStrict)
                 {
-                    var host = CreateAsyncTestAgent(harnessDirectory, metadata, true);
-                    host.QueueCode(testSource, fullName, false, true);
-                    host.RunAllJobs();
+                    var agent = CreateAsyncTestAgent(harnessDirectory, metadata, true);
+                    agent.QueueCode(testSource, new ScriptOptions
+                    {
+                        ScriptName = fullName,
+                        Type = metadata.Module ? ScriptType.Module : ScriptType.Script,
+                        ForceStrict = true
+                    });
+                    agent.RunAllJobs();
                 }
                 if (!metadata.OnlyStrict)
                 {
-                    var host = CreateAsyncTestAgent(harnessDirectory, metadata, false);
-                    host.QueueCode(testSource, fullName);
-                    host.RunAllJobs();
+                    var agent = CreateAsyncTestAgent(harnessDirectory, metadata, false);
+                    agent.QueueCode(testSource, new ScriptOptions
+                    {
+                        ScriptName = fullName,
+                        Type = metadata.Module ? ScriptType.Module : ScriptType.Script
+                    });
+                    agent.RunAllJobs();
                 }
             }
             else
             {
                 if (!metadata.NoStrict)
                 {
-                    var host = CreateTestAgent(harnessDirectory, metadata, true);
-                    host.QueueCode(testSource, fullName, false, true);
-                    host.RunAllJobs();
+                    var agent = CreateTestAgent(harnessDirectory, metadata, true);
+                    agent.QueueCode(testSource, new ScriptOptions
+                    {
+                        ScriptName = fullName,
+                        Type = metadata.Module ? ScriptType.Module : ScriptType.Script,
+                        ForceStrict = true
+                    });
+                    agent.RunAllJobs();
                 }
                 if (!metadata.OnlyStrict)
                 {
-                    var host = CreateTestAgent(harnessDirectory, metadata, false);
-                    host.QueueCode(testSource, fullName);
-                    host.RunAllJobs();
+                    var agent = CreateTestAgent(harnessDirectory, metadata, false);
+                    agent.QueueCode(testSource, new ScriptOptions
+                    {
+                        ScriptName = fullName,
+                        Type = metadata.Module ? ScriptType.Module : ScriptType.Script
+                    });
+                    agent.RunAllJobs();
                 }
             }
         }
@@ -114,15 +117,20 @@ namespace NetScriptTest
             if (!metadata.NoStrict)
             {
                 var threw = false;
-                var host = CreateTestAgent(harnessDirectory, metadata, true);
+                var agent = CreateTestAgent(harnessDirectory, metadata, true);
                 try
                 {
-                    host.QueueCode(testSource, fullName, metadata.Module, true);
-                    host.RunAllJobs();
+                    agent.QueueCode(testSource, new ScriptOptions
+                    {
+                        ScriptName = fullName,
+                        Type = metadata.Module ? ScriptType.Module : ScriptType.Script,
+                        ForceStrict = true
+                    });
+                    agent.RunAllJobs();
                 }
                 catch (ScriptException e)
                 {
-                    var syntaxError = host.GetPrototypeOf(e.Value) == host.Realm.SyntaxErrorPrototype;
+                    var syntaxError = agent.GetPrototypeOf(e.Value) == agent.Realm.SyntaxErrorPrototype;
                     if (isEarly && !syntaxError)
                     {
                         throw;
@@ -138,15 +146,19 @@ namespace NetScriptTest
             if (!metadata.OnlyStrict)
             {
                 var threw = false;
-                var host = CreateTestAgent(harnessDirectory, metadata, false);
+                var agent = CreateTestAgent(harnessDirectory, metadata, false);
                 try
                 {
-                    host.QueueCode(testSource, fullName, metadata.Module);
-                    host.RunAllJobs();
+                    agent.QueueCode(testSource, new ScriptOptions
+                    {
+                        ScriptName = fullName,
+                        Type = metadata.Module ? ScriptType.Module : ScriptType.Script
+                    });
+                    agent.RunAllJobs();
                 }
                 catch (ScriptException e)
                 {
-                    var syntaxError = host.GetPrototypeOf(e.Value) == host.Realm.SyntaxErrorPrototype;
+                    var syntaxError = agent.GetPrototypeOf(e.Value) == agent.Realm.SyntaxErrorPrototype;
                     if (isEarly && !syntaxError)
                     {
                         throw;
@@ -173,7 +185,11 @@ namespace NetScriptTest
             foreach (var include in includes)
             {
                 var file = Path.Combine(harnessDirectory, include);
-                agent.QueueFile(file, false, isStrict);
+                agent.QueueFile(file, new ScriptOptions
+                {
+                    Type = ScriptType.Script,
+                    ForceStrict = isStrict
+                });
             }
 
             return agent;
@@ -192,7 +208,11 @@ namespace NetScriptTest
             foreach (var include in includes)
             {
                 var file = Path.Combine(harnessDirectory, include);
-                agent.QueueFile(file, false, isStrict);
+                agent.QueueFile(file, new ScriptOptions
+                {
+                    Type = ScriptType.Script,
+                    ForceStrict = isStrict
+                });
             }
 
             return agent;
@@ -200,42 +220,42 @@ namespace NetScriptTest
 
         private static void SetupRealm([NotNull] Agent agent, [NotNull] Realm realm)
         {
-            realm.GlobalObject["print"] = agent.CreateCallbackObject(arguments =>
+            realm.GlobalObject["print"] = agent.CreateUserFunction(arguments =>
             {
                 Console.WriteLine(arguments[0].ToString());
                 return ScriptValue.Undefined;
             });
 
-            var _262 = realm.GlobalObject["$262"] = agent.CreateObject();
-            _262["createRealm"] = agent.CreateCallbackObject(arguments =>
+            var object262 = realm.GlobalObject["$262"] = agent.CreateObject();
+            object262["createRealm"] = agent.CreateUserFunction(arguments =>
             {
                 var newRealm = agent.CreateRealm();
                 SetupRealm(agent, newRealm);
                 return newRealm.GlobalObject["$262"];
             });
-            _262["detachArrayBuffer"] = agent.CreateCallbackObject(arguments =>
+            object262["detachArrayBuffer"] = agent.CreateUserFunction(arguments =>
             {
                 throw new NotImplementedException();
             });
-            _262["evalScript"] = agent.CreateCallbackObject(arguments =>
+            object262["evalScript"] = agent.CreateUserFunction(arguments =>
             {
                 throw new NotImplementedException();
             });
-            _262["global"] = realm.GlobalObject;
-            var scriptAgent = _262["agent"] = agent.CreateObject();
-            scriptAgent["start"] = agent.CreateCallbackObject(arguments =>
+            object262["global"] = realm.GlobalObject;
+            var scriptAgent = object262["agent"] = agent.CreateObject();
+            scriptAgent["start"] = agent.CreateUserFunction(arguments =>
             {
                 throw new NotImplementedException();
             });
-            scriptAgent["broadcast"] = agent.CreateCallbackObject(arguments =>
+            scriptAgent["broadcast"] = agent.CreateUserFunction(arguments =>
             {
                 throw new NotImplementedException();
             });
-            scriptAgent["getReport"] = agent.CreateCallbackObject(arguments =>
+            scriptAgent["getReport"] = agent.CreateUserFunction(arguments =>
             {
                 throw new NotImplementedException();
             });
-            scriptAgent["sleep"] = agent.CreateCallbackObject(arguments =>
+            scriptAgent["sleep"] = agent.CreateUserFunction(arguments =>
             {
                 throw new NotImplementedException();
             });
@@ -319,16 +339,16 @@ namespace NetScriptTest
                 metadata.EsId = esidNode.Value;
             }
 
-            if (mapping.Children.TryGetValue("es5id", out var es5id))
+            if (mapping.Children.TryGetValue("es5id", out var es5Id))
             {
-                var es5idNode = (YamlScalarNode)es5id;
-                metadata.Es5Id = es5idNode.Value;
+                var es5IdNode = (YamlScalarNode)es5Id;
+                metadata.Es5Id = es5IdNode.Value;
             }
 
-            if (mapping.Children.TryGetValue("es6id", out var es6id))
+            if (mapping.Children.TryGetValue("es6id", out var es6Id))
             {
-                var es6idNode = (YamlScalarNode)es6id;
-                metadata.Es6Id = es6idNode.Value;
+                var es6IdNode = (YamlScalarNode)es6Id;
+                metadata.Es6Id = es6IdNode.Value;
             }
 
             if (mapping.Children.TryGetValue("description", out var description))

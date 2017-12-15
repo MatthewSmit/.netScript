@@ -94,7 +94,12 @@ namespace NetScript.Runtime
             throw CreateTypeError();
         }
 
-        internal static bool ToBoolean(ScriptValue argument)
+        public bool ToBoolean(ScriptValue argument)
+        {
+            return RealToBoolean(argument);
+        }
+
+        internal static bool RealToBoolean(ScriptValue argument)
         {
             switch (argument.ValueType)
             {
@@ -105,7 +110,6 @@ namespace NetScript.Runtime
                     return (bool)argument;
                 case ScriptValue.Type.Number:
                     var doubleValue = (double)argument;
-                    // ReSharper disable once CompareOfFloatsByEqualityOperator
                     return !double.IsNaN(doubleValue) && doubleValue != 0;
                 case ScriptValue.Type.String:
                     return ((string)argument).Length != 0;

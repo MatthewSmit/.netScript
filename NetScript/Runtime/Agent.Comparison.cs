@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using JetBrains.Annotations;
 using NetScript.Runtime.Objects;
 
@@ -34,10 +33,12 @@ namespace NetScript.Runtime
 
             if ((ScriptObject)argument is ScriptProxyObject proxyObject)
             {
-                //If argument.[[ProxyHandler]] is null, throw a TypeError exception.
-                //Let target be argument.[[ProxyTarget]].
-                //Return ? IsArray(target).
-                throw new NotImplementedException();
+                if (proxyObject.ProxyHandler == null)
+                {
+                    throw CreateTypeError();
+                }
+
+                return IsArray(proxyObject.ProxyTarget);
             }
 
             return false;

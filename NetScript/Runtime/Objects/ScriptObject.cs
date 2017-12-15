@@ -6,6 +6,9 @@ using NetScript.Runtime.Builtins;
 
 namespace NetScript.Runtime.Objects
 {
+    /// <summary>
+    /// An ECMAScript object.
+    /// </summary>
     public class ScriptObject
     {
         private sealed class IteratorInternals
@@ -86,17 +89,33 @@ namespace NetScript.Runtime.Objects
             return value;
         }
 
+        /// <summary>
+        /// Returns true if the object contains the specified property.
+        /// <exception cref="ArgumentException">Throws if property is not a Property Key.</exception>
+        /// </summary>
         public bool HasOwnProperty(ScriptValue property)
         {
-            Debug.Assert(Agent.IsPropertyKey(property));
+            if (!Agent.IsPropertyKey(property))
+            {
+                throw new ArgumentException("Property must be a property key.", nameof(property));
+            }
+
             var descriptor = GetOwnProperty(property);
             return descriptor != null;
         }
 
+        /// <summary>
+        /// Returns true if the object or a parent along the prototype chain contains the specified property.
+        /// <exception cref="ArgumentException">Throws if property is not a Property Key.</exception>
+        /// </summary>
         public virtual bool HasProperty(ScriptValue property)
         {
             //https://tc39.github.io/ecma262/#sec-ordinaryhasproperty
-            Debug.Assert(Agent.IsPropertyKey(property));
+            if (!Agent.IsPropertyKey(property))
+            {
+                throw new ArgumentException("Property must be a property key.", nameof(property));
+            }
+
             var hasOwn = GetOwnProperty(property);
             if (hasOwn != null)
             {
@@ -138,9 +157,13 @@ namespace NetScript.Runtime.Objects
             while (!done)
             {
                 if (p == null)
+                {
                     done = true;
+                }
                 else if (p == this)
+                {
                     return false;
+                }
                 else
                 {
                     //If p.[[GetPrototypeOf]] is not the ordinary object internal method defined in 9.1.1, set done to true.
@@ -236,7 +259,7 @@ namespace NetScript.Runtime.Objects
             return false;
         }
 
-        private bool OrdinarySetWithOwnDescriptor(ScriptValue property, ScriptValue value, [CanBeNull] ScriptValue receiver, [CanBeNull] PropertyDescriptor ownDescriptor)
+        private bool OrdinarySetWithOwnDescriptor(ScriptValue property, ScriptValue value, ScriptValue receiver, [CanBeNull] PropertyDescriptor ownDescriptor)
         {
             //https://tc39.github.io/ecma262/#sec-ordinarysetwithowndescriptor
             Debug.Assert(Agent.IsPropertyKey(property));
@@ -441,9 +464,22 @@ namespace NetScript.Runtime.Objects
 
         public ScriptValue this[ScriptValue property]
         {
-            get => Get(property);
+            get
+            {
+                if (!Agent.IsPropertyKey(property))
+                {
+                    throw new ArgumentException("Property must be a property key.", nameof(property));
+                }
+
+                return Get(property);
+            }
             set
             {
+                if (!Agent.IsPropertyKey(property))
+                {
+                    throw new ArgumentException("Property must be a property key.", nameof(property));
+                }
+
                 var result = DefineOwnProperty(property, new PropertyDescriptor(value));
                 if (!result)
                     throw new ScriptException();

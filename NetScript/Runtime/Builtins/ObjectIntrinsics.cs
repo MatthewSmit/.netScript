@@ -453,11 +453,11 @@ namespace NetScript.Runtime.Builtins
             var descriptor = new PropertyDescriptor();
             if (obj.HasProperty("enumerable"))
             {
-                descriptor.Enumerable = Agent.ToBoolean(obj["enumerable"]);
+                descriptor.Enumerable = Agent.RealToBoolean(obj["enumerable"]);
             }
             if (obj.HasProperty("configurable"))
             {
-                descriptor.Configurable = Agent.ToBoolean(obj["configurable"]);
+                descriptor.Configurable = Agent.RealToBoolean(obj["configurable"]);
             }
             if (obj.HasProperty("value"))
             {
@@ -465,7 +465,7 @@ namespace NetScript.Runtime.Builtins
             }
             if (obj.HasProperty("writable"))
             {
-                descriptor.Writable = Agent.ToBoolean(obj["writable"]);
+                descriptor.Writable = Agent.RealToBoolean(obj["writable"]);
             }
             if (obj.HasProperty("get"))
             {

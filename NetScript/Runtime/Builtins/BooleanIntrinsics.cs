@@ -22,7 +22,7 @@ namespace NetScript.Runtime.Builtins
         private static ScriptValue Boolean([NotNull] ScriptArguments arg)
         {
             //https://tc39.github.io/ecma262/#sec-boolean-constructor-boolean-value
-            var boolean = Agent.ToBoolean(arg[0]);
+            var boolean = Agent.RealToBoolean(arg[0]);
             if (arg.NewTarget == null)
             {
                 return boolean;
