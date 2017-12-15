@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\xunit.runner.console.2.3.1\build\xunit.runner.console.props" Condition="Exists('..\packages\xunit.runner.console.2.3.1\build\xunit.runner.console.props')" />
+  <Import Project="..\packages\xunit.core.2.3.1\build\xunit.core.props" Condition="Exists('..\packages\xunit.core.2.3.1\build\xunit.core.props')" />
+  <Import Project="..\packages\xunit.runner.visualstudio.2.3.1\build\net20\xunit.runner.visualstudio.props" Condition="Exists('..\packages\xunit.runner.visualstudio.2.3.1\build\net20\xunit.runner.visualstudio.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D99467B0-11AE-419F-BD50-9FBBE408C2AA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NetScriptTest</RootNamespace>
+    <AssemblyName>NetScriptTest</AssemblyName>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
+    <IsCodedUITest>False</IsCodedUITest>
+    <TestProjectType>UnitTest</TestProjectType>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=11.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.11.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\xunit.abstractions.2.0.1\lib\net35\xunit.abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.assert, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\xunit.assert.2.3.1\lib\netstandard1.1\xunit.assert.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.core, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\xunit.extensibility.core.2.3.1\lib\netstandard1.1\xunit.core.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.execution.desktop, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\xunit.extensibility.execution.2.3.1\lib\net452\xunit.execution.desktop.dll</HintPath>
+    </Reference>
+    <Reference Include="YamlDotNet, Version=4.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\YamlDotNet.4.2.3-pre0454\lib\net35\YamlDotNet.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BaseTest.cs" />
+    <Compile Include="NetScriptTest.language.literals.null.cs" />
+    <Compile Include="NetScriptTest.language.literals.numeric.cs" />
+    <Compile Include="NetScriptTest.language.literals.regexp.cs" />
+    <Compile Include="NetScriptTest.language.literals.string.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.arguments.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.definition.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.name﹏binding.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.strict﹏mode.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.Array.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.ArrayBuffer.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.Boolean.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.DataView.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.Date.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.Error.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.Function.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.GeneratorFunction.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.Map.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.NativeError.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.Number.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.Object.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.Promise.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.Proxy.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.RegExp.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.Set.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.String.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.Symbol.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.TypedArray.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.WeakMap.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.builtin﹏objects.WeakSet.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.subclass.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.super.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.syntax.cs" />
+    <Compile Include="NetScriptTest.language.statements.Class.syntax.early﹏errors.cs" />
+    <Compile Include="NetScriptTest.language.statements.Const.cs" />
+    <Compile Include="NetScriptTest.language.statements.Const.syntax.cs" />
+    <Compile Include="NetScriptTest.language.statements.continue.cs" />
+    <Compile Include="NetScriptTest.language.statements.do﹏while.cs" />
+    <Compile Include="NetScriptTest.language.statements.for.cs" />
+    <Compile Include="NetScriptTest.language.statements.for﹏in.cs" />
+    <Compile Include="NetScriptTest.language.statements.for﹏of.cs" />
+    <Compile Include="NetScriptTest.language.statements.function.cs" />
+    <Compile Include="NetScriptTest.language.statements.generators.cs" />
+    <Compile Include="NetScriptTest.language.statements.if.cs" />
+    <Compile Include="NetScriptTest.language.statements.labeled.cs" />
+    <Compile Include="NetScriptTest.language.statements.let.cs" />
+    <Compile Include="NetScriptTest.language.statements.let.syntax.cs" />
+    <Compile Include="NetScriptTest.language.statements.return.cs" />
+    <Compile Include="NetScriptTest.language.statements.Switch.cs" />
+    <Compile Include="NetScriptTest.language.statements.Switch.syntax.redeclaration.cs" />
+    <Compile Include="NetScriptTest.language.statements.throw.cs" />
+    <Compile Include="NetScriptTest.language.statements.try.cs" />
+    <Compile Include="NetScriptTest.language.statements.variable.cs" />
+    <Compile Include="NetScriptTest.language.statements.while.cs" />
+    <Compile Include="NetScriptTest.language.statements.with.cs" />
+    <Compile Include="NetScriptTest.language.types.number.cs" />
+    <Compile Include="NetScriptTest.language.types.Object.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestMetadata.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NetScript\NetScript.csproj">
+      <Project>{F41F2D3C-D958-40DE-85B0-0500EEC12495}</Project>
+      <Name>NetScript</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\xunit.runner.visualstudio.2.3.1\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\xunit.runner.visualstudio.2.3.1\build\net20\xunit.runner.visualstudio.props'))" />
+    <Error Condition="!Exists('..\packages\xunit.core.2.3.1\build\xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\xunit.core.2.3.1\build\xunit.core.props'))" />
+    <Error Condition="!Exists('..\packages\xunit.core.2.3.1\build\xunit.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\xunit.core.2.3.1\build\xunit.core.targets'))" />
+    <Error Condition="!Exists('..\packages\xunit.runner.console.2.3.1\build\xunit.runner.console.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\xunit.runner.console.2.3.1\build\xunit.runner.console.props'))" />
+  </Target>
+  <Import Project="..\packages\xunit.core.2.3.1\build\xunit.core.targets" Condition="Exists('..\packages\xunit.core.2.3.1\build\xunit.core.targets')" />
+</Project>

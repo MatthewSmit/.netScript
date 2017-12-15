@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F41F2D3C-D958-40DE-85B0-0500EEC12495}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NetScript</RootNamespace>
+    <AssemblyName>NetScript</AssemblyName>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=11.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.11.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Runtime\Agent.Comparison.cs" />
+    <Compile Include="Runtime\Agent.cs" />
+    <Compile Include="Runtime\Agent.Iterator.cs" />
+    <Compile Include="Runtime\Agent.Objects.cs" />
+    <Compile Include="Runtime\Agent.TypeConversion.cs" />
+    <Compile Include="Runtime\Builtins\AsyncFunctionIntrinsics.cs" />
+    <Compile Include="Runtime\Builtins\BooleanIntrinsics.cs" />
+    <Compile Include="Runtime\Builtins\DateIntrinsics.cs" />
+    <Compile Include="Runtime\Builtins\EnumerateType.cs" />
+    <Compile Include="Runtime\Builtins\GeneratorInstrinsics.cs" />
+    <Compile Include="Runtime\Builtins\IteratorIntrinsics.cs" />
+    <Compile Include="Runtime\Builtins\MathsIntrinsics.cs" />
+    <Compile Include="Runtime\Builtins\NumberIntrinsics.cs" />
+    <Compile Include="Runtime\Builtins\PromiseIntrinsics.cs" />
+    <Compile Include="Runtime\Builtins\ProxyIntrinsics.cs" />
+    <Compile Include="Runtime\Builtins\RegExpIntrinsics.cs" />
+    <Compile Include="Runtime\DoubleConverter.cs" />
+    <Compile Include="Runtime\IModule.cs" />
+    <Compile Include="Runtime\NodeModule.cs" />
+    <Compile Include="Runtime\Objects\ErrorData.cs" />
+    <Compile Include="Runtime\Objects\PropertyCollection.cs" />
+    <Compile Include="Runtime\Objects\ScriptArgumentsObject.cs" />
+    <Compile Include="Runtime\BaseEnvironment.cs" />
+    <Compile Include="Runtime\Objects\BoundFunctionObject.cs" />
+    <Compile Include="Runtime\BreakException.cs" />
+    <Compile Include="Runtime\Builtins\ArrayIntrinsics.cs" />
+    <Compile Include="Runtime\Builtins\ErrorIntrinsics.cs" />
+    <Compile Include="Runtime\Builtins\FunctionIntrinsics.cs" />
+    <Compile Include="Runtime\Builtins\Intrinsics.cs" />
+    <Compile Include="Runtime\Builtins\ObjectIntrinsics.cs" />
+    <Compile Include="Runtime\Builtins\StringIntrinsics.cs" />
+    <Compile Include="Runtime\Builtins\SymbolIntrinsics.cs" />
+    <Compile Include="Runtime\ContinueException.cs" />
+    <Compile Include="Runtime\Objects\ScriptStringObject.cs" />
+    <Compile Include="Runtime\PromiseCapability.cs" />
+    <Compile Include="Walkers\EarlyErrorWalker.cs" />
+    <Compile Include="Runtime\Objects\ScriptArrayObject.cs" />
+    <Compile Include="Runtime\Objects\ConstructorKind.cs" />
+    <Compile Include="Runtime\DeclarativeEnvironment.cs" />
+    <Compile Include="Runtime\ScriptException.cs" />
+    <Compile Include="Walkers\EvaluateWalker.cs" />
+    <Compile Include="Runtime\ExecutionContext.cs" />
+    <Compile Include="Runtime\FunctionEnvironment.cs" />
+    <Compile Include="Runtime\Objects\FunctionKind.cs" />
+    <Compile Include="Runtime\FunctionNode.cs" />
+    <Compile Include="Runtime\GlobalEnvironment.cs" />
+    <Compile Include="Runtime\IDeclaration.cs" />
+    <Compile Include="Runtime\IFunction.cs" />
+    <Compile Include="Runtime\IScript.cs" />
+    <Compile Include="Runtime\Job.cs" />
+    <Compile Include="Runtime\LexicalEnvironment.cs" />
+    <Compile Include="Runtime\ModuleEnvironment.cs" />
+    <Compile Include="Runtime\NodeScript.cs" />
+    <Compile Include="Runtime\ObjectEnvironment.cs" />
+    <Compile Include="Runtime\PropertyDescriptor.cs" />
+    <Compile Include="Runtime\Realm.cs" />
+    <Compile Include="Runtime\Reference.cs" />
+    <Compile Include="Runtime\ReturnException.cs" />
+    <Compile Include="Runtime\ScriptArguments.cs" />
+    <Compile Include="Runtime\Objects\ScriptFunctionObject.cs" />
+    <Compile Include="Runtime\Objects\ScriptObject.cs" />
+    <Compile Include="Runtime\Objects\ScriptProxyObject.cs" />
+    <Compile Include="Runtime\ScriptValue.cs" />
+    <Compile Include="Runtime\Objects\SpecialObjectType.cs" />
+    <Compile Include="Runtime\Symbol.cs" />
+    <Compile Include="Runtime\ThisBindingStatus.cs" />
+    <Compile Include="Runtime\ThisMode.cs" />
+    <Compile Include="Runtime\ValueReference.cs" />
+    <Compile Include="Walkers\BoundNamesWalker.cs" />
+    <Compile Include="Walkers\DeclarationNode.cs" />
+    <Compile Include="Walkers\LexicallyDeclaredNamesWalker.cs" />
+    <Compile Include="Runtime\Trinary.cs" />
+    <Compile Include="Walkers\LexicallyScopedDeclarationsWalker.cs" />
+    <Compile Include="Walkers\TopLevelLexicallyDeclaredNamesWalker.cs" />
+    <Compile Include="Walkers\TopLevelLexicallyScopedDeclarationsWalker.cs" />
+    <Compile Include="Walkers\TopLevelVarDeclaredNamesWalker.cs" />
+    <Compile Include="Walkers\TopLevelVarScopedDeclarationsWalker.cs" />
+    <Compile Include="Walkers\VarDeclaredNamesWalker.cs" />
+    <Compile Include="Walkers\VarScopedDeclarationsWalker.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\AcornSharp\AcornSharp\AcornSharp.Framework.csproj">
+      <Project>{DF45A515-EB67-407D-98D4-939DA28D0A66}</Project>
+      <Name>AcornSharp.Framework</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
