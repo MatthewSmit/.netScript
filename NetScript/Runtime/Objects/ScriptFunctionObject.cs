@@ -349,7 +349,7 @@ namespace NetScript.Runtime.Objects
         {
             //https://tc39.github.io/ecma262/#sec-createunmappedargumentsobject
             var length = arguments.Count;
-            var obj = Agent.ObjectCreate(Realm.ObjectPrototype, SpecialObjectType.Parameter);
+            var obj = Agent.ObjectCreate(Realm.ObjectPrototype, SpecialObjectType.ArgumentsObject);
             Agent.DefinePropertyOrThrow(obj, "length", new PropertyDescriptor(length, true, false, true));
             for (var i = 0; i < length; i++)
             {

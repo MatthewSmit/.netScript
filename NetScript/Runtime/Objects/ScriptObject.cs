@@ -56,7 +56,7 @@ namespace NetScript.Runtime.Objects
             switch (specialObjectType)
             {
                 case SpecialObjectType.None:
-                case SpecialObjectType.Parameter:
+                case SpecialObjectType.ArgumentsObject:
                 case SpecialObjectType.TypedArray:
                     break;
 
@@ -237,12 +237,12 @@ namespace NetScript.Runtime.Objects
             Debug.Assert(descriptor.IsAccessorDescriptor);
 
             var getter = descriptor.Get;
-            if (getter == null)
+            if (!getter.HasValue || getter.Value == ScriptValue.Undefined)
             {
                 return ScriptValue.Undefined;
             }
 
-            return Agent.Call(getter, receiver);
+            return Agent.Call((ScriptObject)getter.Value, receiver);
         }
 
         internal virtual ScriptValue Call(ScriptValue thisValue, IReadOnlyList<ScriptValue> arguments)
@@ -338,11 +338,11 @@ namespace NetScript.Runtime.Objects
 
             Debug.Assert(ownDescriptor.IsAccessorDescriptor);
             var setter = ownDescriptor.Set;
-            if (setter == null)
+            if (!setter.HasValue || setter.Value == ScriptValue.Undefined)
             {
                 return false;
             }
-            var result = Agent.Call(setter, receiver, value);
+            var result = Agent.Call((ScriptObject)setter.Value, receiver, value);
             if (result != ScriptValue.Undefined)
             {
                 throw new NotImplementedException();
@@ -386,8 +386,8 @@ namespace NetScript.Runtime.Objects
                     Debug.Assert(descriptor.IsAccessorDescriptor);
                     if (obj != null)
                     {
-                        obj.properties[property] = new PropertyDescriptor(descriptor.Get,
-                            descriptor.Set,
+                        obj.properties[property] = new PropertyDescriptor(descriptor.Get ?? ScriptValue.Undefined,
+                            descriptor.Set ?? ScriptValue.Undefined,
                             (bool)descriptor.Enumerable,
                             (bool)descriptor.Configurable);
                     }
@@ -399,8 +399,8 @@ namespace NetScript.Runtime.Objects
                 !descriptor.Enumerable.HasValue &&
                 !descriptor.Writable.HasValue &&
                 !descriptor.Value.HasValue &&
-                descriptor.Get == null &&
-                descriptor.Set == null)
+                !descriptor.Get.HasValue &&
+                !descriptor.Set.HasValue)
             {
                 return true;
             }
@@ -433,9 +433,13 @@ namespace NetScript.Runtime.Objects
                     {
                         current.Value = default;
                         current.Writable = default;
+                        current.Get = ScriptValue.Undefined;
+                        current.Set = ScriptValue.Undefined;
                     }
                     else
                     {
+                        current.Value = ScriptValue.Undefined;
+                        current.Writable = false;
                         current.Get = default;
                         current.Set = default;
                     }
@@ -460,12 +464,12 @@ namespace NetScript.Runtime.Objects
             {
                 if (!current.Configurable)
                 {
-                    if (descriptor.Set != null && descriptor.Set != current.Set)
+                    if (descriptor.Set.HasValue && descriptor.Set != current.Set)
                     {
                         return false;
                     }
 
-                    if (descriptor.Get != null && descriptor.Get != current.Get)
+                    if (descriptor.Get.HasValue && descriptor.Get != current.Get)
                     {
                         return false;
                     }
@@ -492,11 +496,11 @@ namespace NetScript.Runtime.Objects
                 {
                     current.Value = descriptor.Value;
                 }
-                if (descriptor.Get != null)
+                if (descriptor.Get.HasValue)
                 {
                     current.Get = descriptor.Get;
                 }
-                if (descriptor.Set != null)
+                if (descriptor.Set.HasValue)
                 {
                     current.Set = descriptor.Set;
                 }

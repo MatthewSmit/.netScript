@@ -18,15 +18,8 @@ namespace NetScript.Runtime
         {
             if (code is BlockStatementNode block)
             {
-                try
-                {
-                    EvaluateWalker.Walk(block.Body, executionContext);
-                    return ScriptValue.Undefined;
-                }
-                catch (ReturnException e)
-                {
-                    return e.Value;
-                }
+                EvaluateWalker.Walk(block.Body, executionContext);
+                return ScriptValue.Undefined;
             }
 
             var expressionReference = EvaluateWalker.Walk(code, executionContext);

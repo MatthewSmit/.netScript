@@ -139,9 +139,12 @@ namespace NetScript.Runtime.Builtins
             return obj;
         }
 
-        private static ScriptValue Entries(ScriptArguments arg)
+        private static ScriptValue Entries([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-object.entries
+            var obj = arg.Agent.ToObject(arg[0]);
+            var nameList = EnumerableOwnProperties(arg.Agent, obj, EnumerateType.KeyValue);
+            return ArrayIntrinsics.CreateArrayFromList(arg.Agent, nameList);
         }
 
         private static ScriptValue Freeze([NotNull] ScriptArguments arg)
@@ -398,7 +401,7 @@ namespace NetScript.Runtime.Builtins
             {
                 builtinTag = "String";
             }
-            else if (obj is ScriptArgumentsObject || obj.SpecialObjectType == SpecialObjectType.Parameter)
+            else if (obj.SpecialObjectType == SpecialObjectType.ArgumentsObject)
             {
                 builtinTag = "Arguments";
             }
@@ -491,47 +494,29 @@ namespace NetScript.Runtime.Builtins
 
             var obj = agent.CreateObject();
             var result = true;
-            if (descriptor.IsDataDescriptor)
+            if (descriptor.Value.HasValue)
             {
-                result = obj.CreateDataProperty("value", descriptor.Value ?? ScriptValue.Undefined);
+                result = obj.CreateDataProperty("value", descriptor.Value.Value);
+            }
+            if (descriptor.Writable.HasValue)
+            {
                 result = result && obj.CreateDataProperty("writable", (bool)descriptor.Writable);
-                result = result && obj.CreateDataProperty("enumerable", (bool)descriptor.Enumerable);
-                result = result && obj.CreateDataProperty("configurable", (bool)descriptor.Configurable);
             }
-            else if (descriptor.IsAccessorDescriptor)
+            if (descriptor.Get.HasValue)
             {
-                result = obj.CreateDataProperty("get", descriptor.Get ?? ScriptValue.Undefined);
-                result = result && obj.CreateDataProperty("set", descriptor.Set ?? ScriptValue.Undefined);
-                result = result && obj.CreateDataProperty("enumerable", (bool)descriptor.Enumerable);
-                result = result && obj.CreateDataProperty("configurable", (bool)descriptor.Configurable);
+                result = result && obj.CreateDataProperty("get", descriptor.Get.Value);
             }
-            else
+            if (descriptor.Set.HasValue)
             {
-                if (descriptor.Value.HasValue)
-                {
-                    result = obj.CreateDataProperty("value", descriptor.Value.Value);
-                }
-                if (descriptor.Writable.HasValue)
-                {
-                    result = result && obj.CreateDataProperty("writable", (bool)descriptor.Writable);
-                }
-                if (descriptor.Get != null)
-                {
-                    result = result && obj.CreateDataProperty("get", descriptor.Get);
-                }
-                if (descriptor.Set != null)
-                {
-                    result = result && obj.CreateDataProperty("set", descriptor.Set);
-                }
-                if (descriptor.Enumerable.HasValue)
-                {
-                    result = result && obj.CreateDataProperty("enumerable", (bool)descriptor.Enumerable);
-                }
-                if (descriptor.Configurable.HasValue)
-                {
-                    result = result && obj.CreateDataProperty("configurable", (bool)descriptor.Configurable);
-                }
-                throw new NotImplementedException();
+                result = result && obj.CreateDataProperty("set", descriptor.Set.Value);
+            }
+            if (descriptor.Enumerable.HasValue)
+            {
+                result = result && obj.CreateDataProperty("enumerable", (bool)descriptor.Enumerable);
+            }
+            if (descriptor.Configurable.HasValue)
+            {
+                result = result && obj.CreateDataProperty("configurable", (bool)descriptor.Configurable);
             }
 
             Debug.Assert(result);
@@ -561,8 +546,6 @@ namespace NetScript.Runtime.Builtins
             var keys = properties.OwnPropertyKeys();
 
             var descriptors = new List<(ScriptValue, PropertyDescriptor)>();
-
-            //Let descriptors be a new empty List.
             foreach (var nextKey in keys)
             {
                 var propertyDescriptor = properties.GetOwnProperty(nextKey);
@@ -706,7 +689,7 @@ namespace NetScript.Runtime.Builtins
                     throw agent.CreateTypeError();
                 }
 
-                descriptor.Get = getter == ScriptValue.Undefined ? null : (ScriptObject)getter;
+                descriptor.Get = getter;
             }
             if (obj.HasProperty("set"))
             {
@@ -716,7 +699,7 @@ namespace NetScript.Runtime.Builtins
                     throw agent.CreateTypeError();
                 }
 
-                descriptor.Set = setter == ScriptValue.Undefined ? null : (ScriptObject)setter;
+                descriptor.Set = setter;
             }
 
             if ((descriptor.Get != null || descriptor.Set != null) && (descriptor.Value.HasValue || descriptor.Writable.HasValue))

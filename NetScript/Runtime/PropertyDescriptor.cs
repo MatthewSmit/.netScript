@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using NetScript.Runtime.Objects;
 
 namespace NetScript.Runtime
 {
@@ -9,7 +8,7 @@ namespace NetScript.Runtime
         {
         }
 
-        public PropertyDescriptor([CanBeNull] ScriptObject get, [CanBeNull] ScriptObject set, bool enumerable, bool configurable)
+        public PropertyDescriptor(ScriptValue? get, ScriptValue? set, bool enumerable, bool configurable)
         {
             Get = get;
             Set = set;
@@ -17,7 +16,7 @@ namespace NetScript.Runtime
             Configurable = configurable;
         }
 
-        public PropertyDescriptor([CanBeNull] ScriptObject get, [CanBeNull] ScriptObject set, Trinary enumerable, Trinary configurable)
+        public PropertyDescriptor(ScriptValue? get, ScriptValue? set, Trinary enumerable, Trinary configurable)
         {
             Get = get;
             Set = set;
@@ -94,8 +93,8 @@ namespace NetScript.Runtime
         public bool IsGenericDescriptor => !IsAccessorDescriptor && !IsDataDescriptor;
 
         public ScriptValue? Value { get; set; }
-        [CanBeNull]        public ScriptObject Get { get; set; }
-        [CanBeNull]        public ScriptObject Set { get; set; }
+        [CanBeNull]        public ScriptValue? Get { get; set; }
+        [CanBeNull]        public ScriptValue? Set { get; set; }
         public Trinary Writable { get; set; }
         public Trinary Enumerable { get; set; }
         public Trinary Configurable { get; set; }

@@ -52,9 +52,53 @@ namespace NetScript.Runtime.Builtins
             return arg.Agent.Call((ScriptObject)arg.ThisValue, arg[0], argList);
         }
 
-        private static ScriptValue Bind(ScriptArguments arg)
+        private static ScriptValue Bind([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-function.prototype.bind
+            var target = arg.ThisValue;
+            if (!Agent.IsCallable(target))
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var targetObject = (ScriptObject)target;
+
+            var arguments = new ScriptValue[arg.Count - 1];
+            for (var i = 0; i < arguments.Length; i++)
+            {
+                arguments[i] = arg[i + 1];
+            }
+
+            var function = new ScriptBoundFunctionObject(targetObject, arg[0], arguments);
+            var targetHasLength = targetObject.HasOwnProperty("length");
+            int length;
+            if (targetHasLength)
+            {
+                var targetLength = targetObject.Get("length");
+                if (!targetLength.IsNumber)
+                {
+                    length = 0;
+                }
+                else
+                {
+                    var number = arg.Agent.ToInteger(targetLength);
+                    length = Math.Max(0, (int)number - arg.Count + 1);
+                }
+            }
+            else
+            {
+                length = 0;
+            }
+
+            arg.Agent.DefinePropertyOrThrow(function, "length", new PropertyDescriptor(length, false, false, true));
+            var targetName = targetObject.Get("name");
+            if (!targetName.IsString)
+            {
+                targetName = "";
+            }
+
+            arg.Agent.SetFunctionName(function, targetName, "bound");
+            return function;
         }
 
         private static ScriptValue Call([NotNull] ScriptArguments arg)

@@ -3,7 +3,7 @@
     internal enum SpecialObjectType
     {
         None,
-        Parameter,        IteratedList,
+        ArgumentsObject,        IteratedList,
         ArrayIterator,
         TypedArray,
         Date,

@@ -6,9 +6,12 @@ namespace NetScript.Runtime.Objects
 {
     internal sealed class ScriptBoundFunctionObject : ScriptObject
     {
-        internal ScriptBoundFunctionObject([NotNull] Realm realm, [CanBeNull] ScriptObject prototype, bool extensible, SpecialObjectType specialObjectType) :
-            base(realm, prototype, extensible, specialObjectType)
+        internal ScriptBoundFunctionObject([NotNull] ScriptObject targetFunction, ScriptValue boundThis, [NotNull] IReadOnlyList<ScriptValue> boundArguments) :
+            base(targetFunction.Realm, targetFunction.GetPrototypeOf(), true, SpecialObjectType.None)
         {
+            BoundTargetFunction = targetFunction;
+            BoundThis = boundThis;
+            BoundArguments = boundArguments;
         }
 
         /// <inheritdoc />
@@ -23,6 +26,16 @@ namespace NetScript.Runtime.Objects
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
+        public override bool IsConstructable => BoundTargetFunction.IsConstructable;
         public override bool IsCallable => true;
+
+        [NotNull]
+        public ScriptObject BoundTargetFunction { get; }
+
+        public ScriptValue BoundThis { get; }
+
+        [NotNull]
+        public IReadOnlyList<ScriptValue> BoundArguments { get; }
     }
 }
