@@ -86,13 +86,17 @@ namespace NetScript.Walkers
         public static void Walk([NotNull] ClassDeclarationNode classDeclaration, [NotNull] IList<string> list)
         {
             if (classDeclaration.Id != null)
+            {
                 list.Add(classDeclaration.Id.Name);
+            }
         }
 
         public static void Walk([NotNull] FunctionDeclarationNode functionDeclaration, [NotNull] IList<string> list)
         {
             if (functionDeclaration.Id != null)
+            {
                 list.Add(functionDeclaration.Id.Name);
+            }
         }
 
         public static void Walk([NotNull] IdentifierNode identifier, [NotNull] IList<string> list)
@@ -119,24 +123,46 @@ namespace NetScript.Walkers
         {
             foreach (var variableDeclaratorNode in variableDeclaration.Declarations)
             {
-                if (variableDeclaratorNode.Id is IdentifierNode identifierNode)
-                {
-                    list.Add(identifierNode.Name);
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
+                Walk(variableDeclaratorNode, list);
             }
         }
-        public static void Walk([NotNull] VariableDeclaratorNode variableDeclarator, [NotNull] IList<string> list)        {
-            if (variableDeclarator.Id is IdentifierNode identifierNode)
+        public static void Walk([NotNull] VariableDeclaratorNode variableDeclarator, [NotNull] IList<string> list)
+        {
+            WalkBinding(variableDeclarator.Id, list);
+        }
+
+        private static void WalkBinding([CanBeNull] BaseNode idNode, [NotNull] ICollection<string> list)
+        {
+            if (idNode is IdentifierNode identifier)
             {
-                list.Add(identifierNode.Name);
+                list.Add(identifier.Name);
+            }
+            else if (idNode is ArrayPatternNode arrayPattern)
+            {
+                foreach (var elementNode in arrayPattern.Elements)
+                {
+                    WalkBinding(elementNode, list);
+                }
+            }
+            else if (idNode is ObjectPatternNode objectPattern)
+            {
+                throw new NotImplementedException();
+            }
+            else if (idNode is AssignmentPatternNode assignmentPattern)
+            {
+                WalkBinding(assignmentPattern.Left, list);
+            }
+            else if (idNode is RestElementNode restElement)
+            {
+                WalkBinding(restElement.Argument, list);
+            }
+            else if (idNode == null)
+            {
             }
             else
             {
-                throw new NotImplementedException();
-            }        }
+                throw new InvalidOperationException();
+            }
+        }
     }
 }

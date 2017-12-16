@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using JetBrains.Annotations;
 
@@ -7,8 +6,8 @@ namespace NetScript.Runtime.Objects
 {
     internal sealed class ScriptArrayObject : ScriptObject
     {
-        internal ScriptArrayObject([NotNull] Agent agent, [CanBeNull] ScriptObject prototype, bool extensible, uint length) :
-            base(agent, prototype, extensible, SpecialObjectType.None)
+        internal ScriptArrayObject([NotNull] Realm realm, [CanBeNull] ScriptObject prototype, bool extensible, uint length) :
+            base(realm, prototype, extensible, SpecialObjectType.None)
         {
             base.DefineOwnProperty("length", new PropertyDescriptor(length, true, false, false));
         }
@@ -77,33 +76,62 @@ namespace NetScript.Runtime.Objects
 
             Debug.Assert(!oldLengthDescriptor?.IsAccessorDescriptor == true);
             Debug.Assert(oldLengthDescriptor.Value != null, "oldLengthDescriptor.Value != null");
-            var oldLength = (double)oldLengthDescriptor.Value.Value;
+            var oldLength = (uint)(double)oldLengthDescriptor.Value.Value;
 
             if (newLength >= oldLength)
             {
                 return base.DefineOwnProperty("length", newLengthDescriptor);
             }
 
-            //If oldLenDesc.[[Writable]] is false, return false.
-            //If newLenDesc.[[Writable]] is absent or has the value true, let newWritable be true.
-            //Else,
-            //    Need to defer setting the [[Writable]] attribute to false in case any elements cannot be deleted.
-            //    Let newWritable be false.
-            //    Set newLenDesc.[[Writable]] to true.
-            //Let succeeded be ! OrdinaryDefineOwnProperty(A, "length", newLenDesc).
-            //If succeeded is false, return false.
-            //Repeat, while newLen < oldLen,
-            //    Set oldLen to oldLen - 1.
-            //    Let deleteSucceeded be ! A.[[Delete]](! ToString(oldLen)).
-            //    If deleteSucceeded is false, then
-            //        Set newLenDesc.[[Value]] to oldLen + 1.
-            //        If newWritable is false, set newLenDesc.[[Writable]] to false.
-            //        Let succeeded be ! OrdinaryDefineOwnProperty(A, "length", newLenDesc).
-            //        Return false.
-            //If newWritable is false, then
-            //    Return OrdinaryDefineOwnProperty(A, "length", PropertyDescriptor{[[Writable]]: false}). This call will always return true.
-            //Return true.
-            throw new NotImplementedException();
+            if (!oldLengthDescriptor.Writable)
+            {
+                return false;
+            }
+
+            bool newWritable;
+            if (!newLengthDescriptor.Writable.HasValue || newLengthDescriptor.Writable)
+            {
+                newWritable = true;
+            }
+            else
+            {
+                //Need to defer setting the [[Writable]] attribute to false in case any elements cannot be deleted.
+                newWritable = false;
+                newLengthDescriptor.Writable = true;
+            }
+
+            var succeeded = base.DefineOwnProperty("length", newLengthDescriptor);
+            if (!succeeded)
+            {
+                return false;
+            }
+
+            while (newLength < oldLength)
+            {
+                oldLength--;
+                var deleteSucceeded = Delete(oldLength.ToString(CultureInfo.InvariantCulture));
+                if (!deleteSucceeded)
+                {
+                    newLengthDescriptor.Value = oldLength + 1;
+                    if (!newWritable)
+                    {
+                        newLengthDescriptor.Writable = false;
+                    }
+
+                    base.DefineOwnProperty("length", newLengthDescriptor);
+                    return false;
+                }
+            }
+
+            if (!newWritable)
+            {
+                return base.DefineOwnProperty("length", new PropertyDescriptor
+                {
+                    Writable = false
+                });
+            }
+
+            return true;
         }
     }
 }

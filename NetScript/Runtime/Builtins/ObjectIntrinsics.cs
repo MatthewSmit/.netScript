@@ -9,38 +9,46 @@ namespace NetScript.Runtime.Builtins
 {
     internal static class ObjectIntrinsics
     {
-        public static (ScriptObject objectConstructor, ScriptObject objectPrototypeToString, ScriptObject objectPrototypeValueOf) Initialise([NotNull] Agent agent, [NotNull] Realm realm, [NotNull] ScriptObject objectPrototype, [NotNull] ScriptObject functionPrototype)
+        private enum IntegrityLevel
         {
-            var objectConstructor = Intrinsics.CreateBuiltinFunction(agent, realm, Object, functionPrototype, 1, "Object", ConstructorKind.Base);
-            Intrinsics.DefineFunction(objectConstructor, "assign", 2, agent, realm, Assign);
-            Intrinsics.DefineFunction(objectConstructor, "create", 2, agent, realm, Create);
-            Intrinsics.DefineFunction(objectConstructor, "defineProperties", 2, agent, realm, DefineProperties);
-            Intrinsics.DefineFunction(objectConstructor, "defineProperty", 3, agent, realm, DefineProperty);
-            Intrinsics.DefineFunction(objectConstructor, "entries", 1, agent, realm, Entries);
-            Intrinsics.DefineFunction(objectConstructor, "freeze", 1, agent, realm, Freeze);
-            Intrinsics.DefineFunction(objectConstructor, "getOwnPropertyDescriptor", 2, agent, realm, GetOwnPropertyDescriptor);
-            Intrinsics.DefineFunction(objectConstructor, "getOwnPropertyDescriptors", 1, agent, realm, GetOwnPropertyDescriptors);
-            Intrinsics.DefineFunction(objectConstructor, "getOwnPropertyNames", 1, agent, realm, GetOwnPropertyNames);
-            Intrinsics.DefineFunction(objectConstructor, "getOwnPropertySymbols", 1, agent, realm, GetOwnPropertySymbols);
-            Intrinsics.DefineFunction(objectConstructor, "getPrototypeOf", 1, agent, realm, GetPrototypeOf);
-            Intrinsics.DefineFunction(objectConstructor, "is", 2, agent, realm, Is);
-            Intrinsics.DefineFunction(objectConstructor, "isExtensible", 1, agent, realm, IsExtensible);
-            Intrinsics.DefineFunction(objectConstructor, "isFrozen", 1, agent, realm, IsFrozen);
-            Intrinsics.DefineFunction(objectConstructor, "isSealed", 1, agent, realm, IsSealed);
-            Intrinsics.DefineFunction(objectConstructor, "keys", 1, agent, realm, Keys);
-            Intrinsics.DefineFunction(objectConstructor, "preventExtensions", 1, agent, realm, PreventExtensions);
+            Sealed,
+            Frozen
+        }
+
+        public static (ScriptFunctionObject objectConstructor,
+            ScriptFunctionObject objectPrototypeToString,
+            ScriptFunctionObject objectPrototypeValueOf) Initialise([NotNull] Realm realm, [NotNull] ScriptObject objectPrototype, [NotNull] ScriptObject functionPrototype)
+        {
+            var objectConstructor = Intrinsics.CreateBuiltinFunction(realm, Object, functionPrototype, 1, "Object", ConstructorKind.Base);
+            Intrinsics.DefineFunction(objectConstructor, "assign", 2, realm, Assign);
+            Intrinsics.DefineFunction(objectConstructor, "create", 2, realm, Create);
+            Intrinsics.DefineFunction(objectConstructor, "defineProperties", 2, realm, DefineProperties);
+            Intrinsics.DefineFunction(objectConstructor, "defineProperty", 3, realm, DefineProperty);
+            Intrinsics.DefineFunction(objectConstructor, "entries", 1, realm, Entries);
+            Intrinsics.DefineFunction(objectConstructor, "freeze", 1, realm, Freeze);
+            Intrinsics.DefineFunction(objectConstructor, "getOwnPropertyDescriptor", 2, realm, GetOwnPropertyDescriptor);
+            Intrinsics.DefineFunction(objectConstructor, "getOwnPropertyDescriptors", 1, realm, GetOwnPropertyDescriptors);
+            Intrinsics.DefineFunction(objectConstructor, "getOwnPropertyNames", 1, realm, GetOwnPropertyNames);
+            Intrinsics.DefineFunction(objectConstructor, "getOwnPropertySymbols", 1, realm, GetOwnPropertySymbols);
+            Intrinsics.DefineFunction(objectConstructor, "getPrototypeOf", 1, realm, GetPrototypeOf);
+            Intrinsics.DefineFunction(objectConstructor, "is", 2, realm, Is);
+            Intrinsics.DefineFunction(objectConstructor, "isExtensible", 1, realm, IsExtensible);
+            Intrinsics.DefineFunction(objectConstructor, "isFrozen", 1, realm, IsFrozen);
+            Intrinsics.DefineFunction(objectConstructor, "isSealed", 1, realm, IsSealed);
+            Intrinsics.DefineFunction(objectConstructor, "keys", 1, realm, Keys);
+            Intrinsics.DefineFunction(objectConstructor, "preventExtensions", 1, realm, PreventExtensions);
             Intrinsics.DefineDataProperty(objectConstructor, "prototype", objectPrototype, false, false, false);
-            Intrinsics.DefineFunction(objectConstructor, "seal", 1, agent, realm, Seal);
-            Intrinsics.DefineFunction(objectConstructor, "setPrototypeOf", 2, agent, realm, SetPrototypeOf);
-            Intrinsics.DefineFunction(objectConstructor, "values", 1, agent, realm, Values);
+            Intrinsics.DefineFunction(objectConstructor, "seal", 1, realm, Seal);
+            Intrinsics.DefineFunction(objectConstructor, "setPrototypeOf", 2, realm, SetPrototypeOf);
+            Intrinsics.DefineFunction(objectConstructor, "values", 1, realm, Values);
 
             Intrinsics.DefineDataProperty(objectPrototype, "constructor", objectConstructor);
-            Intrinsics.DefineFunction(objectPrototype, "hasOwnProperty", 1, agent, realm, HasOwnProperty);
-            Intrinsics.DefineFunction(objectPrototype, "isPrototypeOf", 1, agent, realm, IsPrototypeOf);
-            Intrinsics.DefineFunction(objectPrototype, "propertyIsEnumerable", 1, agent, realm, PropertyIsEnumerable);
-            Intrinsics.DefineFunction(objectPrototype, "toLocaleString", 0, agent, realm, ToLocaleString);
-            var objectPrototypeToString = Intrinsics.DefineFunction(objectPrototype, "toString", 0, agent, realm, ToString);
-            var objectPrototypeValueOf = Intrinsics.DefineFunction(objectPrototype, "valueOf", 0, agent, realm, ValueOf);
+            Intrinsics.DefineFunction(objectPrototype, "hasOwnProperty", 1, realm, HasOwnProperty);
+            Intrinsics.DefineFunction(objectPrototype, "isPrototypeOf", 1, realm, IsPrototypeOf);
+            Intrinsics.DefineFunction(objectPrototype, "propertyIsEnumerable", 1, realm, PropertyIsEnumerable);
+            Intrinsics.DefineFunction(objectPrototype, "toLocaleString", 0, realm, ToLocaleString);
+            var objectPrototypeToString = Intrinsics.DefineFunction(objectPrototype, "toString", 0, realm, ToString);
+            var objectPrototypeValueOf = Intrinsics.DefineFunction(objectPrototype, "valueOf", 0, realm, ValueOf);
 
             return (objectConstructor, objectPrototypeToString, objectPrototypeValueOf);
         }
@@ -49,8 +57,7 @@ namespace NetScript.Runtime.Builtins
         {
             if (arg.NewTarget != null && arg.NewTarget != arg.Agent.Realm.ObjectConstructor)
             {
-                throw new NotImplementedException();
-//                return OrdinaryCreateFromConstructor(arg.NewTarget, arg.Agent.Realm.ObjectPrototype);
+                return arg.Agent.OrdinaryCreateFromConstructor(arg.NewTarget, arg.NewTarget.Realm.ObjectPrototype);
             }
 
             var value = arg[0];
@@ -62,14 +69,52 @@ namespace NetScript.Runtime.Builtins
             return arg.Agent.ToObject(value);
         }
 
-        private static ScriptValue Assign(ScriptArguments arg)
+        private static ScriptValue Assign([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-object.assign
+            var to = arg.Agent.ToObject(arg[0]);
+            if (arg.Count == 1)
+            {
+                return to;
+            }
+
+            for (var i = 1; i < arg.Count; i++)
+            {
+                var nextSource = arg[i];
+                if (nextSource != ScriptValue.Undefined && nextSource != ScriptValue.Null)
+                {
+                    var from = arg.Agent.ToObject(nextSource);
+                    var keys = from.OwnPropertyKeys();
+                    foreach (var nextKey in keys)
+                    {
+                        var descriptor = from.GetOwnProperty(nextKey);
+                        if (descriptor != null && descriptor.Enumerable)
+                        {
+                            var propertyValue = from.Get(nextKey);
+                            arg.Agent.Set(to, nextKey, propertyValue, true);
+                        }
+                    }
+                }
+            }
+
+            return to;
         }
 
-        private static ScriptValue Create(ScriptArguments arg)
+        private static ScriptValue Create([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-object.create
+            if (!arg[0].IsObject && arg[0] != ScriptValue.Null)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var obj = arg.Agent.ObjectCreate(arg[0] == ScriptValue.Null ? null : (ScriptObject)arg[0]);
+            if (arg[1] != ScriptValue.Undefined)
+            {
+                return ObjectDefineProperties(arg.Agent, obj, arg[1]);
+            }
+
+            return obj;
         }
 
         private static ScriptValue DefineProperties([NotNull] ScriptArguments arg)
@@ -99,9 +144,21 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue Freeze(ScriptArguments arg)
+        private static ScriptValue Freeze([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-object.freeze
+            if (!arg[0].IsObject)
+            {
+                return arg[0];
+            }
+
+            var status = SetIntegrityLevel(arg.Agent, (ScriptObject)arg[0], IntegrityLevel.Frozen);
+            if (!status)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            return arg[0];
         }
 
         private static ScriptValue GetOwnPropertyDescriptor([NotNull] ScriptArguments arg)
@@ -113,9 +170,22 @@ namespace NetScript.Runtime.Builtins
             return FromPropertyDescriptor(arg.Agent, descriptor);
         }
 
-        private static ScriptValue GetOwnPropertyDescriptors(ScriptArguments arg)
+        private static ScriptValue GetOwnPropertyDescriptors([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-object.getownpropertydescriptors
+            var obj = arg.Agent.ToObject(arg[0]);
+            var ownKeys = obj.OwnPropertyKeys();
+            var descriptors = arg.Agent.ObjectCreate(arg.Function.Realm.ObjectPrototype);
+            foreach (var key in ownKeys)
+            {
+                var desc = obj.GetOwnProperty(key);
+                var descriptor = FromPropertyDescriptor(arg.Agent, desc);
+                if (descriptor != ScriptValue.Undefined)
+                {
+                    descriptors.CreateDataProperty(key, descriptor);
+                }
+            }
+            return descriptors;
         }
 
         private static ScriptValue GetOwnPropertyNames([NotNull] ScriptArguments arg)
@@ -129,14 +199,17 @@ namespace NetScript.Runtime.Builtins
             return GetOwnPropertyKeys(arg.Agent, arg[0], ScriptValue.Type.Symbol);
         }
 
-        private static ScriptValue GetPrototypeOf(ScriptArguments arg)
+        private static ScriptValue GetPrototypeOf([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-object.getprototypeof
+            var obj = arg.Agent.ToObject(arg[0]);
+            return obj.GetPrototypeOf();
         }
 
-        private static ScriptValue Is(ScriptArguments arg)
+        private static ScriptValue Is([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-object.is
+            return arg[0].SameValue(arg[1]);
         }
 
         private static ScriptValue IsExtensible([NotNull] ScriptArguments arg)
@@ -151,14 +224,26 @@ namespace NetScript.Runtime.Builtins
             return ((ScriptObject)obj).IsExtensible;
         }
 
-        private static ScriptValue IsFrozen(ScriptArguments arg)
+        private static ScriptValue IsFrozen([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-object.isfrozen
+            if (!arg[0].IsObject)
+            {
+                return true;
+            }
+
+            return TestIntegrityLevel((ScriptObject)arg[0], IntegrityLevel.Frozen);
         }
 
-        private static ScriptValue IsSealed(ScriptArguments arg)
+        private static ScriptValue IsSealed([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-object.issealed
+            if (!arg[0].IsObject)
+            {
+                return true;
+            }
+
+            return TestIntegrityLevel((ScriptObject)arg[0], IntegrityLevel.Sealed);
         }
 
         private static ScriptValue Keys([NotNull] ScriptArguments arg)
@@ -187,9 +272,21 @@ namespace NetScript.Runtime.Builtins
             return obj;
         }
 
-        private static ScriptValue Seal(ScriptArguments arg)
+        private static ScriptValue Seal([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-object.seal
+            if (!arg[0].IsObject)
+            {
+                return arg[0];
+            }
+
+            var status = SetIntegrityLevel(arg.Agent, (ScriptObject)arg[0], IntegrityLevel.Sealed);
+            if (!status)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            return arg[0];
         }
 
         private static ScriptValue SetPrototypeOf([NotNull] ScriptArguments arg)
@@ -216,9 +313,12 @@ namespace NetScript.Runtime.Builtins
             return obj;
         }
 
-        private static ScriptValue Values(ScriptArguments arg)
+        private static ScriptValue Values([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-object.values
+            var obj = arg.Agent.ToObject(arg[0]);
+            var nameList = EnumerableOwnProperties(arg.Agent, obj, EnumerateType.Value);
+            return ArrayIntrinsics.CreateArrayFromList(arg.Agent, nameList);
         }
 
         private static ScriptValue HasOwnProperty([NotNull] ScriptArguments arg)
@@ -229,9 +329,29 @@ namespace NetScript.Runtime.Builtins
             return obj.HasOwnProperty(property);
         }
 
-        private static ScriptValue IsPrototypeOf(ScriptArguments arg)
+        private static ScriptValue IsPrototypeOf([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-object.prototype.isprototypeof
+            if (!arg[0].IsObject)
+            {
+                return false;
+            }
+
+            var obj = arg.Agent.ToObject(arg.ThisValue);
+            var value = (ScriptObject)arg[0];
+            while (true)
+            {
+                value = value.GetPrototypeOf();
+                if (value == null)
+                {
+                    return false;
+                }
+
+                if (obj == value)
+                {
+                    return true;
+                }
+            }
         }
 
         private static ScriptValue PropertyIsEnumerable([NotNull] ScriptArguments arg)
@@ -248,9 +368,11 @@ namespace NetScript.Runtime.Builtins
             return (bool)descriptor.Enumerable;
         }
 
-        private static ScriptValue ToLocaleString(ScriptArguments arg)
+        private static ScriptValue ToLocaleString([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-object.prototype.tolocalestring
+            var obj = arg.ThisValue;
+            return arg.Agent.Invoke(obj, "toString");
         }
 
         private static ScriptValue ToString([NotNull] ScriptArguments arg)
@@ -284,29 +406,32 @@ namespace NetScript.Runtime.Builtins
             {
                 builtinTag = "Function";
             }
-            else switch (obj.SpecialObjectType)
+            else
             {
-                case SpecialObjectType.Error:
-                    builtinTag = "Error";
-                    break;
-                case SpecialObjectType.Boolean:
-                    builtinTag = "Boolean";
-                    break;
-                case SpecialObjectType.Number:
-                    builtinTag = "Number";
-                    break;
-                case SpecialObjectType.Date:
-                    builtinTag = "Date";
-                    break;
-                case SpecialObjectType.RegExp:
-                    builtinTag = "RegExp";
-                    break;
-                default:
-                    builtinTag = "Object";
-                    break;
+                switch (obj.SpecialObjectType)
+                {
+                    case SpecialObjectType.Error:
+                        builtinTag = "Error";
+                        break;
+                    case SpecialObjectType.Boolean:
+                        builtinTag = "Boolean";
+                        break;
+                    case SpecialObjectType.Number:
+                        builtinTag = "Number";
+                        break;
+                    case SpecialObjectType.Date:
+                        builtinTag = "Date";
+                        break;
+                    case SpecialObjectType.RegExp:
+                        builtinTag = "RegExp";
+                        break;
+                    default:
+                        builtinTag = "Object";
+                        break;
+                }
             }
 
-            var tag = obj.Get(arg.Agent.Realm.SymbolToStringTag);
+            var tag = obj.Get(Symbol.ToStringTag);
             if (tag.IsString)
             {
                 builtinTag = (string)tag;
@@ -356,7 +481,7 @@ namespace NetScript.Runtime.Builtins
             return properties;
         }
 
-        private static ScriptValue FromPropertyDescriptor([NotNull] Agent agent, [CanBeNull] PropertyDescriptor descriptor)
+        internal static ScriptValue FromPropertyDescriptor([NotNull] Agent agent, [CanBeNull] PropertyDescriptor descriptor)
         {
             //https://tc39.github.io/ecma262/#sec-frompropertydescriptor
             if (descriptor == null)
@@ -366,29 +491,47 @@ namespace NetScript.Runtime.Builtins
 
             var obj = agent.CreateObject();
             var result = true;
-            if (descriptor.Value.HasValue)
+            if (descriptor.IsDataDescriptor)
             {
-                result = obj.CreateDataProperty("value", descriptor.Value.Value);
-            }
-            if (descriptor.Writable.HasValue)
-            {
+                result = obj.CreateDataProperty("value", descriptor.Value ?? ScriptValue.Undefined);
                 result = result && obj.CreateDataProperty("writable", (bool)descriptor.Writable);
-            }
-            if (descriptor.Get != null)
-            {
-                result = result && obj.CreateDataProperty("get", descriptor.Get);
-            }
-            if (descriptor.Set != null)
-            {
-                result = result && obj.CreateDataProperty("set", descriptor.Set);
-            }
-            if (descriptor.Enumerable.HasValue)
-            {
                 result = result && obj.CreateDataProperty("enumerable", (bool)descriptor.Enumerable);
-            }
-            if (descriptor.Configurable.HasValue)
-            {
                 result = result && obj.CreateDataProperty("configurable", (bool)descriptor.Configurable);
+            }
+            else if (descriptor.IsAccessorDescriptor)
+            {
+                result = obj.CreateDataProperty("get", descriptor.Get ?? ScriptValue.Undefined);
+                result = result && obj.CreateDataProperty("set", descriptor.Set ?? ScriptValue.Undefined);
+                result = result && obj.CreateDataProperty("enumerable", (bool)descriptor.Enumerable);
+                result = result && obj.CreateDataProperty("configurable", (bool)descriptor.Configurable);
+            }
+            else
+            {
+                if (descriptor.Value.HasValue)
+                {
+                    result = obj.CreateDataProperty("value", descriptor.Value.Value);
+                }
+                if (descriptor.Writable.HasValue)
+                {
+                    result = result && obj.CreateDataProperty("writable", (bool)descriptor.Writable);
+                }
+                if (descriptor.Get != null)
+                {
+                    result = result && obj.CreateDataProperty("get", descriptor.Get);
+                }
+                if (descriptor.Set != null)
+                {
+                    result = result && obj.CreateDataProperty("set", descriptor.Set);
+                }
+                if (descriptor.Enumerable.HasValue)
+                {
+                    result = result && obj.CreateDataProperty("enumerable", (bool)descriptor.Enumerable);
+                }
+                if (descriptor.Configurable.HasValue)
+                {
+                    result = result && obj.CreateDataProperty("configurable", (bool)descriptor.Configurable);
+                }
+                throw new NotImplementedException();
             }
 
             Debug.Assert(result);
@@ -439,8 +582,96 @@ namespace NetScript.Runtime.Builtins
             return obj;
         }
 
+        private static bool SetIntegrityLevel([NotNull] Agent agent, [NotNull] ScriptObject obj, IntegrityLevel level)
+        {
+            //https://tc39.github.io/ecma262/#sec-setintegritylevel
+            var status = obj.PreventExtensions();
+            if (!status)
+            {
+                return false;
+            }
+
+            var keys = obj.OwnPropertyKeys();
+            switch (level)
+            {
+                case IntegrityLevel.Sealed:
+                    foreach (var key in keys)
+                    {
+                        agent.DefinePropertyOrThrow(obj, key, new PropertyDescriptor
+                        {
+                            Configurable = false
+                        });
+                    }
+                    break;
+                case IntegrityLevel.Frozen:
+                    foreach (var key in keys)
+                    {
+                        var currentDescriptor = obj.GetOwnProperty(key);
+                        if (currentDescriptor != null)
+                        {
+                            PropertyDescriptor descriptor;
+                            if (currentDescriptor.IsAccessorDescriptor)
+                            {
+                                descriptor = new PropertyDescriptor
+                                {
+                                    Configurable = false
+                                };
+                            }
+                            else
+                            {
+                                descriptor = new PropertyDescriptor
+                                {
+                                    Configurable = false,
+                                    Writable = false
+                                };
+                            }
+
+                            agent.DefinePropertyOrThrow(obj, key, descriptor);
+                        }
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(level));
+            }
+
+            return true;
+        }
+
+        private static bool TestIntegrityLevel([NotNull] ScriptObject obj, IntegrityLevel level)
+        {
+            //https://tc39.github.io/ecma262/#sec-testintegritylevel
+            var status = obj.IsExtensible;
+            if (status)
+            {
+                return false;
+            }
+            //NOTE: If the object is extensible, none of its properties are examined.
+            var keys = obj.OwnPropertyKeys();
+            foreach (var key in keys)
+            {
+                var currentDescriptor = obj.GetOwnProperty(key);
+                if (currentDescriptor != null)
+                {
+                    if (currentDescriptor.Configurable)
+                    {
+                        return false;
+                    }
+
+                    if (level == IntegrityLevel.Frozen && currentDescriptor.IsDataDescriptor)
+                    {
+                        if (currentDescriptor.Writable)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
         [NotNull]
-        private static PropertyDescriptor ToPropertyDescriptor([NotNull] Agent agent, ScriptValue value)
+        internal static PropertyDescriptor ToPropertyDescriptor([NotNull] Agent agent, ScriptValue value)
         {
             //https://tc39.github.io/ecma262/#sec-topropertydescriptor
             if (!value.IsObject)

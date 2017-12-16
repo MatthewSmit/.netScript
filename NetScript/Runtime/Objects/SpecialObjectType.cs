@@ -11,6 +11,8 @@
         Boolean,
         Number,
         RegExp,
-        Symbol
+        Symbol,
+        ArrayBuffer,
+        RevocableProxy
     }
 }

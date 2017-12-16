@@ -96,44 +96,20 @@ namespace NetScript.Runtime
 
             if (type == Type.Number)
             {
-                //If x is NaN and y is NaN, return true.
-                //If x is +0 and y is -0, return false.
-                //If x is -0 and y is +0, return false.
-                //If x is the same Number value as y, return true.
-                //Return false.
-                throw new NotImplementedException();
-            }
-
-            return SameValueNonNumber(other);
-        }
-
-        public bool SameValueZero(ScriptValue other)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool SameValueNonNumber(ScriptValue other)
-        {
-            //https://tc39.github.io/ecma262/#sec-samevaluenonnumber
-            Debug.Assert(type != Type.Number);
-            Debug.Assert(type == other.type);
-
-            switch (type)
-            {
-                case Type.Undefined:
-                case Type.Null:
+                if (double.IsNaN(doubleValue) && double.IsNaN(other.doubleValue))
+                {
                     return true;
-                case Type.Boolean:
-                    // ReSharper disable once CompareOfFloatsByEqualityOperator
-                    return doubleValue == other.doubleValue;
-                case Type.String:
-                    return ((string)objectValue).Equals((string)other.objectValue, StringComparison.Ordinal);
-                case Type.Symbol:
-                case Type.Object:
-                    return objectValue.Equals(other.objectValue);
-                default:
-                    throw new ArgumentOutOfRangeException();
+                }
+
+                if (doubleValue == 0 && other.doubleValue == 0 && doubleValue.IsNegative() != other.doubleValue.IsNegative())
+                {
+                    return false;
+                }
+
+                return doubleValue == other.doubleValue;
             }
+
+            return Agent.SameValueNonNumber(this, other);
         }
 
         /// <inheritdoc />

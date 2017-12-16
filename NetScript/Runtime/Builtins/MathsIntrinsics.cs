@@ -20,54 +20,56 @@ namespace NetScript.Runtime.Builtins
             Intrinsics.DefineDataProperty(maths, "PI", Math.PI, false, false, false);
             Intrinsics.DefineDataProperty(maths, "SQRT1_2", Math.Sqrt(0.5), false, false, false);
             Intrinsics.DefineDataProperty(maths, "SQRT2", Math.Sqrt(2), false, false, false);
-            Intrinsics.DefineDataProperty(maths, realm.SymbolToStringTag, "Math", false);
+            Intrinsics.DefineDataProperty(maths, Symbol.ToStringTag, "Math", false);
 
-            Intrinsics.DefineFunction(maths, "abs", 1, agent, realm, Abs);
-            Intrinsics.DefineFunction(maths, "acos", 1, agent, realm, Acos);
-            Intrinsics.DefineFunction(maths, "acosh", 1, agent, realm, Acosh);
-            Intrinsics.DefineFunction(maths, "asin", 1, agent, realm, Asin);
-            Intrinsics.DefineFunction(maths, "asinh", 1, agent, realm, Asinh);
-            Intrinsics.DefineFunction(maths, "atan", 1, agent, realm, Atan);
-            Intrinsics.DefineFunction(maths, "atanh", 1, agent, realm, Atanh);
-            Intrinsics.DefineFunction(maths, "atan2", 2, agent, realm, Atan2);
-            Intrinsics.DefineFunction(maths, "cbrt", 1, agent, realm, Cbrt);
-            Intrinsics.DefineFunction(maths, "ceil", 1, agent, realm, Ceiling);
-            Intrinsics.DefineFunction(maths, "clz32", 1, agent, realm, Clz32);
-            Intrinsics.DefineFunction(maths, "cos", 1, agent, realm, Cos);
-            Intrinsics.DefineFunction(maths, "cosh", 1, agent, realm, Cosh);
-            Intrinsics.DefineFunction(maths, "exp", 1, agent, realm, Exp);
-            Intrinsics.DefineFunction(maths, "expm1", 1, agent, realm, Expm1);
-            Intrinsics.DefineFunction(maths, "floor", 1, agent, realm, Floor);
-            Intrinsics.DefineFunction(maths, "fround", 1, agent, realm, Fround);
-            Intrinsics.DefineFunction(maths, "hypot", 1, agent, realm, Hypot);
-            Intrinsics.DefineFunction(maths, "imul", 2, agent, realm, Imul);
-            Intrinsics.DefineFunction(maths, "log", 1, agent, realm, Log);
-            Intrinsics.DefineFunction(maths, "log1p", 1, agent, realm, Log1P);
-            Intrinsics.DefineFunction(maths, "log2", 1, agent, realm, Log2);
-            Intrinsics.DefineFunction(maths, "max", 1, agent, realm, Max);
-            Intrinsics.DefineFunction(maths, "min", 1, agent, realm, Min);
-            Intrinsics.DefineFunction(maths, "pow", 2, agent, realm, Pow);
-            Intrinsics.DefineFunction(maths, "random", 0, agent, realm, Random);
-            Intrinsics.DefineFunction(maths, "round", 1, agent, realm, Round);
-            Intrinsics.DefineFunction(maths, "sign", 1, agent, realm, Sign);
-            Intrinsics.DefineFunction(maths, "sin", 1, agent, realm, Sin);
-            Intrinsics.DefineFunction(maths, "sinh", 1, agent, realm, Sinh);
-            Intrinsics.DefineFunction(maths, "sqrt", 1, agent, realm, Sqrt);
-            Intrinsics.DefineFunction(maths, "tan", 1, agent, realm, Tan);
-            Intrinsics.DefineFunction(maths, "tanh", 1, agent, realm, Tanh);
-            Intrinsics.DefineFunction(maths, "trunc", 1, agent, realm, Trunc);
+            Intrinsics.DefineFunction(maths, "abs", 1, realm, Abs);
+            Intrinsics.DefineFunction(maths, "acos", 1, realm, Acos);
+            Intrinsics.DefineFunction(maths, "acosh", 1, realm, Acosh);
+            Intrinsics.DefineFunction(maths, "asin", 1, realm, Asin);
+            Intrinsics.DefineFunction(maths, "asinh", 1, realm, Asinh);
+            Intrinsics.DefineFunction(maths, "atan", 1, realm, Atan);
+            Intrinsics.DefineFunction(maths, "atanh", 1, realm, Atanh);
+            Intrinsics.DefineFunction(maths, "atan2", 2, realm, Atan2);
+            Intrinsics.DefineFunction(maths, "cbrt", 1, realm, Cbrt);
+            Intrinsics.DefineFunction(maths, "ceil", 1, realm, Ceiling);
+            Intrinsics.DefineFunction(maths, "clz32", 1, realm, Clz32);
+            Intrinsics.DefineFunction(maths, "cos", 1, realm, Cos);
+            Intrinsics.DefineFunction(maths, "cosh", 1, realm, Cosh);
+            Intrinsics.DefineFunction(maths, "exp", 1, realm, Exp);
+            Intrinsics.DefineFunction(maths, "expm1", 1, realm, Expm1);
+            Intrinsics.DefineFunction(maths, "floor", 1, realm, Floor);
+            Intrinsics.DefineFunction(maths, "fround", 1, realm, Fround);
+            Intrinsics.DefineFunction(maths, "hypot", 1, realm, Hypot);
+            Intrinsics.DefineFunction(maths, "imul", 2, realm, Imul);
+            Intrinsics.DefineFunction(maths, "log", 1, realm, Log);
+            Intrinsics.DefineFunction(maths, "log1p", 1, realm, Log1P);
+            Intrinsics.DefineFunction(maths, "log2", 1, realm, Log2);
+            Intrinsics.DefineFunction(maths, "max", 1, realm, Max);
+            Intrinsics.DefineFunction(maths, "min", 1, realm, Min);
+            Intrinsics.DefineFunction(maths, "pow", 2, realm, Pow);
+            Intrinsics.DefineFunction(maths, "random", 0, realm, Random);
+            Intrinsics.DefineFunction(maths, "round", 1, realm, Round);
+            Intrinsics.DefineFunction(maths, "sign", 1, realm, Sign);
+            Intrinsics.DefineFunction(maths, "sin", 1, realm, Sin);
+            Intrinsics.DefineFunction(maths, "sinh", 1, realm, Sinh);
+            Intrinsics.DefineFunction(maths, "sqrt", 1, realm, Sqrt);
+            Intrinsics.DefineFunction(maths, "tan", 1, realm, Tan);
+            Intrinsics.DefineFunction(maths, "tanh", 1, realm, Tanh);
+            Intrinsics.DefineFunction(maths, "trunc", 1, realm, Trunc);
 
             return maths;
         }
 
-        private static ScriptValue Abs(ScriptArguments arg)
+        private static ScriptValue Abs([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-math.abs
+            return Math.Abs(arg.Agent.ToNumber(arg[0]));
         }
 
-        private static ScriptValue Acos(ScriptArguments arg)
+        private static ScriptValue Acos([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-math.acos
+            return Math.Acos(arg.Agent.ToNumber(arg[0]));
         }
 
         private static ScriptValue Acosh(ScriptArguments arg)
@@ -75,9 +77,10 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue Asin(ScriptArguments arg)
+        private static ScriptValue Asin([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-math.asin
+            return Math.Asin(arg.Agent.ToNumber(arg[0]));
         }
 
         private static ScriptValue Asinh(ScriptArguments arg)
@@ -85,9 +88,10 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue Atan(ScriptArguments arg)
+        private static ScriptValue Atan([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-math.atan
+            return Math.Atan(arg.Agent.ToNumber(arg[0]));
         }
 
         private static ScriptValue Atanh(ScriptArguments arg)
@@ -95,9 +99,10 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue Atan2(ScriptArguments arg)
+        private static ScriptValue Atan2([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-math.atan2
+            return Math.Atan2(arg.Agent.ToNumber(arg[0]), arg.Agent.ToNumber(arg[1]));
         }
 
         private static ScriptValue Cbrt(ScriptArguments arg)
@@ -111,14 +116,49 @@ namespace NetScript.Runtime.Builtins
             return Math.Ceiling(arg.Agent.ToNumber(arg[0]));
         }
 
-        private static ScriptValue Clz32(ScriptArguments arg)
+        private static ScriptValue Clz32([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-math.clz
+            var number = arg.Agent.ToUint32(arg[0]);
+
+            if (number == 0)
+            {
+                return 32;
+            }
+
+            var n = 1u;
+            if (number >> 16 == 0)
+            {
+                n += 16;
+                number <<= 16;
+            }
+
+            if (number >> 24 == 0)
+            {
+                n += 8;
+                number <<= 8;
+            }
+
+            if (number >> 28 == 0)
+            {
+                n += 4;
+                number <<= 4;
+            }
+
+            if (number >> 30 == 0)
+            {
+                n += 2;
+                number <<= 2;
+            }
+
+            n -= number >> 31;
+            return n;
         }
 
-        private static ScriptValue Cos(ScriptArguments arg)
+        private static ScriptValue Cos([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-math.cos
+            return Math.Cos(arg.Agent.ToNumber(arg[0]));
         }
 
         private static ScriptValue Cosh(ScriptArguments arg)
@@ -157,9 +197,10 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue Log(ScriptArguments arg)
+        private static ScriptValue Log([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-math.log
+            return Math.Log(arg.Agent.ToNumber(arg[0]));
         }
 
         private static ScriptValue Log1P(ScriptArguments arg)
@@ -188,9 +229,9 @@ namespace NetScript.Runtime.Builtins
             return EvaluateWalker.Exponentiation(arg[0], arg[1], arg.Agent);
         }
 
-        private static ScriptValue Random(ScriptArguments arg)
+        private static ScriptValue Random([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            return arg.Function.Realm.Random.NextDouble();
         }
 
         private static ScriptValue Round(ScriptArguments arg)
@@ -203,9 +244,9 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue Sin(ScriptArguments arg)
+        private static ScriptValue Sin([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            return Math.Sin(arg.Agent.ToNumber(arg[0]));
         }
 
         private static ScriptValue Sinh(ScriptArguments arg)

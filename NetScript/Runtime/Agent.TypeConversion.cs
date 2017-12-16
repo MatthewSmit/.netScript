@@ -24,7 +24,7 @@ namespace NetScript.Runtime
         {
             if (input.IsObject)
             {
-                var exoticToPrimitive = GetMethod(input, RunningExecutionContext.Realm.SymbolToPrimitive);
+                var exoticToPrimitive = GetMethod(input, Symbol.ToPrimitive);
 
                 if (exoticToPrimitive != null)
                 {
@@ -191,7 +191,10 @@ namespace NetScript.Runtime
                             {
                                 number |= (byte)(10 + digit - 'A');
                             }
-                            else throw new InvalidOperationException();
+                            else
+                            {
+                                throw new InvalidOperationException();
+                            }
                         }
 
                         return number;
@@ -261,7 +264,9 @@ namespace NetScript.Runtime
             var number = ToNumber(argument);
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (double.IsNaN(number) || double.IsInfinity(number) || number == 0)
+            {
                 return 0;
+            }
 
             return (uint)(Math.Sign(number) * Math.Floor(Math.Abs(number)));
         }
@@ -303,7 +308,7 @@ namespace NetScript.Runtime
                 case ScriptValue.Type.Null:
                     return "null";
                 case ScriptValue.Type.Boolean:
-                    return ((bool)argument) ? "true" : "false";
+                    return (bool)argument ? "true" : "false";
                 case ScriptValue.Type.Number:
                     return NumberToString((double)argument);
                 case ScriptValue.Type.String:
@@ -357,19 +362,19 @@ namespace NetScript.Runtime
                 case ScriptValue.Type.Null:
                     throw CreateTypeError();
                 case ScriptValue.Type.Boolean:
-                    return new ScriptObject(this, Realm.BooleanPrototype, true, SpecialObjectType.Boolean)
+                    return new ScriptObject(Realm, Realm.BooleanPrototype, true, SpecialObjectType.Boolean)
                     {
                         BooleanValue = (bool)argument
                     };
                 case ScriptValue.Type.Number:
-                    return new ScriptObject(this, Realm.NumberPrototype, true, SpecialObjectType.Number)
+                    return new ScriptObject(Realm, Realm.NumberPrototype, true, SpecialObjectType.Number)
                     {
                         NumberValue = (double)argument
                     };
                 case ScriptValue.Type.String:
-                    return new ScriptStringObject(this, Realm.StringPrototype, (string)argument);
+                    return new ScriptStringObject(Realm, Realm.StringPrototype, (string)argument);
                 case ScriptValue.Type.Symbol:
-                    return new ScriptObject(this, Realm.SymbolPrototype, true, SpecialObjectType.Symbol)
+                    return new ScriptObject(Realm, Realm.SymbolPrototype, true, SpecialObjectType.Symbol)
                     {
                         SymbolValue = (Symbol)argument
                     };
@@ -421,9 +426,27 @@ namespace NetScript.Runtime
             return number;
         }
 
-        internal ulong ToIndex(ScriptValue argument)
+        internal ulong ToIndex(ScriptValue value)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-toindex
+            if (value == ScriptValue.Undefined)
+            {
+                return 0;
+            }
+
+            var integerIndex = ToInteger(value);
+            if (integerIndex < 0)
+            {
+                throw CreateTypeError();
+            }
+
+            var index = ToLength(integerIndex);
+            if (!SameValueZero(integerIndex, index))
+            {
+                throw CreateRangeError();
+            }
+
+            return index;
         }
     }
 }

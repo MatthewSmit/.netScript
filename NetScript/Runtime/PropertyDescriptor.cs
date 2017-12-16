@@ -60,6 +60,33 @@ namespace NetScript.Runtime
             };
         }
 
+        public void CompletePropertyDescriptor()
+        {
+            //https://tc39.github.io/ecma262/#sec-completepropertydescriptor
+            if (IsGenericDescriptor || IsDataDescriptor)
+            {
+                if (!Value.HasValue)
+                {
+                    Value = ScriptValue.Undefined;
+                }
+
+                if (!Writable.HasValue)
+                {
+                    Writable = false;
+                }
+            }
+
+            if (!Enumerable.HasValue)
+            {
+                Enumerable = false;
+            }
+
+            if (!Configurable.HasValue)
+            {
+                Configurable = false;
+            }
+        }
+
         public bool IsAccessorDescriptor => Get != null || Set != null;
 
         public bool IsDataDescriptor => Value.HasValue || Writable.HasValue;

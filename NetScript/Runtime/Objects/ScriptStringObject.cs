@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using JetBrains.Annotations;
 
 namespace NetScript.Runtime.Objects
 {
     internal sealed class ScriptStringObject : ScriptObject
     {
-        internal ScriptStringObject([NotNull] Agent agent, [CanBeNull] ScriptObject prototype, [NotNull] string data, bool extensible = true) :
-            base(agent, prototype, extensible, SpecialObjectType.None)
+        internal ScriptStringObject([NotNull] Realm realm, [CanBeNull] ScriptObject prototype, [NotNull] string data, bool extensible = true) :
+            base(realm, prototype, extensible, SpecialObjectType.None)
         {
             StringData = data;
             base.DefineOwnProperty("length", new PropertyDescriptor(data.Length, false, false, false));
@@ -34,8 +34,7 @@ namespace NetScript.Runtime.Objects
             var stringDescriptor = StringGetOwnProperty(property);
             if (stringDescriptor != null)
             {
-                //Return ! IsCompatiblePropertyDescriptor(extensible, Desc, stringDesc).
-                throw new NotImplementedException();
+                return ValidateAndApplyPropertyDescriptor(null, ScriptValue.Undefined, IsExtensible, descriptor, stringDescriptor);
             }
 
             return base.DefineOwnProperty(property, descriptor);
@@ -43,7 +42,16 @@ namespace NetScript.Runtime.Objects
 
         internal override IEnumerable<ScriptValue> OwnPropertyKeys()
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-string-exotic-objects-ownpropertykeys
+            for (var i = 0; i < StringData.Length; i++)
+            {
+                yield return i.ToString(CultureInfo.InvariantCulture);
+            }
+
+            foreach (var propertyKey in base.OwnPropertyKeys())
+            {
+                yield return propertyKey;
+            }
         }
 
         [CanBeNull]
@@ -62,14 +70,24 @@ namespace NetScript.Runtime.Objects
                 return null;
             }
 
-            //If IsInteger(index) is false, return undefined.
-            //If index = -0, return undefined.
-            //Let str be the String value of S.[[StringData]].
-            //Let len be the length of str.
-            //If index < 0 or len ≤ index, return undefined.
-            //Let resultStr be the String value of length 1, containing one code unit from str, specifically the code unit at index index.
-            //Return a PropertyDescriptor{[[Value]]: resultStr, [[Writable]]: false, [[Enumerable]]: true, [[Configurable]]: false}.
-            throw new NotImplementedException();
+            if (!Agent.IsInteger(index.Value))
+            {
+                return null;
+            }
+
+            if (index.Value == 0 && index.Value.IsNegative())
+            {
+                return null;
+            }
+
+            var realValue = (int)index.Value;
+            if (realValue < 0 || realValue >= StringData.Length)
+            {
+                return null;
+            }
+
+            var result = StringData[realValue];
+            return new PropertyDescriptor(result.ToString(CultureInfo.InvariantCulture), false, true, false);
         }
 
         [NotNull]

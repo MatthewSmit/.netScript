@@ -9,6 +9,7 @@ namespace NetScript.Runtime.Objects
     /// <summary>
     /// An ECMAScript object.
     /// </summary>
+    [DebuggerTypeProxy(typeof(ScriptObjectDebugView))]
     public class ScriptObject
     {
         private sealed class IteratorInternals
@@ -24,6 +25,18 @@ namespace NetScript.Runtime.Objects
             public EnumerateType Kind;
         }
 
+        internal sealed class ArrayBufferInternals
+        {
+            public byte[] Data;
+            public bool Shared;
+        }
+
+        internal sealed class RegExpInternals
+        {
+            public string OriginalSource;
+            public string OriginalFlags;
+        }
+
         private sealed class BasicInternal<T>
         {
             public T Value;
@@ -33,9 +46,9 @@ namespace NetScript.Runtime.Objects
         private readonly object specialValue;
         private readonly PropertyCollection properties = new PropertyCollection();
 
-        internal ScriptObject([NotNull] Agent agent, [CanBeNull] ScriptObject prototype, bool extensible, SpecialObjectType specialObjectType)
+        internal ScriptObject([NotNull] Realm realm, [CanBeNull] ScriptObject prototype, bool extensible, SpecialObjectType specialObjectType)
         {
-            Agent = agent;
+            Realm = realm;
             this.prototype = prototype;
             SpecialObjectType = specialObjectType;
             IsExtensible = extensible;
@@ -44,7 +57,9 @@ namespace NetScript.Runtime.Objects
             {
                 case SpecialObjectType.None:
                 case SpecialObjectType.Parameter:
+                case SpecialObjectType.TypedArray:
                     break;
+
                 case SpecialObjectType.IteratedList:
                     specialValue = new IteratorInternals();
                     break;
@@ -63,6 +78,15 @@ namespace NetScript.Runtime.Objects
                     break;
                 case SpecialObjectType.Error:
                     specialValue = new BasicInternal<ErrorData>();
+                    break;
+                case SpecialObjectType.ArrayBuffer:
+                    specialValue = new ArrayBufferInternals();
+                    break;
+                case SpecialObjectType.RegExp:
+                    specialValue = new RegExpInternals();
+                    break;
+                case SpecialObjectType.RevocableProxy:
+                    specialValue = new BasicInternal<ScriptObject>();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(specialObjectType), specialObjectType, null);
@@ -146,12 +170,16 @@ namespace NetScript.Runtime.Objects
         internal virtual bool SetPrototypeOf([CanBeNull] ScriptObject prototype)
         {
             //https://tc39.github.io/ecma262/#sec-ordinarysetprototypeof
-            //Let extensible be O.[[Extensible]].
-            //Let current be O.[[Prototype]].
             if (prototype == this.prototype)
+            {
                 return true;
+            }
+
             if (!IsExtensible)
+            {
                 return false;
+            }
+
             var p = prototype;
             var done = false;
             while (!done)
@@ -166,10 +194,14 @@ namespace NetScript.Runtime.Objects
                 }
                 else
                 {
-                    //If p.[[GetPrototypeOf]] is not the ordinary object internal method defined in 9.1.1, set done to true.
                     if (this is ScriptProxyObject)
+                    {
                         done = true;
-                    else p = p.prototype;
+                    }
+                    else
+                    {
+                        p = p.prototype;
+                    }
                 }
             }
             this.prototype = prototype;
@@ -181,7 +213,7 @@ namespace NetScript.Runtime.Objects
             return Get(property, this);
         }
 
-        internal virtual ScriptValue Get(ScriptValue property, ScriptValue reciever)
+        internal virtual ScriptValue Get(ScriptValue property, ScriptValue receiver)
         {
             //https://tc39.github.io/ecma262/#sec-ordinaryget
             Debug.Assert(Agent.IsPropertyKey(property));
@@ -193,7 +225,7 @@ namespace NetScript.Runtime.Objects
                 {
                     return ScriptValue.Undefined;
                 }
-                return parent.Get(property, reciever);
+                return parent.Get(property, receiver);
             }
 
             if (descriptor.IsDataDescriptor)
@@ -210,7 +242,7 @@ namespace NetScript.Runtime.Objects
                 return ScriptValue.Undefined;
             }
 
-            return Agent.Call(getter, reciever);
+            return Agent.Call(getter, receiver);
         }
 
         internal virtual ScriptValue Call(ScriptValue thisValue, IReadOnlyList<ScriptValue> arguments)
@@ -327,7 +359,7 @@ namespace NetScript.Runtime.Objects
             return DefineOwnProperty(property, newDescriptor);
         }
 
-        private static bool ValidateAndApplyPropertyDescriptor([CanBeNull] ScriptObject obj, ScriptValue property, bool extensible, [NotNull] PropertyDescriptor descriptor, [CanBeNull] PropertyDescriptor current)
+        internal static bool ValidateAndApplyPropertyDescriptor([CanBeNull] ScriptObject obj, ScriptValue property, bool extensible, [NotNull] PropertyDescriptor descriptor, [CanBeNull] PropertyDescriptor current)
         {
             //https://tc39.github.io/ecma262/#sec-validateandapplypropertydescriptor
             Debug.Assert(obj == null || Agent.IsPropertyKey(property));
@@ -335,7 +367,9 @@ namespace NetScript.Runtime.Objects
             if (current == null)
             {
                 if (!extensible)
+                {
                     return false;
+                }
 
                 if (descriptor.IsGenericDescriptor || descriptor.IsDataDescriptor)
                 {
@@ -367,7 +401,9 @@ namespace NetScript.Runtime.Objects
                 !descriptor.Value.HasValue &&
                 descriptor.Get == null &&
                 descriptor.Set == null)
+            {
                 return true;
+            }
 
             if (!current.Configurable)
             {
@@ -424,10 +460,17 @@ namespace NetScript.Runtime.Objects
             {
                 if (!current.Configurable)
                 {
-                    //If Desc.[[Set]] is present and SameValue(Desc.[[Set]], current.[[Set]]) is false, return false.
-                    //If Desc.[[Get]] is present and SameValue(Desc.[[Get]], current.[[Get]]) is false, return false.
-                    //Return true.
-                    throw new NotImplementedException();
+                    if (descriptor.Set != null && descriptor.Set != current.Set)
+                    {
+                        return false;
+                    }
+
+                    if (descriptor.Get != null && descriptor.Get != current.Get)
+                    {
+                        return false;
+                    }
+
+                    return true;
                 }
             }
 
@@ -482,12 +525,17 @@ namespace NetScript.Runtime.Objects
 
                 var result = DefineOwnProperty(property, new PropertyDescriptor(value));
                 if (!result)
+                {
                     throw new ScriptException();
+                }
             }
         }
 
         [NotNull]
-        public Agent Agent { get; }
+        public Agent Agent => Realm.Agent;
+
+        [NotNull]
+        public Realm Realm { get; }
 
         public virtual bool IsCallable => false;
         public virtual bool IsConstructable => false;
@@ -633,6 +681,38 @@ namespace NetScript.Runtime.Objects
             {
                 Debug.Assert(SpecialObjectType == SpecialObjectType.Error);
                 ((BasicInternal<ErrorData>)specialValue).Value = value;
+            }
+        }
+
+        internal ArrayBufferInternals ArrayBuffer
+        {
+            get
+            {
+                Debug.Assert(SpecialObjectType == SpecialObjectType.ArrayBuffer);
+                return (ArrayBufferInternals)specialValue;
+            }
+        }
+
+        internal RegExpInternals RegExp
+        {
+            get
+            {
+                Debug.Assert(SpecialObjectType == SpecialObjectType.RegExp);
+                return (RegExpInternals)specialValue;
+            }
+        }
+
+        internal ScriptObject RevocableProxy
+        {
+            get
+            {
+                Debug.Assert(SpecialObjectType == SpecialObjectType.RevocableProxy);
+                return ((BasicInternal<ScriptObject>)specialValue).Value;
+            }
+            set
+            {
+                Debug.Assert(SpecialObjectType == SpecialObjectType.RevocableProxy);
+                ((BasicInternal<ScriptObject>)specialValue).Value = value;
             }
         }
 

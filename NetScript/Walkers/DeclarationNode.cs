@@ -26,23 +26,8 @@ namespace NetScript.Walkers
             }
 
             var functionNode = (FunctionDeclarationNode)node;
-
-            if (functionNode.Async)
-            {
-                throw new NotImplementedException();
-            }
-
-            if (functionNode.Generator)
-            {
-                throw new NotImplementedException();
-            }
-
-            if (functionNode.Id == null)
-            {
-                throw new NotImplementedException();
-            }
-
             var strict = agent.RunningExecutionContext.Strict ||
+                         functionNode.Id == null ||
                          functionNode.Body is BlockStatementNode block &&
                          block.Body.Count > 0 &&
                          block.Body[0] is ExpressionStatementNode expression &&
@@ -50,12 +35,32 @@ namespace NetScript.Walkers
                          literal.Value.IsString &&
                          literal.Value.AsString == "use strict";
 
-            var name = functionNode.Id.Name;
-            var function = agent.FunctionCreate(FunctionKind.Normal, functionNode.Parameters, functionNode.Body, scope, strict);
+            ScriptFunctionObject function;
+            if (functionNode.Async)
+            {
+                //https://tc39.github.io/ecma262/#sec-async-function-definitions-InstantiateFunctionObject
+                throw new NotImplementedException();
+            }
+            else if (functionNode.Generator)
+            {
+                //https://tc39.github.io/ecma262/#sec-generator-function-definitions-runtime-semantics-instantiatefunctionobject
+                if (functionNode.Id == null)
+                {
+                    throw new NotImplementedException();
+                }
 
-            agent.MakeConstructor(function);
-            agent.SetFunctionName(function, name);
+                function = agent.GeneratorFunctionCreate(FunctionKind.Normal, functionNode.Parameters, functionNode.Body, scope, strict);
+                var prototype = agent.ObjectCreate(agent.Realm.GeneratorPrototype);
+                agent.DefinePropertyOrThrow(function, "prototype", new PropertyDescriptor(prototype, true, false, false));
+            }
+            else
+            {
+                //https://tc39.github.io/ecma262/#sec-function-definitions-runtime-semantics-instantiatefunctionobject
+                function = agent.FunctionCreate(FunctionKind.Normal, functionNode.Parameters, functionNode.Body, scope, strict);
+                agent.MakeConstructor(function);
+            }
 
+            agent.SetFunctionName(function, functionNode.Id?.Name ?? "default");
             return function;
         }
 

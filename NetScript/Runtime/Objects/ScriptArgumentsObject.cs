@@ -5,8 +5,8 @@ namespace NetScript.Runtime.Objects
 {
     internal sealed class ScriptArgumentsObject : ScriptObject
     {
-        internal ScriptArgumentsObject([NotNull] Agent agent, [CanBeNull] ScriptObject prototype, bool extensible) :
-            base(agent, prototype, extensible, SpecialObjectType.None)
+        internal ScriptArgumentsObject([NotNull] Realm realm, [CanBeNull] ScriptObject prototype, bool extensible) :
+            base(realm, prototype, extensible, SpecialObjectType.None)
         {
         }
 

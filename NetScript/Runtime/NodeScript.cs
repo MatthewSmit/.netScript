@@ -18,7 +18,8 @@ namespace NetScript.Runtime
 
         public ScriptValue Evaluate(ExecutionContext context)
         {
-            return EvaluateWalker.Walk(node.Body, context).Value;
+            var result = EvaluateWalker.Walk(node.Body, context);
+            return result.IsValue ? result.Value : ScriptValue.Undefined;
         }
 
         public void HandleEarlyErrors(Agent agent, bool strictEval)

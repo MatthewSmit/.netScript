@@ -20,7 +20,10 @@ namespace NetScriptTest
             var testSource = File.ReadAllText(fileInfo.FullName);
             var metadataMatch = metadataRegex.Match(testSource);
             if (!metadataMatch.Success)
+            {
                 throw new NotImplementedException();
+            }
+
             var metadataText = metadataMatch.Groups[1].Value;
             var metadata = ParseMetadata(metadataText);
 
@@ -31,22 +34,44 @@ namespace NetScriptTest
         {
             // Web browser only feature
             if (metadata.Features.Contains("caller"))
+            {
                 return;
+            }
 
             // TODO
             if (metadata.Features.Contains("BigInt"))
+            {
                 return;
+            }
 
             // TODO
             if (metadata.Features.Contains("async-iteration"))
+            {
                 return;
+            }
+
+            // TODO
+            if (metadata.Features.Contains("generators"))
+            {
+                return;
+            }
 
             // TODO
             if (metadata.Includes.Contains("tcoHelper.js"))
+            {
                 return;
+            }
+
+            // TODO
+            if (metadata.Async)
+            {
+                return;
+            }
 
             if (metadata.NegativePhase != null)
+            {
                 RunNegativeTest(harnessDirectory, metadata, testSource, fullName);
+            }
             else if (metadata.Raw)
             {
                 throw new NotImplementedException();
@@ -140,7 +165,9 @@ namespace NetScriptTest
                 }
 
                 if (!threw)
+                {
                     throw new InvalidOperationException();
+                }
             }
 
             if (!metadata.OnlyStrict)
@@ -168,7 +195,9 @@ namespace NetScriptTest
                 }
 
                 if (!threw)
+                {
                     throw new InvalidOperationException();
+                }
             }
         }
 
@@ -177,7 +206,9 @@ namespace NetScriptTest
         {
             var includes = new HashSet<string> { "assert.js", "sta.js" };
             foreach (var include in metadata.Includes)
+            {
                 includes.Add(include);
+            }
 
             var agent = new Agent();
             SetupRealm(agent, agent.Realm);
@@ -200,7 +231,9 @@ namespace NetScriptTest
         {
             var includes = new HashSet<string> { "assert.js", "sta.js", "doneprintHandle.js" };
             foreach (var include in metadata.Includes)
+            {
                 includes.Add(include);
+            }
 
             var agent = new Agent();
             SetupRealm(agent, agent.Realm);

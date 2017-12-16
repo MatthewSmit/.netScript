@@ -29,6 +29,8 @@ namespace NetScript.Walkers
         {
             switch (baseNode)
             {
+                case DebuggerStatementNode _:
+                case EmptyStatementNode _:
                 case LiteralNode _:
                 case MetaPropertyNode _:
                 case ReturnStatementNode _:
@@ -44,7 +46,7 @@ namespace NetScript.Walkers
                     break;
 
                 case AssignmentExpressionNode assignmentExpression:
-                    //TODO
+                    Walk(agent, assignmentExpression, isStrict);
                     break;
 
                 case BinaryExpressionNode binaryExpression:
@@ -60,7 +62,7 @@ namespace NetScript.Walkers
                     break;
 
                 case CallExpressionNode callExpression:
-                    //TODO
+                    Walk(agent, callExpression, isStrict);
                     break;
 
                 case ClassDeclarationNode classDeclaration:
@@ -71,11 +73,12 @@ namespace NetScript.Walkers
                     //TODO
                     break;
 
-                case DoWhileStatementNode doWhileStatement:
+                case ContinueStatementNode continueStatement:
                     //TODO
                     break;
 
-                case EmptyStatementNode _:
+                case DoWhileStatementNode doWhileStatement:
+                    Walk(agent, doWhileStatement, isStrict);
                     break;
 
                 case ExpressionStatementNode expressionStatement:
@@ -96,6 +99,10 @@ namespace NetScript.Walkers
 
                 case FunctionDeclarationNode functionDeclaration:
                     Walk(agent, functionDeclaration, isStrict);
+                    break;
+
+                case FunctionExpressionNode functionExpression:
+                    Walk(agent, functionExpression, isStrict);
                     break;
 
                 case IdentifierNode identifier:
@@ -133,7 +140,7 @@ namespace NetScript.Walkers
                     break;
 
                 case ObjectExpressionNode objectExpression:
-                    //TODO
+                    Walk(agent, objectExpression, isStrict);
                     break;
 
                 case SequenceExpressionNode sequenceExpression:
@@ -177,6 +184,37 @@ namespace NetScript.Walkers
             }
         }
 
+        private static void Walk([NotNull] Agent agent, [NotNull] AssignmentExpressionNode assignmentExpression, bool isStrict)
+        {
+            //https://tc39.github.io/ecma262/#sec-assignment-operators-static-semantics-early-errors
+            if (assignmentExpression.Operator == Operator.Assignment)
+            {
+                if (assignmentExpression.Left is ArrayPatternNode)
+                {
+                }
+                else if (assignmentExpression.Left is ObjectPatternNode)
+                {
+                }
+                else
+                {
+                    if (!IsValidSimpleAssignmentTarget(agent, assignmentExpression.Left, isStrict))
+                    {
+                        throw agent.CreateSyntaxError();
+                    }
+                }
+            }
+            else
+            {
+                if (!IsValidSimpleAssignmentTarget(agent, assignmentExpression.Left, isStrict))
+                {
+                    throw agent.CreateSyntaxError();
+                }
+            }
+
+            Walk(agent, assignmentExpression.Left, isStrict);
+            Walk(agent, assignmentExpression.Right, isStrict);
+        }
+
         private static void Walk([NotNull] Agent agent, [NotNull] BlockStatementNode blockStatement, bool isStrict)
         {
             //https://tc39.github.io/ecma262/#sec-block-static-semantics-early-errors
@@ -210,6 +248,28 @@ namespace NetScript.Walkers
             }
         }
 
+        private static void Walk([NotNull] Agent agent, [NotNull] CallExpressionNode callExpression, bool isStrict)
+        {
+            //TODO
+
+            Walk(agent, callExpression.Callee, isStrict);
+            foreach (var argument in callExpression.Arguments)
+            {
+                Walk(agent, argument, isStrict);
+            }
+        }
+
+        private static void Walk([NotNull] Agent agent, [NotNull] DoWhileStatementNode doWhileStatement, bool isStrict)
+        {
+            if (IsLabelledFunction(doWhileStatement.Body))
+            {
+                throw agent.CreateSyntaxError();
+            }
+
+            Walk(agent, doWhileStatement.Test, isStrict);
+            Walk(agent, doWhileStatement.Body, isStrict);
+        }
+
         private static void Walk([NotNull] Agent agent, [NotNull] ForStatementNode forStatement, bool isStrict)
         {
             //TODO
@@ -218,6 +278,10 @@ namespace NetScript.Walkers
         private static void Walk([NotNull] Agent agent, [NotNull] ForInStatementNode forInStatement, bool isStrict)
         {
             //TODO
+
+            Walk(agent, forInStatement.Left, isStrict);
+            Walk(agent, forInStatement.Right, isStrict);
+            Walk(agent, forInStatement.Body, isStrict);
         }
 
         private static void Walk([NotNull] Agent agent, [NotNull] ForOfStatementNode forOfStatement, bool isStrict)
@@ -233,6 +297,13 @@ namespace NetScript.Walkers
             Walk(agent, functionDeclaration.Body, isStrict || new FunctionNode(functionDeclaration.Body).IsStrict);
         }
 
+        private static void Walk([NotNull] Agent agent, [NotNull] FunctionExpressionNode functionExpression, bool isStrict)
+        {
+            //TODO
+
+            Walk(agent, functionExpression.Body, isStrict || new FunctionNode(functionExpression.Body).IsStrict);
+        }
+
         private static void Walk([NotNull] Agent agent, [NotNull] IdentifierNode identifier, bool isStrict)
         {
             //https://tc39.github.io/ecma262/#sec-identifiers-static-semantics-early-errors
@@ -240,8 +311,6 @@ namespace NetScript.Walkers
             {
                 switch (identifier.Name)
                 {
-                    case "arguments":
-                    case "eval":
                     case "yield":
                     case "implements":
                     case "interface":
@@ -253,6 +322,37 @@ namespace NetScript.Walkers
                     case "static":
                         throw agent.CreateSyntaxError();
                 }
+            }
+        }
+
+        private static void Walk([NotNull] Agent agent, [NotNull] ObjectExpressionNode objectExpression, bool isStrict)
+        {
+            //TODO
+
+            foreach (var property in objectExpression.Properties)
+            {
+                Walk(agent, property, isStrict);
+            }
+        }
+
+        private static void Walk([NotNull] Agent agent, [NotNull] PropertyNode property, bool isStrict)
+        {
+            //TODO
+
+            if (property.Kind == PropertyKind.Get || property.Kind == PropertyKind.Set)
+            {
+                if (property.Key is IdentifierNode)
+                {
+                }
+                else
+                {
+                    Walk(agent, property.Key, isStrict);
+                }
+            }
+
+            if (property.Value != null)
+            {
+                Walk(agent, property.Value, isStrict);
             }
         }
 
@@ -338,16 +438,108 @@ namespace NetScript.Walkers
         private static void Walk([NotNull] Agent agent, [NotNull] VariableDeclarationNode variableDeclaration, bool isStrict)
         {
             //TODO
+
+            foreach (var variableDeclarator in variableDeclaration.Declarations)
+            {
+                Walk(agent, variableDeclarator, isStrict);
+            }
+        }
+
+        private static void Walk([NotNull] Agent agent, [NotNull] VariableDeclaratorNode variableDeclarator, bool isStrict)
+        {
+            //TODO
+
+            WalkBinding(agent, variableDeclarator.Id, isStrict);
+            if (variableDeclarator.Init != null)
+            {
+                Walk(agent, variableDeclarator.Init, isStrict);
+            }
         }
 
         private static void Walk([NotNull] Agent agent, [NotNull] WhileStatementNode whileStatement, bool isStrict)
         {
-            //TODO
+            if (IsLabelledFunction(whileStatement.Body))
+            {
+                throw agent.CreateSyntaxError();
+            }
+
+            Walk(agent, whileStatement.Test, isStrict);
+            Walk(agent, whileStatement.Body, isStrict);
         }
 
         private static void Walk([NotNull] Agent agent, [NotNull] WithStatementNode withStatement, bool isStrict)
         {
-            //TODO
+            if (isStrict)
+            {
+                throw agent.CreateSyntaxError();
+            }
+
+            if (IsLabelledFunction(withStatement.Body))
+            {
+                throw agent.CreateSyntaxError();
+            }
+
+            Walk(agent, withStatement.Object, false);
+            Walk(agent, withStatement.Body, false);
+        }
+
+        private static void WalkBinding([NotNull] Agent agent, [NotNull] BaseNode baseNode, bool isStrict)
+        {
+            switch (baseNode)
+            {
+                case IdentifierNode identifier:
+                    if (isStrict && (string.Equals(identifier.Name, "arguments", StringComparison.Ordinal) || string.Equals(identifier.Name, "eval", StringComparison.Ordinal)))
+                    {
+                        throw agent.CreateSyntaxError();
+                    }
+
+                    Walk(agent, identifier, isStrict);
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+
+        private static bool IsLabelledFunction(BaseNode statement)
+        {
+            //https://tc39.github.io/ecma262/#sec-islabelledfunction
+            if (statement is LabelledStatementNode labelledStatement)
+            {
+                if (labelledStatement.Body is FunctionDeclarationNode)
+                {
+                    return true;
+                }
+
+                return IsLabelledFunction(labelledStatement.Body);
+            }
+
+            return false;
+        }
+
+        private static bool IsValidSimpleAssignmentTarget(Agent agent, [NotNull] ExpressionNode expression, bool isStrict)
+        {
+            switch (expression)
+            {
+                case ThisExpressionNode _:
+                case LiteralNode _:
+                    return false;
+
+                case MemberExpressionNode _:
+                    return true;
+
+                case IdentifierNode identifier:
+                    if (isStrict && (string.Equals(identifier.Name, "eval", StringComparison.Ordinal) || string.Equals(identifier.Name, "arguments", StringComparison.Ordinal)))
+                    {
+                        return false;
+                    }
+
+                    return true;
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 }

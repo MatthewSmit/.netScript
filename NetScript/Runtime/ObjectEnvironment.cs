@@ -27,12 +27,14 @@ namespace NetScript.Runtime
                 return true;
             }
 
-            var unscopables = BindingObject.Get(BindingObject.Agent.Realm.SymbolUnscopables);
+            var unscopables = BindingObject.Get(Symbol.Unscopables);
             if (unscopables.IsObject)
             {
-                //Let blocked be ToBoolean(? Get(unscopables, N)).
-                //If blocked is true, return false.
-                throw new NotImplementedException();
+                var blocked = Agent.RealToBoolean(((ScriptObject)unscopables).Get(name));
+                if (blocked)
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -67,7 +69,10 @@ namespace NetScript.Runtime
             if (!value)
             {
                 if (strict)
+                {
                     throw BindingObject.Agent.CreateReferenceError();
+                }
+
                 return ScriptValue.Undefined;
             }
 

@@ -5,14 +5,14 @@ namespace NetScript.Runtime.Builtins
 {
     internal static class BooleanIntrinsics
     {
-        public static (ScriptObject boolean, ScriptObject booleanPrototype) Initialise([NotNull] Agent agent, [NotNull] Realm realm, [NotNull] ScriptObject objectPrototype, [NotNull] ScriptObject functionPrototype)
+        public static (ScriptFunctionObject boolean, ScriptObject booleanPrototype) Initialise([NotNull] Agent agent, [NotNull] Realm realm, [NotNull] ScriptObject objectPrototype, [NotNull] ScriptObject functionPrototype)
         {
-            var boolean = Intrinsics.CreateBuiltinFunction(agent, realm, Boolean, functionPrototype, 1, "Boolean", ConstructorKind.Base);
+            var boolean = Intrinsics.CreateBuiltinFunction(realm, Boolean, functionPrototype, 1, "Boolean", ConstructorKind.Base);
 
             var booleanPrototype = agent.ObjectCreate(objectPrototype, SpecialObjectType.Boolean);
             Intrinsics.DefineDataProperty(booleanPrototype, "constructor", boolean);
-            Intrinsics.DefineFunction(booleanPrototype, "toString", 0, agent, realm, ToString);
-            Intrinsics.DefineFunction(booleanPrototype, "valueOf", 0, agent, realm, ValueOf);
+            Intrinsics.DefineFunction(booleanPrototype, "toString", 0, realm, ToString);
+            Intrinsics.DefineFunction(booleanPrototype, "valueOf", 0, realm, ValueOf);
 
             Intrinsics.DefineDataProperty(boolean, "prototype", booleanPrototype, false, false, false);
 
@@ -28,7 +28,7 @@ namespace NetScript.Runtime.Builtins
                 return boolean;
             }
 
-            var obj = arg.Agent.OrdinaryCreateFromConstructor(arg.NewTarget, arg.Agent.Realm.BooleanPrototype, SpecialObjectType.Boolean);
+            var obj = arg.Agent.OrdinaryCreateFromConstructor(arg.NewTarget, arg.NewTarget.Realm.BooleanPrototype, SpecialObjectType.Boolean);
             obj.BooleanValue = boolean;
             return obj;
         }

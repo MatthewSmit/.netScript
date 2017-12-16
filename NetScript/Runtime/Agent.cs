@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using AcornSharp;
@@ -69,7 +70,9 @@ namespace NetScript.Runtime
         public ScriptValue RunCode([NotNull] string source,ScriptOptions options = default)
         {
             if (options.ForceStrict)
+            {
                 source = "'use strict';" + source;
+            }
 
             switch (options.Type)
             {
@@ -149,7 +152,10 @@ namespace NetScript.Runtime
         public ScriptObject CreateObject(ScriptObject prototype = null)
         {
             if (prototype == null)
+            {
                 prototype = Realm.ObjectPrototype;
+            }
+
             return ObjectCreate(prototype);
         }
 
@@ -161,7 +167,7 @@ namespace NetScript.Runtime
         [NotNull]
         public ScriptFunctionObject CreateUserFunction([NotNull] Func<ScriptArguments, ScriptValue> callback)
         {
-            return new ScriptFunctionObject(this, RunningExecutionContext.Realm.FunctionPrototype, true, RunningExecutionContext.Realm, callback);
+            return new ScriptFunctionObject(Realm, Realm.FunctionPrototype, true, callback);
         }
 
         [NotNull]
@@ -169,20 +175,15 @@ namespace NetScript.Runtime
         {
             //https://tc39.github.io/ecma262/#sec-objectcreate
 
-            return new ScriptObject(this, prototype, true, specialObjectType);
+            return new ScriptObject(prototype?.Realm ?? Realm, prototype, true, specialObjectType);
         }
 
         [NotNull]
-        internal ScriptArrayObject ArrayCreate(int length, [CanBeNull] ScriptObject prototype = null)
+        internal ScriptObject ObjectCreate([NotNull] Realm realm, [CanBeNull] ScriptObject prototype, SpecialObjectType specialObjectType = SpecialObjectType.None)
         {
-            Debug.Assert(length >= 0);
+            //https://tc39.github.io/ecma262/#sec-objectcreate
 
-            if (prototype == null)
-            {
-                prototype = Realm.ArrayPrototype;
-            }
-
-            return new ScriptArrayObject(this, prototype, true, (uint)length);
+            return new ScriptObject(realm, prototype, true, specialObjectType);
         }
 
         [NotNull]
@@ -199,7 +200,9 @@ namespace NetScript.Runtime
             Debug.Assert(IsCallable(constructor));
             var prototype = constructor.Get("prototype");
             if (!prototype.IsObject)
+            {
                 prototype = defaultPrototype;
+            }
 
             return (ScriptObject)prototype;
         }
@@ -207,7 +210,7 @@ namespace NetScript.Runtime
         [NotNull]
         internal ScriptFunctionObject CreateBuiltinFunction([NotNull] Realm realm, [NotNull] Func<ScriptArguments, ScriptValue> callback, [CanBeNull] ScriptObject prototype)
         {
-            return new ScriptFunctionObject(this, prototype, true, realm, callback);
+            return new ScriptFunctionObject(realm, prototype, true, callback);
         }
 
         /// <summary>
@@ -306,17 +309,27 @@ namespace NetScript.Runtime
             foreach (var name in lexNames)
             {
                 if (globalEnvironment.HasVarDeclaration(name))
+                {
                     throw CreateSyntaxError();
+                }
+
                 if (globalEnvironment.HasLexicalDeclaration(name))
+                {
                     throw CreateSyntaxError();
+                }
+
                 if (globalEnvironment.HasRestrictedGlobalProperty(name))
+                {
                     throw CreateSyntaxError();
+                }
             }
 
             foreach (var name in varNames)
             {
                 if (globalEnvironment.HasLexicalDeclaration(name))
+                {
                     throw CreateSyntaxError();
+                }
             }
 
             var varDeclarations = script.VarScopedDeclarations;
@@ -402,55 +415,55 @@ namespace NetScript.Runtime
             DefinePropertyOrThrow(global, "NaN", new PropertyDescriptor(double.NaN, false, false, false));
             DefinePropertyOrThrow(global, "undefined", new PropertyDescriptor(ScriptValue.Undefined, false, false, false));
 
-            DefinePropertyOrThrow(global, "eval", new PropertyDescriptor(realm.Eval));
-            DefinePropertyOrThrow(global, "isFinite", new PropertyDescriptor(realm.IsFinite));
-            DefinePropertyOrThrow(global, "isNaN", new PropertyDescriptor(realm.IsNaN));
-            DefinePropertyOrThrow(global, "parseFloat", new PropertyDescriptor(realm.ParseFloat));
-            DefinePropertyOrThrow(global, "parseInt", new PropertyDescriptor(realm.ParseInt));
-            DefinePropertyOrThrow(global, "decodeURI", new PropertyDescriptor(realm.DecodeURI));
-            DefinePropertyOrThrow(global, "decodeURIComponent", new PropertyDescriptor(realm.DecodeURIComponent));
-            DefinePropertyOrThrow(global, "encodeURI", new PropertyDescriptor(realm.EncodeURI));
-            DefinePropertyOrThrow(global, "encodeURIComponent", new PropertyDescriptor(realm.EncodeURIComponent));
+            DefinePropertyOrThrow(global, "eval", new PropertyDescriptor(realm.Eval, true, false, true));
+            DefinePropertyOrThrow(global, "isFinite", new PropertyDescriptor(realm.IsFinite, true, false, true));
+            DefinePropertyOrThrow(global, "isNaN", new PropertyDescriptor(realm.IsNaN, true, false, true));
+            DefinePropertyOrThrow(global, "parseFloat", new PropertyDescriptor(realm.ParseFloat, true, false, true));
+            DefinePropertyOrThrow(global, "parseInt", new PropertyDescriptor(realm.ParseInt, true, false, true));
+            DefinePropertyOrThrow(global, "decodeURI", new PropertyDescriptor(realm.DecodeURI, true, false, true));
+            DefinePropertyOrThrow(global, "decodeURIComponent", new PropertyDescriptor(realm.DecodeURIComponent, true, false, true));
+            DefinePropertyOrThrow(global, "encodeURI", new PropertyDescriptor(realm.EncodeURI, true, false, true));
+            DefinePropertyOrThrow(global, "encodeURIComponent", new PropertyDescriptor(realm.EncodeURIComponent, true, false, true));
 
-            DefinePropertyOrThrow(global, "Array", new PropertyDescriptor(realm.Array));
-            DefinePropertyOrThrow(global, "ArrayBuffer", new PropertyDescriptor(realm.ArrayBuffer));
-            DefinePropertyOrThrow(global, "Boolean", new PropertyDescriptor(realm.Boolean));
-            DefinePropertyOrThrow(global, "DataView", new PropertyDescriptor(realm.DataView));
-            DefinePropertyOrThrow(global, "Date", new PropertyDescriptor(realm.Date));
-            DefinePropertyOrThrow(global, "Error", new PropertyDescriptor(realm.Error));
-            DefinePropertyOrThrow(global, "EvalError", new PropertyDescriptor(realm.EvalError));
-            DefinePropertyOrThrow(global, "Float32Array", new PropertyDescriptor(realm.Float32Array));
-            DefinePropertyOrThrow(global, "Float64Array", new PropertyDescriptor(realm.Float64Array));
-            DefinePropertyOrThrow(global, "Function", new PropertyDescriptor(realm.Function));
-            DefinePropertyOrThrow(global, "Int8Array", new PropertyDescriptor(realm.Int8Array));
-            DefinePropertyOrThrow(global, "Int16Array", new PropertyDescriptor(realm.Int16Array));
-            DefinePropertyOrThrow(global, "Int32Array", new PropertyDescriptor(realm.Int32Array));
-            DefinePropertyOrThrow(global, "Map", new PropertyDescriptor(realm.Map));
-            DefinePropertyOrThrow(global, "Number", new PropertyDescriptor(realm.Number));
-            DefinePropertyOrThrow(global, "Object", new PropertyDescriptor(realm.ObjectConstructor));
-            DefinePropertyOrThrow(global, "Proxy", new PropertyDescriptor(realm.Proxy));
-            DefinePropertyOrThrow(global, "Promise", new PropertyDescriptor(realm.Promise));
-            DefinePropertyOrThrow(global, "RangeError", new PropertyDescriptor(realm.RangeError));
-            DefinePropertyOrThrow(global, "ReferenceError", new PropertyDescriptor(realm.ReferenceError));
-            DefinePropertyOrThrow(global, "RegExp", new PropertyDescriptor(realm.RegExp));
-            DefinePropertyOrThrow(global, "Set", new PropertyDescriptor(realm.Set));
-            DefinePropertyOrThrow(global, "SharedArrayBuffer", new PropertyDescriptor(realm.SharedArrayBuffer));
-            DefinePropertyOrThrow(global, "String", new PropertyDescriptor(realm.StringConstructor));
-            DefinePropertyOrThrow(global, "Symbol", new PropertyDescriptor(realm.Symbol));
-            DefinePropertyOrThrow(global, "SyntaxError", new PropertyDescriptor(realm.SyntaxError));
-            DefinePropertyOrThrow(global, "TypeError", new PropertyDescriptor(realm.TypeError));
-            DefinePropertyOrThrow(global, "Uint8Array", new PropertyDescriptor(realm.Uint8Array));
-            DefinePropertyOrThrow(global, "Uint8ClampedArray", new PropertyDescriptor(realm.Uint8ClampedArray));
-            DefinePropertyOrThrow(global, "Uint16Array", new PropertyDescriptor(realm.Uint16Array));
-            DefinePropertyOrThrow(global, "Uint32Array", new PropertyDescriptor(realm.Uint32Array));
-            DefinePropertyOrThrow(global, "URIError", new PropertyDescriptor(realm.UriError));
-            DefinePropertyOrThrow(global, "WeakMap", new PropertyDescriptor(realm.WeakMap));
-            DefinePropertyOrThrow(global, "WeakSet", new PropertyDescriptor(realm.WeakSet));
+            DefinePropertyOrThrow(global, "Array", new PropertyDescriptor(realm.Array, true, false, true));
+            DefinePropertyOrThrow(global, "ArrayBuffer", new PropertyDescriptor(realm.ArrayBuffer, true, false, true));
+            DefinePropertyOrThrow(global, "Boolean", new PropertyDescriptor(realm.Boolean, true, false, true));
+            DefinePropertyOrThrow(global, "DataView", new PropertyDescriptor(realm.DataView, true, false, true));
+            DefinePropertyOrThrow(global, "Date", new PropertyDescriptor(realm.Date, true, false, true));
+            DefinePropertyOrThrow(global, "Error", new PropertyDescriptor(realm.Error, true, false, true));
+            DefinePropertyOrThrow(global, "EvalError", new PropertyDescriptor(realm.EvalError, true, false, true));
+            DefinePropertyOrThrow(global, "Float32Array", new PropertyDescriptor(realm.Float32Array, true, false, true));
+            DefinePropertyOrThrow(global, "Float64Array", new PropertyDescriptor(realm.Float64Array, true, false, true));
+            DefinePropertyOrThrow(global, "Function", new PropertyDescriptor(realm.Function, true, false, true));
+            DefinePropertyOrThrow(global, "Int8Array", new PropertyDescriptor(realm.Int8Array, true, false, true));
+            DefinePropertyOrThrow(global, "Int16Array", new PropertyDescriptor(realm.Int16Array, true, false, true));
+            DefinePropertyOrThrow(global, "Int32Array", new PropertyDescriptor(realm.Int32Array, true, false, true));
+            DefinePropertyOrThrow(global, "Map", new PropertyDescriptor(realm.Map, true, false, true));
+            DefinePropertyOrThrow(global, "Number", new PropertyDescriptor(realm.Number, true, false, true));
+            DefinePropertyOrThrow(global, "Object", new PropertyDescriptor(realm.ObjectConstructor, true, false, true));
+            DefinePropertyOrThrow(global, "Proxy", new PropertyDescriptor(realm.Proxy, true, false, true));
+            DefinePropertyOrThrow(global, "Promise", new PropertyDescriptor(realm.Promise, true, false, true));
+            DefinePropertyOrThrow(global, "RangeError", new PropertyDescriptor(realm.RangeError, true, false, true));
+            DefinePropertyOrThrow(global, "ReferenceError", new PropertyDescriptor(realm.ReferenceError, true, false, true));
+            DefinePropertyOrThrow(global, "RegExp", new PropertyDescriptor(realm.RegExp, true, false, true));
+            DefinePropertyOrThrow(global, "Set", new PropertyDescriptor(realm.Set, true, false, true));
+            DefinePropertyOrThrow(global, "SharedArrayBuffer", new PropertyDescriptor(realm.SharedArrayBuffer, true, false, true));
+            DefinePropertyOrThrow(global, "String", new PropertyDescriptor(realm.StringConstructor, true, false, true));
+            DefinePropertyOrThrow(global, "Symbol", new PropertyDescriptor(realm.Symbol, true, false, true));
+            DefinePropertyOrThrow(global, "SyntaxError", new PropertyDescriptor(realm.SyntaxError, true, false, true));
+            DefinePropertyOrThrow(global, "TypeError", new PropertyDescriptor(realm.TypeError, true, false, true));
+            DefinePropertyOrThrow(global, "Uint8Array", new PropertyDescriptor(realm.Uint8Array, true, false, true));
+            DefinePropertyOrThrow(global, "Uint8ClampedArray", new PropertyDescriptor(realm.Uint8ClampedArray, true, false, true));
+            DefinePropertyOrThrow(global, "Uint16Array", new PropertyDescriptor(realm.Uint16Array, true, false, true));
+            DefinePropertyOrThrow(global, "Uint32Array", new PropertyDescriptor(realm.Uint32Array, true, false, true));
+            DefinePropertyOrThrow(global, "URIError", new PropertyDescriptor(realm.UriError, true, false, true));
+            DefinePropertyOrThrow(global, "WeakMap", new PropertyDescriptor(realm.WeakMap, true, false, true));
+            DefinePropertyOrThrow(global, "WeakSet", new PropertyDescriptor(realm.WeakSet, true, false, true));
 
-            DefinePropertyOrThrow(global, "Atomics", new PropertyDescriptor(realm.Atomics));
-            DefinePropertyOrThrow(global, "JSON", new PropertyDescriptor(realm.Json));
-            DefinePropertyOrThrow(global, "Math", new PropertyDescriptor(realm.Math));
-            DefinePropertyOrThrow(global, "Reflect", new PropertyDescriptor(realm.Reflect));
+            DefinePropertyOrThrow(global, "Atomics", new PropertyDescriptor(realm.Atomics, true, false, true));
+            DefinePropertyOrThrow(global, "JSON", new PropertyDescriptor(realm.Json, true, false, true));
+            DefinePropertyOrThrow(global, "Math", new PropertyDescriptor(realm.Math, true, false, true));
+            DefinePropertyOrThrow(global, "Reflect", new PropertyDescriptor(realm.Reflect, true, false, true));
         }
 
         private void SetRealmGlobalObject([NotNull] Realm realm, [CanBeNull] ScriptObject globalObject, [CanBeNull] ScriptObject thisValue)
@@ -523,7 +536,10 @@ namespace NetScript.Runtime
         private static Reference GetIdentifierReference([CanBeNull] LexicalEnvironment environment, [NotNull] string name, bool strict)
         {
             if (environment == null)
+            {
                 return new Reference(null, name, strict);
+            }
+
             var environmentRecord = environment.Environment;
             if (environmentRecord.HasBinding(name))
             {
@@ -540,7 +556,9 @@ namespace NetScript.Runtime
             }
 
             if (value.Reference.IsUnresolvableReference)
+            {
                 throw CreateReferenceError();
+            }
 
             if (value.Reference.IsPropertyReference)
             {
@@ -715,13 +733,16 @@ namespace NetScript.Runtime
                 {
                     count++;
                 }
-                else throw new NotImplementedException();
+                else
+                {
+                    throw new NotImplementedException();
+                }
             }
             return count;
         }
 
         [NotNull]
-        internal ScriptFunctionObject FunctionAllocate([NotNull] ScriptObject functionPrototype, bool strict, FunctionKind functionKind)
+        internal static ScriptFunctionObject FunctionAllocate([NotNull] ScriptObject functionPrototype, bool strict, FunctionKind functionKind)
         {
             //https://tc39.github.io/ecma262/#sec-functionallocate
             Debug.Assert(functionPrototype != null);
@@ -731,7 +752,7 @@ namespace NetScript.Runtime
                 functionKind = FunctionKind.Normal;
             }
 
-            return new ScriptFunctionObject(this, functionPrototype, true, RunningExecutionContext.Realm, functionKind, needsConstruct ? ConstructorKind.Base : ConstructorKind.None, strict);
+            return new ScriptFunctionObject(functionPrototype.Realm, functionPrototype, true, functionKind, needsConstruct ? ConstructorKind.Base : ConstructorKind.None, strict);
         }
 
         internal bool PutValue(ValueReference reference, ScriptValue value)
@@ -809,7 +830,7 @@ namespace NetScript.Runtime
 
             var constructorObject = (ScriptObject)constructor;
 
-            if (constructorObject is BoundFunctionObject)
+            if (constructorObject is ScriptBoundFunctionObject)
             {
                 //Let BC be C.[[BoundTargetFunction]].
                 //Return ? InstanceofOperator(O, BC).
@@ -1098,6 +1119,89 @@ namespace NetScript.Runtime
             throw new NotImplementedException();
         }
 
+        [NotNull]
+        internal IReadOnlyList<ScriptValue> CreateListFromArrayLike(ScriptValue obj, ScriptValue.Type[] elementTypes = null)
+        {
+            //https://tc39.github.io/ecma262/#sec-createlistfromarraylike
+            if (elementTypes == null)
+            {
+                elementTypes = new[]
+                {
+                    ScriptValue.Type.Undefined,
+                    ScriptValue.Type.Null,
+                    ScriptValue.Type.Boolean,
+                    ScriptValue.Type.String,
+                    ScriptValue.Type.Symbol,
+                    ScriptValue.Type.Number,
+                    ScriptValue.Type.Object
+                };
+            }
+
+            if (!obj.IsObject)
+            {
+                throw CreateTypeError();
+            }
+
+            var length = ToLength(((ScriptObject)obj).Get("length"));
+
+            var list = new List<ScriptValue>();
+            var index = 0UL;
+            while (index < length)
+            {
+                var indexName = index.ToString(CultureInfo.InvariantCulture);
+                var next = ((ScriptObject)obj).Get(indexName);
+                if (!elementTypes.Contains(next.ValueType))
+                {
+                    throw CreateTypeError();
+                }
+
+                list.Add(next);
+                index++;
+            }
+
+            return list;
+        }
+
+        [NotNull]
+        internal Realm GetFunctionRealm([NotNull] ScriptObject obj)
+        {
+            //https://tc39.github.io/ecma262/#sec-getfunctionrealm
+            Debug.Assert(obj.IsCallable);
+            if (obj is ScriptFunctionObject functionObject)
+            {
+                return functionObject.Realm;
+            }
+
+            if (obj is ScriptBoundFunctionObject boundFunctionObject)
+            {
+                //Let target be obj.[[BoundTargetFunction]].
+                //Return ? GetFunctionRealm(target).
+                throw new NotImplementedException();
+            }
+
+            if (obj is ScriptProxyObject proxyObject)
+            {
+                //    If obj.[[ProxyHandler]] is null, throw a TypeError exception.
+                //    Let proxyTarget be obj.[[ProxyTarget]].
+                //    Return ? GetFunctionRealm(proxyTarget).
+                throw new NotImplementedException();
+            }
+
+            return Realm;
+        }
+
+        internal ScriptValue Invoke(ScriptValue value, ScriptValue property, [NotNull] params ScriptValue[] arguments)
+        {
+            return Invoke(value, property, (IReadOnlyList<ScriptValue>)arguments);
+        }
+
+        private ScriptValue Invoke(ScriptValue value, ScriptValue property, [NotNull] IReadOnlyList<ScriptValue> arguments)
+        {
+            Debug.Assert(IsPropertyKey(property));
+            var function = GetValue(value, property);
+            return Call(function, value, arguments);
+        }
+
         /// <summary>
         /// Returns the global object for the current Realm.
         /// </summary>
@@ -1108,6 +1212,8 @@ namespace NetScript.Runtime
         /// </summary>
         [NotNull]
         public Realm Realm => RunningExecutionContext.Realm;
+
+        public bool LittleEndian => BitConverter.IsLittleEndian;
 
         [NotNull]
         internal ExecutionContext RunningExecutionContext { get; private set; }

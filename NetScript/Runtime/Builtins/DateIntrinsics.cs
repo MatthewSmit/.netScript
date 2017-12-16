@@ -16,58 +16,58 @@ namespace NetScript.Runtime.Builtins
         private const int MILLISECONDS_PER_HOUR = MILLISECONDS_PER_MINUTE * MINUTES_PER_HOUR;
         private const int MILLISECONDS_PER_DAY = MILLISECONDS_PER_HOUR * HOURS_PER_DAY;
 
-        public static (ScriptObject date, ScriptObject datePrototype) Initialise([NotNull] Agent agent, [NotNull] Realm realm, [NotNull] ScriptObject objectPrototype, [NotNull] ScriptObject functionPrototype)
+        public static (ScriptFunctionObject date, ScriptObject datePrototype) Initialise([NotNull] Agent agent, [NotNull] Realm realm, [NotNull] ScriptObject objectPrototype, [NotNull] ScriptObject functionPrototype)
         {
-            var date = Intrinsics.CreateBuiltinFunction(agent, realm, Date, functionPrototype, 7, "Date", ConstructorKind.Base);
-            Intrinsics.DefineFunction(date, "now", 0, agent, realm, Now);
-            Intrinsics.DefineFunction(date, "parse", 1, agent, realm, Parse);
-            Intrinsics.DefineFunction(date, "UTC", 7, agent, realm, UTC);
+            var date = Intrinsics.CreateBuiltinFunction(realm, Date, functionPrototype, 7, "Date", ConstructorKind.Base);
+            Intrinsics.DefineFunction(date, "now", 0, realm, Now);
+            Intrinsics.DefineFunction(date, "parse", 1, realm, Parse);
+            Intrinsics.DefineFunction(date, "UTC", 7, realm, UTC);
 
             var datePrototype = agent.ObjectCreate(objectPrototype);
             Intrinsics.DefineDataProperty(datePrototype, "constructor", date);
-            Intrinsics.DefineFunction(datePrototype, "getDate", 0, agent, realm, GetDate);
-            Intrinsics.DefineFunction(datePrototype, "getFullYear", 0, agent, realm, GetFullYear);
-            Intrinsics.DefineFunction(datePrototype, "getHours", 0, agent, realm, GetHours);
-            Intrinsics.DefineFunction(datePrototype, "getMilliseconds", 0, agent, realm, GetMilliseconds);
-            Intrinsics.DefineFunction(datePrototype, "getMinutes", 0, agent, realm, GetMinutes);
-            Intrinsics.DefineFunction(datePrototype, "getMonth", 0, agent, realm, GetMonth);
-            Intrinsics.DefineFunction(datePrototype, "getSeconds", 0, agent, realm, GetSeconds);
-            Intrinsics.DefineFunction(datePrototype, "getTime", 0, agent, realm, GetTime);
-            Intrinsics.DefineFunction(datePrototype, "getTimezoneOffset", 0, agent, realm, GetTimezoneOffset);
-            Intrinsics.DefineFunction(datePrototype, "getUTCDate", 0, agent, realm, GetUTCDate);
-            Intrinsics.DefineFunction(datePrototype, "getUTCDay", 0, agent, realm, GetUTCDay);
-            Intrinsics.DefineFunction(datePrototype, "getUTCFullYear", 0, agent, realm, GetUTCFullYear);
-            Intrinsics.DefineFunction(datePrototype, "getUTCHours", 0, agent, realm, GetUTCHours);
-            Intrinsics.DefineFunction(datePrototype, "getUTCMilliseconds", 0, agent, realm, GetUTCMilliseconds);
-            Intrinsics.DefineFunction(datePrototype, "getUTCMinutes", 0, agent, realm, GetUTCMinutes);
-            Intrinsics.DefineFunction(datePrototype, "getUTCMonth", 0, agent, realm, GetUTCMonth);
-            Intrinsics.DefineFunction(datePrototype, "getUTCSeconds", 0, agent, realm, GetUTCSeconds);
-            Intrinsics.DefineFunction(datePrototype, "setDate", 1, agent, realm, SetDate);
-            Intrinsics.DefineFunction(datePrototype, "setFullYear", 3, agent, realm, SetFullYear);
-            Intrinsics.DefineFunction(datePrototype, "setHours", 4, agent, realm, SetHours);
-            Intrinsics.DefineFunction(datePrototype, "setMilliseconds", 1, agent, realm, SetMilliseconds);
-            Intrinsics.DefineFunction(datePrototype, "setMinutes", 3, agent, realm, SetMinutes);
-            Intrinsics.DefineFunction(datePrototype, "setMonth", 2, agent, realm, SetMonth);
-            Intrinsics.DefineFunction(datePrototype, "setSeconds", 2, agent, realm, SetSeconds);
-            Intrinsics.DefineFunction(datePrototype, "setTime", 1, agent, realm, SetTime);
-            Intrinsics.DefineFunction(datePrototype, "setUTCDate", 1, agent, realm, SetUTCDate);
-            Intrinsics.DefineFunction(datePrototype, "setUTCFullYear", 3, agent, realm, SetUTCFullYear);
-            Intrinsics.DefineFunction(datePrototype, "setUTCHours", 4, agent, realm, SetUTCHours);
-            Intrinsics.DefineFunction(datePrototype, "setUTCMilliseconds", 1, agent, realm, SetUTCMilliseconds);
-            Intrinsics.DefineFunction(datePrototype, "setUTCMinutes", 3, agent, realm, SetUTCMinutes);
-            Intrinsics.DefineFunction(datePrototype, "setUTCMonth", 2, agent, realm, SetUTCMonth);
-            Intrinsics.DefineFunction(datePrototype, "setUTCSeconds", 2, agent, realm, SetUTCSeconds);
-            Intrinsics.DefineFunction(datePrototype, "toDateString", 0, agent, realm, ToDateString);
-            Intrinsics.DefineFunction(datePrototype, "toISOString", 0, agent, realm, ToISOString);
-            Intrinsics.DefineFunction(datePrototype, "toJSON", 1, agent, realm, ToJSON);
-            Intrinsics.DefineFunction(datePrototype, "toLocaleDateString", 0, agent, realm, ToLocaleDateString);
-            Intrinsics.DefineFunction(datePrototype, "toLocaleString", 0, agent, realm, ToLocaleString);
-            Intrinsics.DefineFunction(datePrototype, "toLocaleTimeString", 0, agent, realm, ToLocaleTimeString);
-            Intrinsics.DefineFunction(datePrototype, "toString", 0, agent, realm, ToString);
-            Intrinsics.DefineFunction(datePrototype, "toTimeString", 0, agent, realm, ToTimeString);
-            Intrinsics.DefineFunction(datePrototype, "toUTCString", 0, agent, realm, ToUTCString);
-            Intrinsics.DefineFunction(datePrototype, "valueOf", 0, agent, realm, ValueOf);
-            Intrinsics.DefineDataProperty(datePrototype, realm.SymbolToPrimitive, Intrinsics.CreateBuiltinFunction(agent, realm, ToPrimitive, functionPrototype, 1, "[Symbol.toPrimitive]"), false);
+            Intrinsics.DefineFunction(datePrototype, "getDate", 0, realm, GetDate);
+            Intrinsics.DefineFunction(datePrototype, "getFullYear", 0, realm, GetFullYear);
+            Intrinsics.DefineFunction(datePrototype, "getHours", 0, realm, GetHours);
+            Intrinsics.DefineFunction(datePrototype, "getMilliseconds", 0, realm, GetMilliseconds);
+            Intrinsics.DefineFunction(datePrototype, "getMinutes", 0, realm, GetMinutes);
+            Intrinsics.DefineFunction(datePrototype, "getMonth", 0, realm, GetMonth);
+            Intrinsics.DefineFunction(datePrototype, "getSeconds", 0, realm, GetSeconds);
+            Intrinsics.DefineFunction(datePrototype, "getTime", 0, realm, GetTime);
+            Intrinsics.DefineFunction(datePrototype, "getTimezoneOffset", 0, realm, GetTimezoneOffset);
+            Intrinsics.DefineFunction(datePrototype, "getUTCDate", 0, realm, GetUTCDate);
+            Intrinsics.DefineFunction(datePrototype, "getUTCDay", 0, realm, GetUTCDay);
+            Intrinsics.DefineFunction(datePrototype, "getUTCFullYear", 0, realm, GetUTCFullYear);
+            Intrinsics.DefineFunction(datePrototype, "getUTCHours", 0, realm, GetUTCHours);
+            Intrinsics.DefineFunction(datePrototype, "getUTCMilliseconds", 0, realm, GetUTCMilliseconds);
+            Intrinsics.DefineFunction(datePrototype, "getUTCMinutes", 0, realm, GetUTCMinutes);
+            Intrinsics.DefineFunction(datePrototype, "getUTCMonth", 0, realm, GetUTCMonth);
+            Intrinsics.DefineFunction(datePrototype, "getUTCSeconds", 0, realm, GetUTCSeconds);
+            Intrinsics.DefineFunction(datePrototype, "setDate", 1, realm, SetDate);
+            Intrinsics.DefineFunction(datePrototype, "setFullYear", 3, realm, SetFullYear);
+            Intrinsics.DefineFunction(datePrototype, "setHours", 4, realm, SetHours);
+            Intrinsics.DefineFunction(datePrototype, "setMilliseconds", 1, realm, SetMilliseconds);
+            Intrinsics.DefineFunction(datePrototype, "setMinutes", 3, realm, SetMinutes);
+            Intrinsics.DefineFunction(datePrototype, "setMonth", 2, realm, SetMonth);
+            Intrinsics.DefineFunction(datePrototype, "setSeconds", 2, realm, SetSeconds);
+            Intrinsics.DefineFunction(datePrototype, "setTime", 1, realm, SetTime);
+            Intrinsics.DefineFunction(datePrototype, "setUTCDate", 1, realm, SetUTCDate);
+            Intrinsics.DefineFunction(datePrototype, "setUTCFullYear", 3, realm, SetUTCFullYear);
+            Intrinsics.DefineFunction(datePrototype, "setUTCHours", 4, realm, SetUTCHours);
+            Intrinsics.DefineFunction(datePrototype, "setUTCMilliseconds", 1, realm, SetUTCMilliseconds);
+            Intrinsics.DefineFunction(datePrototype, "setUTCMinutes", 3, realm, SetUTCMinutes);
+            Intrinsics.DefineFunction(datePrototype, "setUTCMonth", 2, realm, SetUTCMonth);
+            Intrinsics.DefineFunction(datePrototype, "setUTCSeconds", 2, realm, SetUTCSeconds);
+            Intrinsics.DefineFunction(datePrototype, "toDateString", 0, realm, ToDateString);
+            Intrinsics.DefineFunction(datePrototype, "toISOString", 0, realm, ToISOString);
+            Intrinsics.DefineFunction(datePrototype, "toJSON", 1, realm, ToJSON);
+            Intrinsics.DefineFunction(datePrototype, "toLocaleDateString", 0, realm, ToLocaleDateString);
+            Intrinsics.DefineFunction(datePrototype, "toLocaleString", 0, realm, ToLocaleString);
+            Intrinsics.DefineFunction(datePrototype, "toLocaleTimeString", 0, realm, ToLocaleTimeString);
+            Intrinsics.DefineFunction(datePrototype, "toString", 0, realm, ToString);
+            Intrinsics.DefineFunction(datePrototype, "toTimeString", 0, realm, ToTimeString);
+            Intrinsics.DefineFunction(datePrototype, "toUTCString", 0, realm, ToUTCString);
+            Intrinsics.DefineFunction(datePrototype, "valueOf", 0, realm, ValueOf);
+            Intrinsics.DefineDataProperty(datePrototype, Symbol.ToPrimitive, Intrinsics.CreateBuiltinFunction(realm, ToPrimitive, functionPrototype, 1, "[Symbol.toPrimitive]"), false);
 
             Intrinsics.DefineDataProperty(date, "prototype", datePrototype, false, false, false);
 
@@ -142,7 +142,7 @@ namespace NetScript.Runtime.Builtins
                 }
             }
 
-            var obj = arg.Agent.OrdinaryCreateFromConstructor(arg.NewTarget, arg.Agent.Realm.DatePrototype, SpecialObjectType.Date);
+            var obj = arg.Agent.OrdinaryCreateFromConstructor(arg.NewTarget, arg.NewTarget.Realm.DatePrototype, SpecialObjectType.Date);
             obj.DateValue = timeValue;
             return obj;
         }
@@ -184,9 +184,16 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue GetFullYear(ScriptArguments arg)
+        private static ScriptValue GetFullYear([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-date.prototype.getfullyear
+            var time = ThisTimeValue(arg.Agent, arg.ThisValue);
+            if (double.IsNaN(time))
+            {
+                return double.NaN;
+            }
+
+            return ToDateTime(LocalTime(time)).Year;
         }
 
         private static ScriptValue GetHours(ScriptArguments arg)
@@ -204,9 +211,16 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue GetMonth(ScriptArguments arg)
+        private static ScriptValue GetMonth([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-date.prototype.getmonth
+            var time = ThisTimeValue(arg.Agent, arg.ThisValue);
+            if (double.IsNaN(time))
+            {
+                return double.NaN;
+            }
+
+            return ToDateTime(LocalTime(time)).Month - 1;
         }
 
         private static ScriptValue GetSeconds(ScriptArguments arg)
@@ -428,7 +442,7 @@ namespace NetScript.Runtime.Builtins
 
         private static double LocalTime(double time)
         {
-            return time + LocalTZA + DaylightSavingTA(time);
+            return time + LocalTZA + DaylightSavingTa(time);
         }
 
         private static double ThisTimeValue([NotNull] Agent agent, ScriptValue value)
@@ -506,10 +520,10 @@ namespace NetScript.Runtime.Builtins
         private static double UTC(double time)
         {
             //https://tc39.github.io/ecma262/#sec-utc-t
-            return time - LocalTZA - DaylightSavingTA(time - LocalTZA);
+            return time - LocalTZA - DaylightSavingTa(time - LocalTZA);
         }
 
-        private static double DaylightSavingTA(double d)
+        private static double DaylightSavingTa(double d)
         {
             var time = ToDateTime(d);
             return (TimeZoneInfo.Local.GetUtcOffset(time) - TimeZoneInfo.Local.BaseUtcOffset).TotalMilliseconds;

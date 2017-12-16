@@ -9,22 +9,22 @@ namespace NetScript.Runtime.Builtins
     internal static class FunctionIntrinsics
     {
         [NotNull]
-        public static ScriptObject Initialise([NotNull] Agent agent, [NotNull] Realm realm, [NotNull] ScriptObject functionPrototype)
+        public static ScriptFunctionObject Initialise([NotNull] Realm realm, [NotNull] ScriptObject functionPrototype)
         {
             //https://tc39.github.io/ecma262/#sec-function-objects
 
-            var function = Intrinsics.CreateBuiltinFunction(agent, realm, Constructor, functionPrototype, 1, "Function", ConstructorKind.Base);
+            var function = Intrinsics.CreateBuiltinFunction(realm, Constructor, functionPrototype, 1, "Function", ConstructorKind.Base);
             Intrinsics.DefineDataProperty(function, "prototype", functionPrototype, false, false, false);
 
             Intrinsics.DefineDataProperty(functionPrototype, "length", 0);
             Intrinsics.DefineDataProperty(functionPrototype, "name", "");
 
-            Intrinsics.DefineFunction(functionPrototype, "apply", 2, agent, realm, Apply);
-            Intrinsics.DefineFunction(functionPrototype, "bind", 1, agent, realm, Bind);
-            Intrinsics.DefineFunction(functionPrototype, "call", 1, agent, realm, Call);
+            Intrinsics.DefineFunction(functionPrototype, "apply", 2, realm, Apply);
+            Intrinsics.DefineFunction(functionPrototype, "bind", 1, realm, Bind);
+            Intrinsics.DefineFunction(functionPrototype, "call", 1, realm, Call);
             Intrinsics.DefineDataProperty(functionPrototype, "constructor", function);
-            Intrinsics.DefineFunction(functionPrototype, "toString", 0, agent, realm, ToString);
-            Intrinsics.DefineDataProperty(functionPrototype, realm.SymbolHasInstance, Intrinsics.CreateBuiltinFunction(agent, realm, HasInstance, functionPrototype, 1, "[Symbol.hasInstance]"), false, false, false);
+            Intrinsics.DefineFunction(functionPrototype, "toString", 0, realm, ToString);
+            Intrinsics.DefineDataProperty(functionPrototype, Symbol.HasInstance, Intrinsics.CreateBuiltinFunction(realm, HasInstance, functionPrototype, 1, "[Symbol.hasInstance]"), false, false, false);
 
             return function;
         }
@@ -35,9 +35,21 @@ namespace NetScript.Runtime.Builtins
             return CreateDynamicFunction(arg.Function, arg.NewTarget, FunctionKind.Normal, arg);
         }
 
-        private static ScriptValue Apply(ScriptArguments arg)
+        private static ScriptValue Apply([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-function.prototype.apply
+            if (!Agent.IsCallable(arg.ThisValue))
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            if (arg[1] == ScriptValue.Undefined || arg[1] == ScriptValue.Null)
+            {
+                return arg.Agent.Call((ScriptObject)arg.ThisValue, arg[0]);
+            }
+
+            var argList = arg.Agent.CreateListFromArrayLike(arg[1]);
+            return arg.Agent.Call((ScriptObject)arg.ThisValue, arg[0], argList);
         }
 
         private static ScriptValue Bind(ScriptArguments arg)
@@ -67,7 +79,7 @@ namespace NetScript.Runtime.Builtins
         {
             //https://tc39.github.io/ecma262/#sec-function.prototype.tostring
             var func = arg.ThisValue;
-            if (func.IsObject && (ScriptObject)func is BoundFunctionObject)
+            if (func.IsObject && (ScriptObject)func is ScriptBoundFunctionObject)
             {
                 //Return an implementation-dependent String source code representation of func. The representation must conform to the rules below. It is implementation-dependent whether the representation includes bound function information or information about the target function.
                 throw new NotImplementedException();
@@ -91,7 +103,7 @@ namespace NetScript.Runtime.Builtins
         }
 
 
-        private static ScriptValue CreateDynamicFunction([NotNull] ScriptFunctionObject constructor, ScriptObject newTarget, FunctionKind kind, [NotNull] ScriptArguments args)
+        private static ScriptValue CreateDynamicFunction([NotNull] ScriptObject constructor, ScriptObject newTarget, FunctionKind kind, [NotNull] ScriptArguments args)
         {
             //https://tc39.github.io/ecma262/#sec-createdynamicfunction
 
@@ -110,15 +122,15 @@ namespace NetScript.Runtime.Builtins
             {
                 case FunctionKind.Normal:
                     startFunction = "function anonymous(";
-                    fallbackPrototype = args.Agent.Realm.FunctionPrototype;
+                    fallbackPrototype = newTarget.Realm.FunctionPrototype;
                     break;
                 case FunctionKind.Generator:
                     startFunction = "function *anonymous(";
-                    fallbackPrototype = args.Agent.Realm.Generator;
+                    fallbackPrototype = newTarget.Realm.Generator;
                     break;
                 case FunctionKind.Async:
                     startFunction = "async function anonymous(";
-                    fallbackPrototype = args.Agent.Realm.AsyncFunctionPrototype;
+                    fallbackPrototype = newTarget.Realm.AsyncFunctionPrototype;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
@@ -170,7 +182,7 @@ namespace NetScript.Runtime.Builtins
             //    If BoundNames of parameters contains any duplicate elements, throw a SyntaxError exception.
 
             var prototype = Agent.GetPrototypeFromConstructor(newTarget, fallbackPrototype);
-            var function = args.Agent.FunctionAllocate(prototype, script.Strict, kind);
+            var function = Agent.FunctionAllocate(prototype, script.Strict, kind);
             args.Agent.FunctionInitialise(function, FunctionKind.Normal, functionNode.Parameters, functionNode.Body, function.Realm.GlobalEnvironment);
 
             if (kind == FunctionKind.Generator)

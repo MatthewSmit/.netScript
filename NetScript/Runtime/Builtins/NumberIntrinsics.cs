@@ -7,9 +7,9 @@ namespace NetScript.Runtime.Builtins
 {
     internal static class NumberIntrinsics
     {
-        public static (ScriptObject number, ScriptObject numberPrototype) Initialise([NotNull] Agent agent, [NotNull] Realm realm, [NotNull] ScriptObject objectPrototype, [NotNull] ScriptObject functionPrototype)
+        public static (ScriptFunctionObject number, ScriptObject numberPrototype) Initialise([NotNull] Agent agent, [NotNull] Realm realm, [NotNull] ScriptObject objectPrototype, [NotNull] ScriptObject functionPrototype)
         {
-            var number = Intrinsics.CreateBuiltinFunction(agent, realm, Number, functionPrototype, 1, "Number", ConstructorKind.Base);
+            var number = Intrinsics.CreateBuiltinFunction(realm, Number, functionPrototype, 1, "Number", ConstructorKind.Base);
 
             Intrinsics.DefineDataProperty(number, "EPSILON", 2.2204460492503130808472633361816E-16, false, false, false);
             Intrinsics.DefineDataProperty(number, "MAX_SAFE_INTEGER", 9007199254740991, false, false, false);
@@ -20,23 +20,23 @@ namespace NetScript.Runtime.Builtins
             Intrinsics.DefineDataProperty(number, "NEGATIVE_INFINITY", double.NegativeInfinity, false, false, false);
             Intrinsics.DefineDataProperty(number, "POSITIVE_INFINITY", double.PositiveInfinity, false, false, false);
 
-            Intrinsics.DefineFunction(number, "isFinite", 1, agent, realm, IsFinite);
-            Intrinsics.DefineFunction(number, "isInteger", 1, agent, realm, IsInteger);
-            Intrinsics.DefineFunction(number, "isNaN", 1, agent, realm, IsNaN);
-            Intrinsics.DefineFunction(number, "isSafeInteger", 1, agent, realm, IsSafeInteger);
-            Intrinsics.DefineFunction(number, "parseFloat", 1, agent, realm, ParseFloat);
-            Intrinsics.DefineFunction(number, "parseInt", 2, agent, realm, ParseInt);
+            Intrinsics.DefineFunction(number, "isFinite", 1, realm, IsFinite);
+            Intrinsics.DefineFunction(number, "isInteger", 1, realm, IsInteger);
+            Intrinsics.DefineFunction(number, "isNaN", 1, realm, IsNaN);
+            Intrinsics.DefineFunction(number, "isSafeInteger", 1, realm, IsSafeInteger);
+            Intrinsics.DefineFunction(number, "parseFloat", 1, realm, ParseFloat);
+            Intrinsics.DefineFunction(number, "parseInt", 2, realm, ParseInt);
 
             var numberPrototype = agent.ObjectCreate(objectPrototype, SpecialObjectType.Number);
 
             Intrinsics.DefineDataProperty(numberPrototype, "constructor", number);
 
-            Intrinsics.DefineFunction(numberPrototype, "toExponential", 1, agent, realm, ToExponential);
-            Intrinsics.DefineFunction(numberPrototype, "toFixed", 1, agent, realm, ToFixed);
-            Intrinsics.DefineFunction(numberPrototype, "toLocaleString", 0, agent, realm, ToLocaleString);
-            Intrinsics.DefineFunction(numberPrototype, "toPrecision", 1, agent, realm, ToPrecision);
-            Intrinsics.DefineFunction(numberPrototype, "toString", 1, agent, realm, ToString);
-            Intrinsics.DefineFunction(numberPrototype, "valueOf", 0, agent, realm, ValueOf);
+            Intrinsics.DefineFunction(numberPrototype, "toExponential", 1, realm, ToExponential);
+            Intrinsics.DefineFunction(numberPrototype, "toFixed", 1, realm, ToFixed);
+            Intrinsics.DefineFunction(numberPrototype, "toLocaleString", 0, realm, ToLocaleString);
+            Intrinsics.DefineFunction(numberPrototype, "toPrecision", 1, realm, ToPrecision);
+            Intrinsics.DefineFunction(numberPrototype, "toString", 1, realm, ToString);
+            Intrinsics.DefineFunction(numberPrototype, "valueOf", 0, realm, ValueOf);
 
             Intrinsics.DefineDataProperty(number, "prototype", numberPrototype, false, false, false);
 
@@ -52,7 +52,7 @@ namespace NetScript.Runtime.Builtins
                 return number;
             }
 
-            var obj = arg.Agent.OrdinaryCreateFromConstructor(arg.NewTarget, arg.Agent.Realm.NumberPrototype, SpecialObjectType.Number);
+            var obj = arg.Agent.OrdinaryCreateFromConstructor(arg.NewTarget, arg.NewTarget.Realm.NumberPrototype, SpecialObjectType.Number);
             obj.NumberValue = number;
             return obj;
         }
@@ -152,8 +152,52 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue ToPrecision(ScriptArguments arg)
+        private static ScriptValue ToPrecision([NotNull] ScriptArguments arg)
         {
+            //https://tc39.github.io/ecma262/#sec-number.prototype.toprecision
+            var x = ThisNumberValue(arg.Agent, arg.ThisValue);
+            if (arg[0] == ScriptValue.Undefined)
+            {
+                return arg.Agent.ToString(x);
+            }
+
+            var precision = arg.Agent.ToInteger(arg[0]);
+            if (double.IsNaN(x))
+            {
+                return "NaN";
+            }
+
+            //Let s be the empty String.
+            //If x < 0, then
+            //    Let s be the code unit 0x002D (HYPHEN-MINUS).
+            //    Let x be -x.
+            //If x = +∞, then
+            //    Return the string-concatenation of s and "Infinity".
+            //If p < 1 or p > 100, throw a RangeError exception.
+            //If x = 0, then
+            //    Let m be the String value consisting of p occurrences of the code unit 0x0030 (DIGIT ZERO).
+            //    Let e be 0.
+            //Else x ≠ 0,
+            //    Let e and n be integers such that 10p-1 ≤ n < 10p and for which the exact mathematical value of n × 10e-p+1 - x is as close to zero as possible. If there are two such sets of e and n, pick the e and n for which n × 10e-p+1 is larger.
+            //    Let m be the String value consisting of the digits of the decimal representation of n (in order, with no leading zeroes).
+            //    If e < -6 or e ≥ p, then
+            //        Assert: e ≠ 0.
+            //        If p ≠ 1, then
+            //            Let a be the first element of m, and let b be the remaining p-1 elements of m.
+            //            Let m be the string-concatenation of a, ".", and b.
+            //        If e > 0, then
+            //            Let c be the code unit 0x002B (PLUS SIGN).
+            //        Else e < 0,
+            //            Let c be the code unit 0x002D (HYPHEN-MINUS).
+            //            Let e be -e.
+            //        Let d be the String value consisting of the digits of the decimal representation of e (in order, with no leading zeroes).
+            //        Return the string-concatenation of s, m, the code unit 0x0065 (LATIN SMALL LETTER E), c, and d.
+            //If e = p-1, return the string-concatenation of s and m.
+            //If e ≥ 0, then
+            //    Let m be the string-concatenation of the first e+1 elements of m, the code unit 0x002E (FULL STOP), and the remaining p- (e+1) elements of m.
+            //Else e < 0,
+            //    Let m be the string-concatenation of the code unit 0x0030 (DIGIT ZERO), the code unit 0x002E (FULL STOP), -(e+1) occurrences of the code unit 0x0030 (DIGIT ZERO), and the String m.
+            //Return the string-concatenation of s and m.
             throw new NotImplementedException();
         }
 

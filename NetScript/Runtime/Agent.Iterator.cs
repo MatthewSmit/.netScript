@@ -15,7 +15,7 @@ namespace NetScript.Runtime
 
             if (method == null)
             {
-                method = GetMethod(obj, Realm.SymbolIterator);
+                method = GetMethod(obj, Symbol.Iterator);
             }
 
             var iterator = Call(method, obj);

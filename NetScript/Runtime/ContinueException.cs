@@ -1,20 +1,14 @@
-﻿using System;
-using JetBrains.Annotations;
-
-namespace NetScript.Runtime
+﻿namespace NetScript.Runtime
 {
-    internal sealed class ContinueException : Exception
+    internal sealed class ContinueException : ECMARuntimeException
     {
         public ContinueException()
         {
         }
 
-        public ContinueException(string target)
+        public ContinueException(string target) :
+            base(target)
         {
-            Target = target;
         }
-
-        [CanBeNull]
-        public string Target { get; }
     }
 }

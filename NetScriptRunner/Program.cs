@@ -13,7 +13,7 @@ namespace NetScriptRunner
 //            TestCompat();
 
             BaseTest.
-                RunTest("language/statements/with/S12.10_A1.5_T1.js");
+                RunTest("built-ins/Object/S15.2.2.1_A2_T5.js");
         }
 
 //        private static void TestCompat()
@@ -119,6 +119,12 @@ namespace NetScriptRunner
                 return agent.RunFile(file);
             });
 
+            agent.Global["print"] = agent.CreateUserFunction(arguments =>
+            {
+                Console.WriteLine(arguments[0]);
+                return ScriptValue.Undefined;
+            });
+
             var performance = agent.Global["performance"] = agent.CreateObject();
             performance["now"] = agent.CreateUserFunction(arguments => { throw new NotImplementedException(); });
 
@@ -134,8 +140,7 @@ namespace NetScriptRunner
                 Console.WriteLine(arguments[0].ToString());
                 return ScriptValue.Undefined;
             });
-            agent.QueueCode(@"function foo({y: x = 42}) {}; foo({});");
-            agent.RunAllJobs();
+            agent.RunCode(@"1.797693134862315808e+308 === +Infinity");
         }
     }
 }

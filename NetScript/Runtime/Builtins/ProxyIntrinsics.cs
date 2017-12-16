@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Diagnostics;
+using JetBrains.Annotations;
 using NetScript.Runtime.Objects;
 
 namespace NetScript.Runtime.Builtins
@@ -6,10 +7,10 @@ namespace NetScript.Runtime.Builtins
     internal static class ProxyIntrinsics
     {
         [NotNull]
-        public static ScriptObject Initialise([NotNull] Agent agent, [NotNull] Realm realm)
+        public static ScriptFunctionObject Initialise([NotNull] Realm realm)
         {
-            var proxy = Intrinsics.CreateBuiltinFunction(agent, realm, Proxy, realm.FunctionPrototype, 2, "Proxy", ConstructorKind.Base);
-            Intrinsics.DefineFunction(proxy, "revocable", 2, agent, realm, Revocable);
+            var proxy = Intrinsics.CreateBuiltinFunction(realm, Proxy, realm.FunctionPrototype, 2, "Proxy", ConstructorKind.Base);
+            Intrinsics.DefineFunction(proxy, "revocable", 2, realm, Revocable);
             return proxy;
         }
 
@@ -24,9 +25,36 @@ namespace NetScript.Runtime.Builtins
             return ProxyCreate(arg.Agent, arg[0], arg[1]);
         }
 
-        private static ScriptValue Revocable(ScriptArguments arg)
+        private static ScriptValue Revocable([NotNull] ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-proxy.revocable
+            var proxy = ProxyCreate(arg.Agent, arg[0], arg[1]);
+
+            var revoker = new ScriptFunctionObject(arg.Function.Realm, arg.Function.Realm.FunctionPrototype, true, ProxyRevocation, SpecialObjectType.RevocableProxy);
+            revoker.DefineOwnProperty("length", new PropertyDescriptor(0, false, false, true));
+            revoker.RevocableProxy = proxy;
+
+            var result = arg.Agent.ObjectCreate(arg.Function.Realm.ObjectPrototype);
+            result.CreateDataProperty("proxy", proxy);
+            result.CreateDataProperty("revoke", revoker);
+            return result;
+        }
+
+        private static ScriptValue ProxyRevocation([NotNull] ScriptArguments arg)
+        {
+            //https://tc39.github.io/ecma262/#sec-proxy-revocation-functions
+            var proxy = arg.Function.RevocableProxy;
+            if (proxy == null)
+            {
+                return ScriptValue.Undefined;
+            }
+
+            arg.Function.RevocableProxy = null;
+            Debug.Assert(proxy is ScriptProxyObject);
+            var proxyObject = (ScriptProxyObject)proxy;
+            proxyObject.ProxyTarget = null;
+            proxyObject.ProxyHandler = null;
+            return ScriptValue.Undefined;
         }
 
         [NotNull]
@@ -53,7 +81,7 @@ namespace NetScript.Runtime.Builtins
                 throw agent.CreateTypeError();
             }
 
-            return new ScriptProxyObject(agent, targetObject, handlerObject);
+            return new ScriptProxyObject(targetObject.Realm, targetObject, handlerObject);
         }
     }
 }

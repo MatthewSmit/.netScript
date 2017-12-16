@@ -7,9 +7,9 @@ namespace NetScript.Runtime.Builtins
     internal static class Intrinsics
     {
         [NotNull]
-        public static ScriptFunctionObject CreateBuiltinFunction([NotNull] Agent agent, [NotNull] Realm realm, [NotNull] Func<ScriptArguments, ScriptValue> callback, ScriptObject prototype, int length, string name, ConstructorKind constructorKind = ConstructorKind.None)
+        public static ScriptFunctionObject CreateBuiltinFunction([NotNull] Realm realm, [NotNull] Func<ScriptArguments, ScriptValue> callback, ScriptObject prototype, int length, string name, ConstructorKind constructorKind = ConstructorKind.None)
         {
-            var function = new ScriptFunctionObject(agent, prototype, true, realm, callback, constructorKind);
+            var function = new ScriptFunctionObject(realm, prototype, true, callback, constructorKind);
             function.DefineOwnProperty("length", new PropertyDescriptor(length, false, false, true));
             function.DefineOwnProperty("name", new PropertyDescriptor(name, false, false, true));
             return function;
@@ -26,9 +26,9 @@ namespace NetScript.Runtime.Builtins
         }
 
         [NotNull]
-        public static ScriptFunctionObject DefineFunction([NotNull] ScriptObject scriptObject, string name, int length, [NotNull] Agent agent, [NotNull] Realm realm, [NotNull] Func<ScriptArguments, ScriptValue> callback)
+        public static ScriptFunctionObject DefineFunction([NotNull] ScriptObject scriptObject, string name, int length, [NotNull] Realm realm, [NotNull] Func<ScriptArguments, ScriptValue> callback)
         {
-            var function = CreateBuiltinFunction(agent, realm, callback, realm.FunctionPrototype, length, name);
+            var function = CreateBuiltinFunction(realm, callback, realm.FunctionPrototype, length, name);
             DefineDataProperty(scriptObject, name, function);
             return function;
         }

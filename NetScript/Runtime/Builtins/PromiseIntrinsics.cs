@@ -5,26 +5,26 @@ namespace NetScript.Runtime.Builtins
 {
     internal static class PromiseIntrinsics
     {
-        public static (ScriptObject Promise,
+        public static (ScriptFunctionObject Promise,
             ScriptObject PromisePrototype,
-            ScriptObject PromiseProtoThen,
-            ScriptObject PromiseAll,
-            ScriptObject PromiseReject,
-            ScriptObject PromiseResolve) Initialise([NotNull] Agent agent, [NotNull] Realm realm)
+            ScriptFunctionObject PromiseProtoThen,
+            ScriptFunctionObject PromiseAll,
+            ScriptFunctionObject PromiseReject,
+            ScriptFunctionObject PromiseResolve) Initialise([NotNull] Agent agent, [NotNull] Realm realm)
         {
-            var promise = Intrinsics.CreateBuiltinFunction(agent, realm, Promise, realm.FunctionPrototype, 1, "Promise", ConstructorKind.Base);
-            var promiseAll = Intrinsics.DefineFunction(promise, "all", 1, agent, realm, All);
-            Intrinsics.DefineFunction(promise, "race", 1, agent, realm, Race);
-            var promiseReject = Intrinsics.DefineFunction(promise, "reject", 1, agent, realm, Reject);
-            var promiseResolve = Intrinsics.DefineFunction(promise, "resolve", 1, agent, realm, Resolve);
-            Intrinsics.DefineAccessorProperty(promise, realm.SymbolSpecies, Intrinsics.CreateBuiltinFunction(agent, realm, GetSpecies, realm.FunctionPrototype, 0, "get [Symbol.species]"), null);
+            var promise = Intrinsics.CreateBuiltinFunction(realm, Promise, realm.FunctionPrototype, 1, "Promise", ConstructorKind.Base);
+            var promiseAll = Intrinsics.DefineFunction(promise, "all", 1, realm, All);
+            Intrinsics.DefineFunction(promise, "race", 1, realm, Race);
+            var promiseReject = Intrinsics.DefineFunction(promise, "reject", 1, realm, Reject);
+            var promiseResolve = Intrinsics.DefineFunction(promise, "resolve", 1, realm, Resolve);
+            Intrinsics.DefineAccessorProperty(promise, Symbol.Species, Intrinsics.CreateBuiltinFunction(realm, GetSpecies, realm.FunctionPrototype, 0, "get [Symbol.species]"), null);
 
             var promisePrototype = agent.ObjectCreate(realm.ObjectPrototype);
-            Intrinsics.DefineFunction(promisePrototype, "catch", 1, agent, realm, Catch);
-            var promiseProtoThen = Intrinsics.DefineFunction(promisePrototype, "then", 2, agent, realm, Then);
+            Intrinsics.DefineFunction(promisePrototype, "catch", 1, realm, Catch);
+            var promiseProtoThen = Intrinsics.DefineFunction(promisePrototype, "then", 2, realm, Then);
 
             Intrinsics.DefineDataProperty(promisePrototype, "constructor", promise);
-            Intrinsics.DefineDataProperty(promisePrototype, realm.SymbolToStringTag, "Promise", false);
+            Intrinsics.DefineDataProperty(promisePrototype, Symbol.ToStringTag, "Promise", false);
 
             Intrinsics.DefineDataProperty(promise, "prototype", promisePrototype, false, false, false);
 

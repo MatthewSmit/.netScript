@@ -6,6 +6,7 @@ using AcornSharp;
 using AcornSharp.Node;
 using JetBrains.Annotations;
 using NetScript.Runtime;
+using NetScript.Runtime.Builtins;
 using NetScript.Runtime.Objects;
 
 namespace NetScript.Walkers
@@ -14,12 +15,25 @@ namespace NetScript.Walkers
     {
         public static ValueReference Walk([NotNull] IEnumerable<BaseNode> statementList, [NotNull] ExecutionContext context)
         {
-            var result = (ValueReference)ScriptValue.Undefined;
-            foreach (var statement in statementList)
+            ValueReference result = default;
+            try
             {
-                var tmp = Walk(statement, context);
-                if (tmp.IsValue)
-                    result = tmp;
+                foreach (var statement in statementList)
+                {
+                    var tmp = Walk(statement, context);
+                    if (tmp.IsValue)
+                    {
+                        result = tmp;
+                    }
+                }
+            }
+            catch (ECMARuntimeException e)
+            {
+                if (result.IsValue)
+                {
+                    e.Value = result.Value;
+                }
+                throw;
             }
             return result;
         }
@@ -92,7 +106,7 @@ namespace NetScript.Walkers
                 case SwitchStatementNode switchStatement:
                     throw new NotImplementedException();
                 case WhileStatementNode whileStatement:
-                    throw new NotImplementedException();
+                    return Walk(whileStatement, context, labelSet);
                 default:
                     return Walk(baseNode, context);
             }
@@ -102,7 +116,9 @@ namespace NetScript.Walkers
         {
             //https://tc39.github.io/ecma262/#sec-block-runtime-semantics-evaluation
             if (blockStatement.Body.Count == 0)
+            {
                 return default;
+            }
 
             var agent = context.Realm.Agent;
             var oldEnvironment = context.LexicalEnvironment;
@@ -183,6 +199,11 @@ namespace NetScript.Walkers
                         throw;
                     }
 
+                    if (e.Value.HasValue)
+                    {
+                        value = e.Value.Value;
+                    }
+
                     return value;
                 }
                 catch (ContinueException e)
@@ -191,6 +212,11 @@ namespace NetScript.Walkers
                     if (e.Target != null && (labelSet == null || !labelSet.Contains(e.Target)))
                     {
                         throw;
+                    }
+
+                    if (e.Value.HasValue)
+                    {
+                        value = e.Value.Value;
                     }
                 }
 
@@ -254,18 +280,7 @@ namespace NetScript.Walkers
 
         private static ValueReference Walk([NotNull] FunctionDeclarationNode functionDeclaration, [NotNull] ExecutionContext context)
         {
-            if (functionDeclaration.Async)
-            {
-                throw new NotImplementedException();
-            }
-            else if (functionDeclaration.Generator)
-            {
-                throw new NotImplementedException();
-            }
-            else
-            {
-                return default;
-            }
+            return default;
         }
 
         private static ValueReference Walk([NotNull] IfStatementNode ifStatement, [NotNull] ExecutionContext context)
@@ -277,17 +292,39 @@ namespace NetScript.Walkers
             var result = agent.GetValue(expressionReference);
 
             var expressionValue = Agent.RealToBoolean(result);
-            if (expressionValue)
-            {
-                return Walk(ifStatement.Consequent, context);
-            }
 
-            if (ifStatement.Alternate == null)
+            try
             {
-                return default;
-            }
+                ValueReference ifResult;
+                if (expressionValue)
+                {
+                    ifResult = Walk(ifStatement.Consequent, context);
+                }
+                else if (ifStatement.Alternate == null)
+                {
+                    ifResult = ScriptValue.Undefined;
+                }
+                else
+                {
+                    ifResult = Walk(ifStatement.Alternate, context);
+                }
 
-            return Walk(ifStatement.Alternate, context);
+                if (ifResult.IsValue)
+                {
+                    return ifResult.Value;
+                }
+
+                return ScriptValue.Undefined;
+            }
+            catch (ECMARuntimeException e)
+            {
+                if (!e.Value.HasValue)
+                {
+                    e.Value = ScriptValue.Undefined;
+                }
+
+                throw;
+            }
         }
 
         private static ValueReference Walk([NotNull] LabelledStatementNode labelledStatement, [NotNull] ExecutionContext context, [CanBeNull] ICollection<string> labelSet = null)
@@ -313,7 +350,9 @@ namespace NetScript.Walkers
             catch (BreakException e)
             {
                 if (e.Target == labelledStatement.Label.Name)
+                {
                     return default;
+                }
 
                 throw;
             }
@@ -434,7 +473,10 @@ namespace NetScript.Walkers
                 {
                     return CatchClauseEvaluation(tryStatement.Handler, e.Value, context);
                 }
-                else throw;
+                else
+                {
+                    throw;
+                }
             }
             finally
             {
@@ -512,7 +554,9 @@ namespace NetScript.Walkers
                     }
                     else
                     {
-                        throw new NotImplementedException();
+                        var rhs = Walk(variableDeclarator.Init, context);
+                        var value = agent.GetValue(rhs);
+                        BindingInitialisation(agent, (ExpressionNode)variableDeclarator.Id, value, context.LexicalEnvironment);
                     }
                 }
             }
@@ -550,6 +594,11 @@ namespace NetScript.Walkers
                         throw;
                     }
 
+                    if (e.Value.HasValue)
+                    {
+                        value = e.Value.Value;
+                    }
+
                     return value;
                 }
                 catch (ContinueException e)
@@ -558,6 +607,11 @@ namespace NetScript.Walkers
                     if (e.Target != null && (labelSet == null || !labelSet.Contains(e.Target)))
                     {
                         throw;
+                    }
+
+                    if (e.Value.HasValue)
+                    {
+                        value = e.Value.Value;
                     }
                 }
             }
@@ -605,7 +659,7 @@ namespace NetScript.Walkers
                 case IdentifierNode identifier:
                     return Walk(identifier, context);
                 case LiteralNode literal:
-                    return Walk(literal);
+                    return Walk(literal, context);
                 case LogicalExpressionNode logicalExpression:
                     return Walk(logicalExpression, context);
                 case MemberExpressionNode memberExpression:
@@ -633,7 +687,7 @@ namespace NetScript.Walkers
         {
             //https://tc39.github.io/ecma262/#sec-array-initializer-runtime-semantics-evaluation
             var agent = context.Realm.Agent;
-            var array = ArrayCreate(agent, 0);
+            var array = ArrayIntrinsics.ArrayCreate(agent, 0);
 
             var length = 0u;
             foreach (var element in arrayExpression.Elements)
@@ -917,8 +971,9 @@ namespace NetScript.Walkers
             return context.Realm.Agent.ResolveBinding(identifier.Name);
         }
 
-        private static ScriptValue Walk([NotNull] LiteralNode literal)
+        private static ScriptValue Walk([NotNull] LiteralNode literal, [NotNull] ExecutionContext context)
         {
+            //https://tc39.github.io/ecma262/#sec-literals-runtime-semantics-evaluation
             switch (literal.Value.Type)
             {
                 case LiteralValue.LiteralType.Null:
@@ -928,9 +983,9 @@ namespace NetScript.Walkers
                 case LiteralValue.LiteralType.Double:
                     return literal.Value.AsDouble;
                 case LiteralValue.LiteralType.String:
-                    return (ScriptValue)literal.Value.AsString;
+                    return literal.Value.AsString;
                 case LiteralValue.LiteralType.Regex:
-                    throw new NotImplementedException();
+                    return RegExpIntrinsics.RegExpCreate(context.Realm.Agent, literal.Value.AsRegex.Pattern, literal.Value.AsRegex.Flags);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -1169,34 +1224,97 @@ namespace NetScript.Walkers
             return list;
         }
 
-        [NotNull]
-        private static ScriptObject ArrayCreate([NotNull] Agent agent, long length, ScriptObject prototype = null)
-        {
-            //https://tc39.github.io/ecma262/#sec-arraycreate
-            Debug.Assert(length >= 0);
-            if (length >= uint.MaxValue)
-            {
-                throw agent.CreateRangeError();
-            }
-
-            if (prototype == null)
-            {
-                prototype = agent.RunningExecutionContext.Realm.ArrayPrototype;
-            }
-
-            return new ScriptArrayObject(agent, prototype, true, (uint)length);
-        }
-
         private static void BindingInitialisation([NotNull] Agent agent, [NotNull] ExpressionNode binding, ScriptValue value, LexicalEnvironment environment)
         {
-            //https://tc39.github.io/ecma262/#sec-identifiers-runtime-semantics-bindinginitialization
             if (binding is IdentifierNode identifier)
             {
+                //https://tc39.github.io/ecma262/#sec-identifiers-runtime-semantics-bindinginitialization
                 InitialiseBoundName(agent, identifier.Name, value, environment);
+            }
+            else if (binding is ArrayPatternNode arrayPattern)
+            {
+                //https://tc39.github.io/ecma262/#sec-destructuring-binding-patterns-runtime-semantics-bindinginitialization
+                var iteratorRecord = agent.GetIterator(value);
+                try
+                {
+                    IteratorBindingInitialisation(agent, arrayPattern.Elements, ref iteratorRecord, environment);
+                }
+                catch (ScriptException)
+                {
+                    if (!iteratorRecord.Done)
+                    {
+                        agent.IteratorClose(iteratorRecord);
+                    }
+                    throw;
+                }
+                if (!iteratorRecord.Done)
+                {
+                    agent.IteratorClose(iteratorRecord);
+                }
+            }
+            else if (binding is ObjectPatternNode objectPattern)
+            {
+                //https://tc39.github.io/ecma262/#sec-destructuring-binding-patterns-runtime-semantics-bindinginitialization
+                agent.RequireObjectCoercible(value);
+                foreach (var property in objectPattern.Properties)
+                {
+                    var name = property.Computed ? agent.GetValue(Walk(property.Key, agent.RunningExecutionContext)) : ((IdentifierNode)property.Key).Name;
+                    if (((AssignmentPatternNode)property.Value).Left is IdentifierNode)
+                    {
+                        KeyedBindingInitialisationSingle(agent, (AssignmentPatternNode)property.Value, value, environment, name);
+                    }
+                    else
+                    {
+                        KeyedBindingInitialisationBinding(agent, (AssignmentPatternNode)property.Value, value, environment, name);
+                    }
+                }
             }
             else
             {
                 throw new NotImplementedException();
+            }
+        }
+
+        private static void IteratorBindingInitialisation([NotNull] Agent agent, [NotNull] IEnumerable<ExpressionNode> elements, ref (ScriptObject Iterator, ScriptFunctionObject NextMethod, bool Done) iteratorRecord, LexicalEnvironment environment)
+        {
+            //https://tc39.github.io/ecma262/#sec-destructuring-binding-patterns-runtime-semantics-iteratorbindinginitialization
+            foreach (var element in elements)
+            {
+                if (element == null)
+                {
+                    throw new NotImplementedException();
+                }
+                else if (element is RestElementNode restElement)
+                {
+                    IteratorBindingInitialisationRest(agent, restElement.Argument, ref iteratorRecord, environment);
+                }
+                else if (element is IdentifierNode identifier)
+                {
+                    IteratorBindingInitialisationSingleName(agent, identifier.Name, null, ref iteratorRecord, environment);
+                }
+                else if (element is AssignmentPatternNode assignmentPattern)
+                {
+                    if (assignmentPattern.Left is IdentifierNode assignmentIdentifier)
+                    {
+                        IteratorBindingInitialisationSingleName(agent, assignmentIdentifier.Name, assignmentPattern.Right, ref iteratorRecord, environment);
+                    }
+                    else
+                    {
+                        IteratorBindingInitialisationBindingPattern(agent, assignmentPattern.Left, assignmentPattern.Right, ref iteratorRecord, environment);
+                    }
+                }
+                else if (element is ArrayPatternNode arrayPattern)
+                {
+                    IteratorBindingInitialisationBindingPattern(agent, arrayPattern, null, ref iteratorRecord, environment);
+                }
+                else if (element is ObjectPatternNode objectPattern)
+                {
+                    IteratorBindingInitialisationBindingPattern(agent, objectPattern, null, ref iteratorRecord, environment);
+                }
+                else
+                {
+                    throw new InvalidOperationException();
+                }
             }
         }
 
@@ -1307,19 +1425,44 @@ namespace NetScript.Walkers
             }
             else
             {
-                //Set the running execution context's LexicalEnvironment to classScope.
-                //Let superclass be the result of evaluating ClassHeritage.
-                //Set the running execution context's LexicalEnvironment to lex.
-                //ReturnIfAbrupt(superclass).
-                //If superclass is null, then
-                //    Let protoParent be null.
-                //    Let constructorParent be the intrinsic object %FunctionPrototype%.
-                //Else if IsConstructor(superclass) is false, throw a TypeError exception.
-                //Else,
-                //    Let protoParent be ? Get(superclass, "prototype").
-                //    If Type(protoParent) is neither Object nor Null, throw a TypeError exception.
-                //    Let constructorParent be superclass.
-                throw new NotImplementedException();
+                ScriptValue superClass;
+                try
+                {
+                    context.LexicalEnvironment = classScope;
+                    superClass = agent.GetValue(Walk(classHeritage, context));
+                }
+                finally
+                {
+                    context.LexicalEnvironment = lexicalEnvironment;
+                }
+
+                if (superClass == ScriptValue.Null)
+                {
+                    prototypeParent = null;
+                    constructorParent = agent.Realm.FunctionPrototype;
+                }
+                else if (!Agent.IsConstructor(superClass))
+                {
+                    throw agent.CreateTypeError();
+                }
+                else
+                {
+                    var tmp = ((ScriptObject)superClass).Get("prototype");
+                    if (tmp == ScriptValue.Null)
+                    {
+                        prototypeParent = null;
+                    }
+                    else if (tmp.IsObject)
+                    {
+                        prototypeParent = (ScriptObject)tmp;
+                    }
+                    else
+                    {
+                        throw agent.CreateTypeError();
+                    }
+
+                    constructorParent = (ScriptObject)superClass;
+                }
             }
 
             var prototype = agent.ObjectCreate(prototypeParent);
@@ -1329,11 +1472,27 @@ namespace NetScript.Walkers
                 if (classHeritage != null)
                 {
                     //Set constructor to the result of parsing the source text
-                    //
                     //constructor(... args){ super (...args);}
-                    //
                     //using the syntactic grammar with the goal symbol MethodDefinition[~Yield, ~Await].
-                    throw new NotImplementedException();
+                    constructor = new MethodDefinitionNode(default,
+                        PropertyKind.Constructor,
+                        false,
+                        new IdentifierNode(default, "constructor"),
+                        new FunctionExpressionNode(default,
+                            false,
+                            false,
+                            null,
+                            new ExpressionNode[]
+                            {
+                                new RestElementNode(default, new IdentifierNode(default, "args"))
+                            },
+                            new BlockStatementNode(default, new BaseNode[]
+                            {
+                                new ExpressionStatementNode(default, new CallExpressionNode(default, new SuperNode(default), new ExpressionNode[]
+                                {
+                                    new SpreadElementNode(default, new IdentifierNode(default, "args"))
+                                }))
+                            })));
                 }
                 else
                 {
@@ -1595,7 +1754,9 @@ namespace NetScript.Walkers
                     var testReference = Walk(test, context);
                     var textValue = agent.GetValue(testReference);
                     if (!Agent.RealToBoolean(textValue))
+                    {
                         return value;
+                    }
                 }
 
                 try
@@ -1614,6 +1775,11 @@ namespace NetScript.Walkers
                         throw;
                     }
 
+                    if (e.Value.HasValue)
+                    {
+                        value = e.Value.Value;
+                    }
+
                     return value;
                 }
                 catch (ContinueException e)
@@ -1622,6 +1788,11 @@ namespace NetScript.Walkers
                     if (e.Target != null && (labelSet == null || !labelSet.Contains(e.Target)))
                     {
                         throw;
+                    }
+
+                    if (e.Value.HasValue)
+                    {
+                        value = e.Value.Value;
                     }
                 }
 
@@ -1962,6 +2133,288 @@ namespace NetScript.Walkers
             }
         }
 
+        internal static void FunctionIteratorBindingInitialisation([NotNull] Agent agent, [NotNull] IEnumerable<ExpressionNode> formalParameters, ref (ScriptObject Iterator, ScriptFunctionObject NextMethod, bool Done) iteratorRecord, LexicalEnvironment environment)
+        {
+            //https://tc39.github.io/ecma262/#sec-function-definitions-runtime-semantics-iteratorbindinginitialization
+            foreach (var formalParameter in formalParameters)
+            {
+                FunctionIteratorBindingInitialisation(agent, formalParameter, ref iteratorRecord, environment);
+            }
+        }
+
+        private static void FunctionIteratorBindingInitialisation([NotNull] Agent agent, [NotNull] ExpressionNode formalParameter, ref (ScriptObject Iterator, ScriptFunctionObject NextMethod, bool Done) iteratorRecord, LexicalEnvironment environment)
+        {
+            //https://tc39.github.io/ecma262/#sec-function-definitions-runtime-semantics-iteratorbindinginitialization
+            switch (formalParameter)
+            {
+                case RestElementNode restElement:
+                    IteratorBindingInitialisationRest(agent, restElement.Argument, ref iteratorRecord, environment);
+                    break;
+
+                case AssignmentPatternNode assignmentPattern:
+                {
+                    var currentContext = agent.RunningExecutionContext;
+                    var originalEnvironment = currentContext.VariableEnvironment;
+                    Debug.Assert(currentContext.VariableEnvironment == currentContext.LexicalEnvironment);
+                    Debug.Assert(environment == originalEnvironment);
+                    var paramVariableEnvironment = LexicalEnvironment.NewDeclarativeEnvironment(agent, originalEnvironment);
+                    currentContext.VariableEnvironment = paramVariableEnvironment;
+                    currentContext.LexicalEnvironment = paramVariableEnvironment;
+                    try
+                    {
+                        switch (assignmentPattern.Left)
+                        {
+                            case ArrayPatternNode _:
+                            case ObjectPatternNode _:
+                                IteratorBindingInitialisationBindingPattern(agent, assignmentPattern.Left, assignmentPattern.Right, ref iteratorRecord, environment);
+                                break;
+
+                            case IdentifierNode identifier:
+                                IteratorBindingInitialisationSingleName(agent, identifier.Name, assignmentPattern.Right, ref iteratorRecord, environment);
+                                break;
+
+                            default:
+                                throw new NotImplementedException();
+                        }
+                    }
+                    finally
+                    {
+                        currentContext.VariableEnvironment = originalEnvironment;
+                        currentContext.LexicalEnvironment = originalEnvironment;
+                    }
+
+                    break;
+                }
+
+                case ArrayPatternNode _:
+                case ObjectPatternNode _:
+                    IteratorBindingInitialisationBindingPattern(agent, formalParameter, null, ref iteratorRecord, environment);
+                    break;
+
+                case IdentifierNode identifier:
+                    IteratorBindingInitialisationSingleName(agent, identifier.Name, null, ref iteratorRecord, environment);
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private static void IteratorBindingInitialisationBindingPattern([NotNull] Agent agent, [NotNull] ExpressionNode formalParameter, [CanBeNull] BaseNode initialiser, ref (ScriptObject Iterator, ScriptFunctionObject NextMethod, bool Done) iteratorRecord, [NotNull] LexicalEnvironment environment)
+        {
+            //https://tc39.github.io/ecma262/#sec-destructuring-binding-patterns-runtime-semantics-iteratorbindinginitialization
+
+            var value = ScriptValue.Undefined;
+            if (!iteratorRecord.Done)
+            {
+                ScriptValue next;
+                try
+                {
+                    next = agent.IteratorStep(iteratorRecord);
+                }
+                catch (ScriptException)
+                {
+                    iteratorRecord.Done = true;
+                    throw;
+                }
+
+                if (next.IsBoolean && !(bool)next)
+                {
+                    iteratorRecord.Done = true;
+                }
+                else
+                {
+                    try
+                    {
+                        value = Agent.IteratorValue((ScriptObject)next);
+                    }
+                    catch (ScriptException)
+                    {
+                        iteratorRecord.Done = true;
+                        throw;
+                    }
+                }
+            }
+
+            if (initialiser != null && value == ScriptValue.Undefined)
+            {
+                var defaultValue = Walk(initialiser, agent.RunningExecutionContext);
+                value = agent.GetValue(defaultValue);
+            }
+
+            BindingInitialisation(agent, formalParameter, value, environment);
+        }
+
+        private static void IteratorBindingInitialisationRest([NotNull] Agent agent, [NotNull] ExpressionNode restArgument, ref (ScriptObject Iterator, ScriptFunctionObject NextMethod, bool Done) iteratorRecord, [CanBeNull] LexicalEnvironment environment)
+        {
+            if (restArgument is IdentifierNode identifier)
+            {
+                var lhs = agent.ResolveBinding(identifier.Name, environment);
+                var array = ArrayIntrinsics.ArrayCreate(agent, 0);
+
+                for (var i = 0;; i++)
+                {
+                    ScriptValue next = default;
+                    if (!iteratorRecord.Done)
+                    {
+                        try
+                        {
+                            next = agent.IteratorStep(iteratorRecord);
+                        }
+                        catch(ScriptException)
+                        {
+                            iteratorRecord.Done = true;
+                            throw;
+                        }
+
+                        if (next.IsBoolean && !(bool)next)
+                        {
+                            iteratorRecord.Done = true;
+                        }
+                    }
+
+                    if (iteratorRecord.Done)
+                    {
+                        if (environment == null)
+                        {
+                            agent.PutValue(lhs, array);
+                            return;
+                        }
+
+                        Agent.InitialiseReferencedBinding(lhs, array);
+                        return;
+                    }
+
+                    ScriptValue nextValue;
+                    try
+                    {
+                        nextValue = Agent.IteratorValue((ScriptObject)next);
+                    }
+                    catch (ScriptException)
+                    {
+                        iteratorRecord.Done = true;
+                        throw;
+                    }
+
+                    var status = array.CreateDataProperty(i.ToString(), nextValue);
+                    Debug.Assert(status);
+                }
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        private static void IteratorBindingInitialisationSingleName([NotNull] Agent agent, [NotNull] string bindingId, [CanBeNull] ExpressionNode initialiser, ref (ScriptObject Iterator, ScriptFunctionObject NextMethod, bool Done) iteratorRecord, [CanBeNull] LexicalEnvironment environment)
+        {
+            //https://tc39.github.io/ecma262/#sec-destructuring-binding-patterns-runtime-semantics-iteratorbindinginitialization
+            var lhs = agent.ResolveBinding(bindingId, environment);
+            var value = ScriptValue.Undefined;
+            if (!iteratorRecord.Done)
+            {
+                ScriptValue next;
+                try
+                {
+                    next = agent.IteratorStep(iteratorRecord);
+                }
+                catch (ScriptException)
+                {
+                    iteratorRecord.Done = true;
+                    throw;
+                }
+
+                if (next.IsBoolean && !(bool)next)
+                {
+                    iteratorRecord.Done = true;
+                }
+                else
+                {
+                    try
+                    {
+                        value = Agent.IteratorValue((ScriptObject)next);
+                    }
+                    catch (ScriptException)
+                    {
+                        iteratorRecord.Done = true;
+                        throw;
+                    }
+                }
+            }
+
+            if (iteratorRecord.Done)
+            {
+                value = ScriptValue.Undefined;
+            }
+
+            if (initialiser != null && value == ScriptValue.Undefined)
+            {
+                var defaultValue = Walk(initialiser, agent.RunningExecutionContext);
+                value = agent.GetValue(defaultValue);
+                if (IsAnonymousFunctionDefinition(initialiser))
+                {
+                    var hasNameProperty = value.HasOwnProperty("name");
+                    if (!hasNameProperty)
+                    {
+                        agent.SetFunctionName((ScriptObject)value, bindingId);
+                    }
+                }
+            }
+
+            if (environment == null)
+            {
+                agent.PutValue(lhs, value);
+            }
+            else
+            {
+                Agent.InitialiseReferencedBinding(lhs, value);
+            }
+        }
+
+        private static void KeyedBindingInitialisationBinding([NotNull] Agent agent, [NotNull] AssignmentPatternNode property, ScriptValue value, [NotNull] LexicalEnvironment environment, ScriptValue propertyName)
+        {
+            //https://tc39.github.io/ecma262/#sec-runtime-semantics-keyedbindinginitialization
+            value = agent.GetValue(value, propertyName);
+            if (property.Right != null && value == ScriptValue.Undefined)
+            {
+                var defaultValue = Walk(property.Right, agent.RunningExecutionContext);
+                value = agent.GetValue(defaultValue);
+            }
+
+            BindingInitialisation(agent, property.Left, value, environment);
+        }
+
+        private static void KeyedBindingInitialisationSingle([NotNull] Agent agent, [NotNull] AssignmentPatternNode property, ScriptValue value, [CanBeNull] LexicalEnvironment environment, ScriptValue propertyName)
+        {
+            //https://tc39.github.io/ecma262/#sec-runtime-semantics-keyedbindinginitialization
+            var bindingIdentifier = ((IdentifierNode)property.Left).Name;
+            var lhs = agent.ResolveBinding(bindingIdentifier, environment);
+            value = agent.GetValue(value, propertyName);
+            if (property.Right != null && value == ScriptValue.Undefined)
+            {
+                var defaultValue = Walk(property.Right, agent.RunningExecutionContext);
+                value = agent.GetValue(defaultValue);
+
+                if (IsAnonymousFunctionDefinition(property.Right))
+                {
+                    var hasNameProperty = value.HasOwnProperty("name");
+                    if (!hasNameProperty)
+                    {
+                        agent.SetFunctionName((ScriptObject)value, bindingIdentifier);
+                    }
+                }
+            }
+
+            if (environment == null)
+            {
+                agent.PutValue(lhs, value);
+            }
+            else
+            {
+                Agent.InitialiseReferencedBinding(lhs, value);
+            }
+        }
+
 
         private static ScriptValue Addition(ScriptValue left, ScriptValue right, [NotNull] Agent agent)
         {
@@ -2132,7 +2585,7 @@ namespace NetScript.Walkers
                 throw agent.CreateTypeError();
             }
 
-            var instanceOfHandler = agent.GetMethod(target, agent.Realm.SymbolHasInstance);
+            var instanceOfHandler = agent.GetMethod(target, Symbol.HasInstance);
             if (instanceOfHandler != ScriptValue.Undefined)
             {
                 return Agent.RealToBoolean(agent.Call(instanceOfHandler, target, value));

@@ -21,7 +21,10 @@ namespace NetScript.Runtime
             Debug.Assert(IsPropertyKey(property));
             var success = scriptObject.Set(property, value, scriptObject);
             if (!success && shouldThrow)
+            {
                 throw CreateTypeError();
+            }
+
             return success;
         }
 
@@ -43,7 +46,10 @@ namespace NetScript.Runtime
             //https://tc39.github.io/ecma262/#sec-definepropertyorthrow
             Debug.Assert(IsPropertyKey(property));
             var success = obj.DefineOwnProperty(property, descriptor);
-            if (!success) throw CreateTypeError();
+            if (!success)
+            {
+                throw CreateTypeError();
+            }
         }
 
         [CanBeNull]
@@ -80,6 +86,16 @@ namespace NetScript.Runtime
                 throw CreateTypeError();
             }
             return function.Call(thisValue, arguments);
+        }
+
+        internal ScriptValue Call(ScriptValue function, ScriptValue thisValue, [NotNull] IReadOnlyList<ScriptValue> arguments)
+        {
+            //https://tc39.github.io/ecma262/#sec-call
+            if (!IsCallable(function))
+            {
+                throw CreateTypeError();
+            }
+            return ((ScriptObject)function).Call(thisValue, arguments);
         }
 
         internal static ScriptValue Construct([NotNull] ScriptObject constructor, [NotNull] IReadOnlyList<ScriptValue> argumentList, ScriptObject newTarget = null)

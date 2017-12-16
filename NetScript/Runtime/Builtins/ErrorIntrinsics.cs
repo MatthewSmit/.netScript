@@ -6,28 +6,28 @@ namespace NetScript.Runtime.Builtins
 {
     internal static class ErrorIntrinsics
     {
-        public static (ScriptObject error, ScriptObject errorPrototype) Initialise([NotNull] Agent agent, [NotNull] Realm realm, [NotNull] ScriptObject objectPrototype, [NotNull] ScriptObject functionPrototype)
+        public static (ScriptFunctionObject error, ScriptObject errorPrototype) Initialise([NotNull] Agent agent, [NotNull] Realm realm, [NotNull] ScriptObject objectPrototype, [NotNull] ScriptObject functionPrototype)
         {
             //https://tc39.github.io/ecma262/#sec-error-objects
 
-            var error = Intrinsics.CreateBuiltinFunction(agent, realm, ErrorConstructor, functionPrototype, 1, "Error", ConstructorKind.Base);
+            var error = Intrinsics.CreateBuiltinFunction(realm, ErrorConstructor, functionPrototype, 1, "Error", ConstructorKind.Base);
 
             var errorPrototype = agent.ObjectCreate(objectPrototype);
             Intrinsics.DefineDataProperty(errorPrototype, "constructor", error);
             Intrinsics.DefineDataProperty(errorPrototype, "message", string.Empty);
             Intrinsics.DefineDataProperty(errorPrototype, "name", "Error");
-            Intrinsics.DefineFunction(errorPrototype, "toString", 0, agent, realm, ToString);
+            Intrinsics.DefineFunction(errorPrototype, "toString", 0, realm, ToString);
 
             Intrinsics.DefineDataProperty(error, "prototype", errorPrototype, false, false, false);
 
             return (error, errorPrototype);
         }
 
-        public static (ScriptObject error, ScriptObject errorPrototype) InitialiseNativeError([NotNull] Agent agent, string nativeErrorType, [NotNull] Realm realm, ScriptObject error, ScriptObject errorPrototype)
+        public static (ScriptFunctionObject error, ScriptObject errorPrototype) InitialiseNativeError([NotNull] Agent agent, string nativeErrorType, [NotNull] Realm realm, ScriptObject error, ScriptObject errorPrototype)
         {
             var nativeErrorPrototype = agent.ObjectCreate(errorPrototype);
 
-            var nativeError = Intrinsics.CreateBuiltinFunction(agent, realm, arguments => NativeErrorConstructor(arguments, nativeErrorPrototype), error, 1, nativeErrorType, ConstructorKind.Base);
+            var nativeError = Intrinsics.CreateBuiltinFunction(realm, arguments => NativeErrorConstructor(arguments, nativeErrorPrototype), error, 1, nativeErrorType, ConstructorKind.Base);
 
             Intrinsics.DefineDataProperty(nativeErrorPrototype, "constructor", nativeError);
             Intrinsics.DefineDataProperty(nativeErrorPrototype, "message", string.Empty);
@@ -43,7 +43,7 @@ namespace NetScript.Runtime.Builtins
             //https://tc39.github.io/ecma262/#sec-error-message
 
             var newTarget = arguments.NewTarget ?? arguments.Function;
-            var obj = arguments.Agent.OrdinaryCreateFromConstructor(newTarget, arguments.Agent.Realm.ErrorPrototype, SpecialObjectType.Error);
+            var obj = arguments.Agent.OrdinaryCreateFromConstructor(newTarget, newTarget.Realm.ErrorPrototype, SpecialObjectType.Error);
             obj.ErrorData = new ErrorData();
 
             var message = arguments[0];

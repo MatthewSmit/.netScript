@@ -1,20 +1,14 @@
-﻿using System;
-using JetBrains.Annotations;
-
-namespace NetScript.Runtime
+﻿namespace NetScript.Runtime
 {
-    internal sealed class BreakException : Exception
+    internal sealed class BreakException : ECMARuntimeException
     {
         public BreakException()
         {
         }
 
-        public BreakException(string target)
+        public BreakException(string target) :
+            base(target)
         {
-            Target = target;
         }
-
-        [CanBeNull]
-        public string Target { get; }
     }
 }

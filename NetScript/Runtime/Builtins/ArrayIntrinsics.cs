@@ -10,54 +10,54 @@ namespace NetScript.Runtime.Builtins
 {
     internal static class ArrayIntrinsics
     {
-        public static (ScriptObject Array,
+        public static (ScriptFunctionObject Array,
             ScriptObject ArrayPrototype,
             ScriptObject ArrayIteratorPrototype,
-            ScriptObject ArrayProtoEntries,
-            ScriptObject ArrayProtoForEach,
-            ScriptObject ArrayProtoKeys,
-            ScriptObject ArrayProtoValues) Initialise([NotNull] Agent agent, [NotNull] Realm realm, ScriptObject objectPrototype, ScriptObject functionPrototype)
+            ScriptFunctionObject ArrayProtoEntries,
+            ScriptFunctionObject ArrayProtoForEach,
+            ScriptFunctionObject ArrayProtoKeys,
+            ScriptFunctionObject ArrayProtoValues) Initialise([NotNull] Agent agent, [NotNull] Realm realm, ScriptObject objectPrototype, ScriptObject functionPrototype)
         {
-            var array = Intrinsics.CreateBuiltinFunction(agent, realm, Array, functionPrototype, 1, "Array", ConstructorKind.Base);
-            Intrinsics.DefineFunction(array, "from", 1, agent, realm, From);
-            Intrinsics.DefineFunction(array, "isArray", 1, agent, realm, IsArray);
-            Intrinsics.DefineFunction(array, "of", 0, agent, realm, Of);
-            Intrinsics.DefineAccessorProperty(array, realm.SymbolSpecies, Intrinsics.CreateBuiltinFunction(agent, realm, arguments => arguments.ThisValue, functionPrototype, 0, "get [Symbol.species]"), null);
+            var array = Intrinsics.CreateBuiltinFunction(realm, Array, functionPrototype, 1, "Array", ConstructorKind.Base);
+            Intrinsics.DefineFunction(array, "from", 1, realm, From);
+            Intrinsics.DefineFunction(array, "isArray", 1, realm, IsArray);
+            Intrinsics.DefineFunction(array, "of", 0, realm, Of);
+            Intrinsics.DefineAccessorProperty(array, Symbol.Species, Intrinsics.CreateBuiltinFunction(realm, arguments => arguments.ThisValue, functionPrototype, 0, "get [Symbol.species]"), null);
 
-            var arrayPrototype = new ScriptArrayObject(agent, objectPrototype, true, 0);
-            Intrinsics.DefineFunction(arrayPrototype, "concat", 1, agent, realm, Concat);
+            var arrayPrototype = new ScriptArrayObject(realm, objectPrototype, true, 0);
+            Intrinsics.DefineFunction(arrayPrototype, "concat", 1, realm, Concat);
             Intrinsics.DefineDataProperty(arrayPrototype, "constructor", array);
-            Intrinsics.DefineFunction(arrayPrototype, "copyWithin", 2, agent, realm, CopyWithin);
-            var arrayProtoEntries = Intrinsics.DefineFunction(arrayPrototype, "entries", 0, agent, realm, Entries);
-            Intrinsics.DefineFunction(arrayPrototype, "every", 1, agent, realm, Every);
-            Intrinsics.DefineFunction(arrayPrototype, "fill", 1, agent, realm, Fill);
-            Intrinsics.DefineFunction(arrayPrototype, "filter", 1, agent, realm, Filter);
-            Intrinsics.DefineFunction(arrayPrototype, "find", 1, agent, realm, Find);
-            Intrinsics.DefineFunction(arrayPrototype, "findIndex", 1, agent, realm, FindIndex);
-            var arrayProtoForEach = Intrinsics.DefineFunction(arrayPrototype, "forEach", 1, agent, realm, ForEach);
-            Intrinsics.DefineFunction(arrayPrototype, "includes", 1, agent, realm, Includes);
-            Intrinsics.DefineFunction(arrayPrototype, "indexOf", 1, agent, realm, IndexOf);
-            Intrinsics.DefineFunction(arrayPrototype, "join", 1, agent, realm, Join);
-            var arrayProtoKeys = Intrinsics.DefineFunction(arrayPrototype, "keys", 0, agent, realm, Keys);
-            Intrinsics.DefineFunction(arrayPrototype, "lastIndexOf", 1, agent, realm, LastIndexOf);
-            Intrinsics.DefineFunction(arrayPrototype, "map", 1, agent, realm, Map);
-            Intrinsics.DefineFunction(arrayPrototype, "pop", 0, agent, realm, Pop);
-            Intrinsics.DefineFunction(arrayPrototype, "push", 1, agent, realm, Push);
-            Intrinsics.DefineFunction(arrayPrototype, "reduce", 1, agent, realm, Reduce);
-            Intrinsics.DefineFunction(arrayPrototype, "reduceRight", 1, agent, realm, ReduceRight);
-            Intrinsics.DefineFunction(arrayPrototype, "reverse", 0, agent, realm, Reverse);
-            Intrinsics.DefineFunction(arrayPrototype, "shift", 0, agent, realm, Shift);
-            Intrinsics.DefineFunction(arrayPrototype, "slice", 2, agent, realm, Slice);
-            Intrinsics.DefineFunction(arrayPrototype, "some", 1, agent, realm, Some);
-            Intrinsics.DefineFunction(arrayPrototype, "sort", 1, agent, realm, Sort);
-            Intrinsics.DefineFunction(arrayPrototype, "splice", 2, agent, realm, Splice);
-            Intrinsics.DefineFunction(arrayPrototype, "toLocaleString", 0, agent, realm, ToLocaleString);
-            Intrinsics.DefineFunction(arrayPrototype, "toString", 0, agent, realm, ToString);
-            Intrinsics.DefineFunction(arrayPrototype, "unshift", 1, agent, realm, Unshift);
-            var arrayProtoValues = Intrinsics.DefineFunction(arrayPrototype, "values", 0, agent, realm, Values);
-            Intrinsics.DefineDataProperty(arrayPrototype, realm.SymbolIterator, arrayProtoValues);
+            Intrinsics.DefineFunction(arrayPrototype, "copyWithin", 2, realm, CopyWithin);
+            var arrayProtoEntries = Intrinsics.DefineFunction(arrayPrototype, "entries", 0, realm, Entries);
+            Intrinsics.DefineFunction(arrayPrototype, "every", 1, realm, Every);
+            Intrinsics.DefineFunction(arrayPrototype, "fill", 1, realm, Fill);
+            Intrinsics.DefineFunction(arrayPrototype, "filter", 1, realm, Filter);
+            Intrinsics.DefineFunction(arrayPrototype, "find", 1, realm, Find);
+            Intrinsics.DefineFunction(arrayPrototype, "findIndex", 1, realm, FindIndex);
+            var arrayProtoForEach = Intrinsics.DefineFunction(arrayPrototype, "forEach", 1, realm, ForEach);
+            Intrinsics.DefineFunction(arrayPrototype, "includes", 1, realm, Includes);
+            Intrinsics.DefineFunction(arrayPrototype, "indexOf", 1, realm, IndexOf);
+            Intrinsics.DefineFunction(arrayPrototype, "join", 1, realm, Join);
+            var arrayProtoKeys = Intrinsics.DefineFunction(arrayPrototype, "keys", 0, realm, Keys);
+            Intrinsics.DefineFunction(arrayPrototype, "lastIndexOf", 1, realm, LastIndexOf);
+            Intrinsics.DefineFunction(arrayPrototype, "map", 1, realm, Map);
+            Intrinsics.DefineFunction(arrayPrototype, "pop", 0, realm, Pop);
+            Intrinsics.DefineFunction(arrayPrototype, "push", 1, realm, Push);
+            Intrinsics.DefineFunction(arrayPrototype, "reduce", 1, realm, Reduce);
+            Intrinsics.DefineFunction(arrayPrototype, "reduceRight", 1, realm, ReduceRight);
+            Intrinsics.DefineFunction(arrayPrototype, "reverse", 0, realm, Reverse);
+            Intrinsics.DefineFunction(arrayPrototype, "shift", 0, realm, Shift);
+            Intrinsics.DefineFunction(arrayPrototype, "slice", 2, realm, Slice);
+            Intrinsics.DefineFunction(arrayPrototype, "some", 1, realm, Some);
+            Intrinsics.DefineFunction(arrayPrototype, "sort", 1, realm, Sort);
+            Intrinsics.DefineFunction(arrayPrototype, "splice", 2, realm, Splice);
+            Intrinsics.DefineFunction(arrayPrototype, "toLocaleString", 0, realm, ToLocaleString);
+            Intrinsics.DefineFunction(arrayPrototype, "toString", 0, realm, ToString);
+            Intrinsics.DefineFunction(arrayPrototype, "unshift", 1, realm, Unshift);
+            var arrayProtoValues = Intrinsics.DefineFunction(arrayPrototype, "values", 0, realm, Values);
+            Intrinsics.DefineDataProperty(arrayPrototype, Symbol.Iterator, arrayProtoValues);
 
-            var unscopableList = agent.ObjectCreate(null);
+            var unscopableList = agent.ObjectCreate(realm, null);
             unscopableList.CreateDataProperty("copyWithin", true);
             unscopableList.CreateDataProperty("entries", true);
             unscopableList.CreateDataProperty("fill", true);
@@ -66,11 +66,11 @@ namespace NetScript.Runtime.Builtins
             unscopableList.CreateDataProperty("includes", true);
             unscopableList.CreateDataProperty("keys", true);
             unscopableList.CreateDataProperty("values", true);
-            Intrinsics.DefineDataProperty(arrayPrototype, realm.SymbolUnscopables, unscopableList, false);
+            Intrinsics.DefineDataProperty(arrayPrototype, Symbol.Unscopables, unscopableList, false);
 
             var arrayIteratorPrototype = agent.ObjectCreate(realm.IteratorPrototype);
-            Intrinsics.DefineFunction(arrayIteratorPrototype, "next", 0, agent, realm, Next);
-            Intrinsics.DefineDataProperty(arrayIteratorPrototype, realm.SymbolToStringTag, "Array Iterator", false);
+            Intrinsics.DefineFunction(arrayIteratorPrototype, "next", 0, realm, Next);
+            Intrinsics.DefineDataProperty(arrayIteratorPrototype, Symbol.ToStringTag, "Array Iterator", false);
 
             Intrinsics.DefineDataProperty(array, "prototype", arrayPrototype, false, false, false);
 
@@ -80,18 +80,18 @@ namespace NetScript.Runtime.Builtins
         private static ScriptValue Array([NotNull] ScriptArguments arg)
         {
             var newTarget = arg.NewTarget ?? arg.Function;
-            var prototype = Agent.GetPrototypeFromConstructor(newTarget, arg.Agent.Realm.ArrayPrototype);
+            var prototype = Agent.GetPrototypeFromConstructor(newTarget, arg.Function.Realm.ArrayPrototype);
 
             if (arg.Count == 0)
             {
                 //https://tc39.github.io/ecma262/#sec-array-constructor-array
-                return arg.Agent.ArrayCreate(0, prototype);
+                return ArrayCreate(arg.Agent, 0, prototype);
             }
 
             if (arg.Count == 1)
             {
                 //https://tc39.github.io/ecma262/#sec-array-len
-                var array = arg.Agent.ArrayCreate(0, prototype);
+                var array = ArrayCreate(arg.Agent, 0, prototype);
 
                 uint intLength;
                 if (!arg[0].IsNumber)
@@ -115,7 +115,7 @@ namespace NetScript.Runtime.Builtins
             else
             {
                 //https://tc39.github.io/ecma262/#sec-array-items
-                var array = arg.Agent.ArrayCreate(arg.Count, prototype);
+                var array = ArrayCreate(arg.Agent, arg.Count, prototype);
                 for (var k = 0; k < arg.Count; k++)
                 {
                     var propertyKey = k.ToString();
@@ -135,9 +135,10 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue IsArray(ScriptArguments arg)
+        private static ScriptValue IsArray([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-array.isarray
+            return arg.Agent.IsArray(arg[0]);
         }
 
         private static ScriptValue Of(ScriptArguments arg)
@@ -145,9 +146,62 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue Concat(ScriptArguments arg)
+        private static ScriptValue Concat([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-array.prototype.concat
+            var obj = arg.Agent.ToObject(arg.ThisValue);
+            var array = ArraySpeciesCreate(arg.Agent, obj, 0);
+            var length = 0UL;
+            var argumentIndex = -1;
+
+            ScriptValue element = obj;
+            while (true)
+            {
+                var spreadable = IsConcatSpreadable(arg.Agent, element);
+                if (spreadable)
+                {
+                    //Let k be 0.
+                    var elementLength = arg.Agent.ToLength(((ScriptObject)element).Get("length"));
+                    if (length + elementLength > Agent.MAX_DOUBLE_U)
+                    {
+                        throw arg.Agent.CreateTypeError();
+                    }
+
+                    for (var k = 0UL; k < elementLength; k++)
+                    {
+                        var property = k.ToString(CultureInfo.InvariantCulture);
+                        var exists = ((ScriptObject)element).HasProperty(property);
+                        if (exists)
+                        {
+                            var subElement = ((ScriptObject)element).Get(property);
+                            arg.Agent.CreateDataPropertyOrThrow(array, length.ToString(CultureInfo.InvariantCulture), subElement);
+                        }
+
+                        length++;
+                    }
+                }
+                else
+                {
+                    if (length >= Agent.MAX_DOUBLE_U)
+                    {
+                        throw arg.Agent.CreateTypeError();
+                    }
+
+                    arg.Agent.CreateDataPropertyOrThrow(array, length.ToString(CultureInfo.InvariantCulture), element);
+                    length++;
+                }
+
+                argumentIndex++;
+                if (argumentIndex >= arg.Count)
+                {
+                    break;
+                }
+
+                element = arg[argumentIndex];
+            }
+
+            arg.Agent.Set(array, "length", length, true);
+            return array;
         }
 
         private static ScriptValue CopyWithin(ScriptArguments arg)
@@ -185,9 +239,30 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue ForEach(ScriptArguments arg)
+        private static ScriptValue ForEach([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-array.prototype.foreach
+            var obj = arg.Agent.ToObject(arg.ThisValue);
+            var length = arg.Agent.ToLength(obj.Get("length"));
+
+            if (!Agent.IsCallable(arg[0]))
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var thisArg = arg[1];
+            for (var k = 0UL; k < length; k++)
+            {
+                var propertyKey = k.ToString(CultureInfo.InvariantCulture);
+                var keyPresent = obj.HasProperty(propertyKey);
+                if (keyPresent)
+                {
+                    var keyValue = obj.Get(propertyKey);
+                    arg.Agent.Call((ScriptObject)arg[0], thisArg, keyValue, k, obj);
+                }
+            }
+
+            return ScriptValue.Undefined;
         }
 
         private static ScriptValue Includes(ScriptArguments arg)
@@ -195,9 +270,49 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue IndexOf(ScriptArguments arg)
+        private static ScriptValue IndexOf([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-array.prototype.indexof
+            var obj = arg.Agent.ToObject(arg.ThisValue);
+            var length = arg.Agent.ToLength(obj.Get("length"));
+            if (length == 0)
+            {
+                return -1;
+            }
+
+            var n = arg.Agent.ToInteger(arg[1]);
+            if (n >= length)
+            {
+                return -1;
+            }
+
+            uint k;
+            if (n >= 0)
+            {
+                k = (uint)n;
+            }
+            else
+            {
+                n += length;
+                k = n < 0 ? 0 : (uint)n;
+            }
+
+            while (k < length)
+            {
+                var present = obj.HasProperty(k.ToString(CultureInfo.InvariantCulture));
+                if (present)
+                {
+                    var element = obj.Get(k.ToString(CultureInfo.InvariantCulture));
+                    if (Agent.StrictEquality(arg[0], element))
+                    {
+                        return k;
+                    }
+                }
+
+                k++;
+            }
+
+            return -1;
         }
 
         private static ScriptValue Join([NotNull] ScriptArguments arg)
@@ -217,7 +332,7 @@ namespace NetScript.Runtime.Builtins
 
                 var element = obj.Get(k.ToString());
                 var next = element == ScriptValue.Undefined || element == ScriptValue.Null ? "" : arg.Agent.ToString(element);
-                result.Append(element);
+                result.Append(next);
             }
 
             return result.ToString();
@@ -400,10 +515,74 @@ namespace NetScript.Runtime.Builtins
         }
 
 
+        [NotNull]
+        internal static ScriptObject ArrayCreate([NotNull] Agent agent, long length, ScriptObject prototype = null)
+        {
+            //https://tc39.github.io/ecma262/#sec-arraycreate
+            Debug.Assert(length >= 0);
+            if (length >= uint.MaxValue)
+            {
+                throw agent.CreateRangeError();
+            }
+
+            if (prototype == null)
+            {
+                prototype = agent.RunningExecutionContext.Realm.ArrayPrototype;
+            }
+
+            return new ScriptArrayObject(prototype.Realm, prototype, true, (uint)length);
+        }
+
+        [NotNull]
+        private static ScriptObject ArraySpeciesCreate([NotNull] Agent agent, [CanBeNull] ScriptObject originalArray, long length)
+        {
+            //https://tc39.github.io/ecma262/#sec-arrayspeciescreate
+            Debug.Assert(length >= 0);
+            var isArray = agent.IsArray(originalArray);
+            if (!isArray)
+            {
+                return ArrayCreate(agent, length);
+            }
+
+            Debug.Assert(originalArray != null, nameof(originalArray) + " != null");
+            var constructor = originalArray.Get("constructor");
+            if (Agent.IsConstructor(constructor))
+            {
+                var thisRealm = agent.Realm;
+                var realmConstructor = agent.GetFunctionRealm((ScriptObject)constructor);
+                if (thisRealm != realmConstructor)
+                {
+                    //If SameValue(C, realmC.[[Intrinsics]].[[%Array%]]) is true, set C to undefined.
+                    throw new NotImplementedException();
+                }
+            }
+
+            if (constructor.IsObject)
+            {
+                constructor = ((ScriptObject)constructor).Get(Symbol.Species);
+                if (constructor == ScriptValue.Null)
+                {
+                    constructor = ScriptValue.Undefined;
+                }
+            }
+
+            if (constructor == ScriptValue.Undefined)
+            {
+                return ArrayCreate(agent, length);
+            }
+
+            if (!Agent.IsConstructor(constructor))
+            {
+                throw agent.CreateTypeError();
+            }
+
+            return (ScriptObject)Agent.Construct((ScriptObject)constructor, new ScriptValue[] {length});
+        }
+
         internal static ScriptValue CreateArrayFromList([NotNull] Agent agent, [NotNull] IEnumerable<ScriptValue> elements)
         {
             //https://tc39.github.io/ecma262/#sec-createarrayfromlist
-            var array = agent.ArrayCreate(0);
+            var array = ArrayCreate(agent, 0);
 
             var i = 0;
             foreach (var element in elements)
@@ -424,6 +603,23 @@ namespace NetScript.Runtime.Builtins
             iterator.ArrayIteratorNextIndex = 0;
             iterator.ArrayIterationKind = kind;
             return iterator;
+        }
+
+        private static bool IsConcatSpreadable([NotNull] Agent agent, ScriptValue obj)
+        {
+            //https://tc39.github.io/ecma262/#sec-isconcatspreadable
+            if (!obj.IsObject)
+            {
+                return false;
+            }
+
+            var spreadable = ((ScriptObject)obj).Get(Symbol.IsConcatSpreadable);
+            if (spreadable != ScriptValue.Undefined)
+            {
+                return Agent.RealToBoolean(spreadable);
+            }
+
+            return agent.IsArray(obj);
         }
     }
 }
