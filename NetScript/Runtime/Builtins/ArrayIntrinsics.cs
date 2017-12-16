@@ -214,9 +214,33 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue Every(ScriptArguments arg)
+        private static ScriptValue Every([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-array.prototype.every
+            var obj = arg.Agent.ToObject(arg.ThisValue);
+            var length = arg.Agent.ToLength(obj.Get("length"));
+            if (!Agent.IsCallable(arg[0]))
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var callbackFunction = (ScriptObject)arg[0];
+            var thisArg = arg[1];
+            for (var k = 0UL; k < length; k++)
+            {
+                var propertyKey = k.ToString(CultureInfo.InvariantCulture);
+                var keyPresent = obj.HasProperty(propertyKey);
+                if (keyPresent)
+                {
+                    var keyValue = obj.Get(propertyKey);
+                    var testResult = Agent.RealToBoolean(arg.Agent.Call(callbackFunction, thisArg, keyValue, k, obj));
+                    if (!testResult)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
         private static ScriptValue Fill(ScriptArguments arg)
@@ -224,9 +248,35 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue Filter(ScriptArguments arg)
+        private static ScriptValue Filter([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-array.prototype.filter
+            var obj = arg.Agent.ToObject(arg.ThisValue);
+            var length = arg.Agent.ToLength(obj.Get("length"));
+            if (!Agent.IsCallable(arg[0]))
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var callbackFunction = (ScriptObject)arg[0];
+            var thisArg = arg[1];
+            var array = ArraySpeciesCreate(arg.Agent, obj, 0);
+            for (ulong k = 0, to = 0; k < length; k++)
+            {
+                var propertyKey = k.ToString(CultureInfo.InvariantCulture);
+                var keyPresent = obj.HasProperty(propertyKey);
+                if (keyPresent)
+                {
+                    var keyValue = obj.Get(propertyKey);
+                    var selected = Agent.RealToBoolean(arg.Agent.Call(callbackFunction, thisArg, keyValue, k, obj));
+                    if (selected)
+                    {
+                        arg.Agent.CreateDataPropertyOrThrow(array, to.ToString(CultureInfo.InvariantCulture), keyValue);
+                        to++;
+                    }
+                }
+            }
+            return array;
         }
 
         private static ScriptValue Find(ScriptArguments arg)
@@ -552,8 +602,10 @@ namespace NetScript.Runtime.Builtins
                 var realmConstructor = agent.GetFunctionRealm((ScriptObject)constructor);
                 if (thisRealm != realmConstructor)
                 {
-                    //If SameValue(C, realmC.[[Intrinsics]].[[%Array%]]) is true, set C to undefined.
-                    throw new NotImplementedException();
+                    if (constructor.SameValue(realmConstructor.Array))
+                    {
+                        constructor = ScriptValue.Undefined;
+                    }
                 }
             }
 

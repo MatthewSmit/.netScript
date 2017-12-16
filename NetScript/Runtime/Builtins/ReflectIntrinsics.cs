@@ -70,9 +70,16 @@ namespace NetScript.Runtime.Builtins
             return ((ScriptObject)arg[0]).DefineOwnProperty(key, descriptor);
         }
 
-        private static ScriptValue DeleteProperty(ScriptArguments arg)
+        private static ScriptValue DeleteProperty([NotNull] ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-reflect.deleteproperty
+            if (!arg[0].IsObject)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var key = arg.Agent.ToPropertyKey(arg[1]);
+            return ((ScriptObject)arg[0]).Delete(key);
         }
 
         private static ScriptValue Get(ScriptArguments arg)

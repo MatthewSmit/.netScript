@@ -18,7 +18,37 @@ namespace NetScript.Runtime.Objects
 
         internal override ScriptObject GetPrototypeOf()
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-getprototypeof
+            if (ProxyHandler == null)
+            {
+                throw Agent.CreateTypeError();
+            }
+            Debug.Assert(ProxyTarget != null, nameof(ProxyTarget) + " != null");
+
+            var trap = Agent.GetMethod(ProxyHandler, "getPrototypeOf");
+            if (trap == null)
+            {
+                return ProxyTarget.GetPrototypeOf();
+            }
+
+            var handlerPrototype = Agent.Call(trap, ProxyHandler, ProxyTarget);
+            if (handlerPrototype != ScriptValue.Null && !handlerPrototype.IsObject)
+            {
+                throw Agent.CreateTypeError();
+            }
+
+            var extensibleTarget = ProxyTarget.IsExtensible;
+            if (extensibleTarget)
+            {
+                return handlerPrototype == ScriptValue.Null ? null : (ScriptObject)handlerPrototype;
+            }
+
+            var targetPrototype = ProxyTarget.GetPrototypeOf();
+            if (!handlerPrototype.SameValue(targetPrototype))
+            {
+                throw Agent.CreateTypeError();
+            }
+            return handlerPrototype == ScriptValue.Null ? null : (ScriptObject)handlerPrototype;
         }
 
         internal override bool SetPrototypeOf(ScriptObject prototype)
@@ -28,10 +58,8 @@ namespace NetScript.Runtime.Objects
             {
                 throw Agent.CreateTypeError();
             }
-
             Debug.Assert(ProxyTarget != null, nameof(ProxyTarget) + " != null");
 
-            //Let target be O.[[ProxyTarget]].
             var trap = Agent.GetMethod(ProxyHandler, "setPrototypeOf");
             if (trap == null)
             {
@@ -61,7 +89,30 @@ namespace NetScript.Runtime.Objects
 
         internal override bool PreventExtensions()
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-preventextensions
+            if (ProxyHandler == null)
+            {
+                throw Agent.CreateTypeError();
+            }
+            Debug.Assert(ProxyTarget != null, nameof(ProxyTarget) + " != null");
+
+            var trap = Agent.GetMethod(ProxyHandler, "preventExtensions");
+            if (trap == null)
+            {
+                return ProxyTarget.PreventExtensions();
+            }
+
+            var booleanTrapResult = Agent.RealToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget));
+            if (booleanTrapResult)
+            {
+                var targetIsExtensible = ProxyTarget.IsExtensible;
+                if (targetIsExtensible)
+                {
+                    throw Agent.CreateTypeError();
+                }
+            }
+
+            return booleanTrapResult;
         }
 
         internal override PropertyDescriptor GetOwnProperty(ScriptValue property)
@@ -88,6 +139,7 @@ namespace NetScript.Runtime.Objects
             }
 
             var targetDescriptor = ProxyTarget.GetOwnProperty(property);
+            bool extensibleTarget;
             if (trapResultObj == ScriptValue.Undefined)
             {
                 if (targetDescriptor == null)
@@ -95,15 +147,21 @@ namespace NetScript.Runtime.Objects
                     return null;
                 }
 
-                //If targetDesc.[[Configurable]] is false, throw a TypeError exception.
-                //Let extensibleTarget be ? IsExtensible(target).
-                //Assert: Type(extensibleTarget) is Boolean.
-                //If extensibleTarget is false, throw a TypeError exception.
-                //Return undefined.
-                throw new NotImplementedException();
+                if (!targetDescriptor.Configurable)
+                {
+                    throw Agent.CreateTypeError();
+                }
+
+                extensibleTarget = ProxyTarget.IsExtensible;
+                if (!extensibleTarget)
+                {
+                    throw Agent.CreateTypeError();
+                }
+
+                return null;
             }
 
-            var extensibleTarget = ProxyTarget.IsExtensible;
+            extensibleTarget = ProxyTarget.IsExtensible;
             var resultDescriptor = ObjectIntrinsics.ToPropertyDescriptor(Agent, trapResultObj);
             resultDescriptor.CompletePropertyDescriptor();
             var valid = ValidateAndApplyPropertyDescriptor(null, ScriptValue.Undefined, extensibleTarget, resultDescriptor, targetDescriptor);
@@ -125,12 +183,95 @@ namespace NetScript.Runtime.Objects
 
         internal override bool DefineOwnProperty(ScriptValue property, PropertyDescriptor descriptor)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-defineownproperty-p-desc
+            Debug.Assert(Agent.IsPropertyKey(property));
+            if (ProxyHandler == null)
+            {
+                throw Agent.CreateTypeError();
+            }
+            Debug.Assert(ProxyTarget != null, nameof(ProxyTarget) + " != null");
+
+            var trap = Agent.GetMethod(ProxyHandler, "defineProperty");
+            if (trap == null)
+            {
+                return ProxyTarget.DefineOwnProperty(property, descriptor);
+            }
+
+            var descriptorObject = ObjectIntrinsics.FromPropertyDescriptor(Agent, descriptor);
+            var booleanTrapResult = Agent.RealToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget, property, descriptorObject));
+            if (!booleanTrapResult)
+            {
+                return false;
+            }
+
+            var targetDescriptor = ProxyTarget.GetOwnProperty(property);
+            var extensibleTarget = ProxyTarget.IsExtensible;
+
+            var settingConfigFalse = descriptor.Configurable.HasValue && !descriptor.Configurable;
+
+            if (targetDescriptor == null)
+            {
+                if (!extensibleTarget)
+                {
+                    throw Agent.CreateTypeError();
+                }
+
+                if (settingConfigFalse)
+                {
+                    throw Agent.CreateTypeError();
+                }
+            }
+            else
+            {
+                if (!ValidateAndApplyPropertyDescriptor(null, ScriptValue.Undefined, extensibleTarget, descriptor, targetDescriptor))
+                {
+                    throw Agent.CreateTypeError();
+                }
+                if (settingConfigFalse && targetDescriptor.Configurable)
+                {
+                    throw Agent.CreateTypeError();
+                }
+            }
+
+            return true;
         }
 
         public override bool HasProperty(ScriptValue property)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-hasproperty-p
+            Debug.Assert(Agent.IsPropertyKey(property));
+            if (ProxyHandler == null)
+            {
+                throw Agent.CreateTypeError();
+            }
+            Debug.Assert(ProxyTarget != null, nameof(ProxyTarget) + " != null");
+
+            var trap = Agent.GetMethod(ProxyHandler, "has");
+            if (trap == null)
+            {
+                return ProxyTarget.HasProperty(property);
+            }
+
+            var booleanTrapResult = Agent.RealToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget, property));
+            if (!booleanTrapResult)
+            {
+                var targetDescriptor = ProxyTarget.GetOwnProperty(property);
+                if (targetDescriptor != null)
+                {
+                    if (!targetDescriptor.Configurable)
+                    {
+                        throw Agent.CreateTypeError();
+                    }
+
+                    var extensibleTarget = ProxyTarget.IsExtensible;
+                    if (!extensibleTarget)
+                    {
+                        throw Agent.CreateTypeError();
+                    }
+                }
+            }
+
+            return booleanTrapResult;
         }
 
         internal override ScriptValue Get(ScriptValue property, ScriptValue receiver)
@@ -183,11 +324,11 @@ namespace NetScript.Runtime.Objects
             {
                 throw Agent.CreateTypeError();
             }
+            Debug.Assert(ProxyTarget != null, nameof(ProxyTarget) + " != null");
 
             var trap = Agent.GetMethod(ProxyHandler, "set");
             if (trap == null)
             {
-                Debug.Assert(ProxyTarget != null, nameof(ProxyTarget) + " != null");
                 return ProxyTarget.Set(property, value, receiver);
             }
 
@@ -197,7 +338,6 @@ namespace NetScript.Runtime.Objects
                 return false;
             }
 
-            Debug.Assert(ProxyTarget != null, nameof(ProxyTarget) + " != null");
             var targetDescriptor = ProxyTarget.GetOwnProperty(property);
             if (targetDescriptor != null && !targetDescriptor.Configurable)
             {
@@ -223,7 +363,38 @@ namespace NetScript.Runtime.Objects
 
         internal override bool Delete(ScriptValue property)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-delete-p
+            Debug.Assert(Agent.IsPropertyKey(property));
+            if (ProxyHandler == null)
+            {
+                throw Agent.CreateTypeError();
+            }
+            Debug.Assert(ProxyTarget != null, nameof(ProxyTarget) + " != null");
+
+            var trap = Agent.GetMethod(ProxyHandler, "deleteProperty");
+            if (trap == null)
+            {
+                return ProxyTarget.Delete(property);
+            }
+
+            var booleanTrapResult = Agent.RealToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget, property));
+            if (!booleanTrapResult)
+            {
+                return false;
+            }
+
+            var targetDescriptor = ProxyTarget.GetOwnProperty(property);
+            if (targetDescriptor == null)
+            {
+                return true;
+            }
+
+            if (!targetDescriptor.Configurable)
+            {
+                throw Agent.CreateTypeError();
+            }
+
+            return true;
         }
 
         internal override IEnumerable<ScriptValue> OwnPropertyKeys()
@@ -291,14 +462,49 @@ namespace NetScript.Runtime.Objects
             throw new NotImplementedException();
         }
 
-        internal override ScriptValue Call(ScriptValue thisValue, IReadOnlyList<ScriptValue> arguments)
+        internal override ScriptValue Call(ScriptValue thisArgument, [NotNull] IReadOnlyList<ScriptValue> arguments)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-call-thisargument-argumentslist
+            if (ProxyHandler == null)
+            {
+                throw Agent.CreateTypeError();
+            }
+            Debug.Assert(ProxyTarget != null, nameof(ProxyTarget) + " != null");
+
+            var trap = Agent.GetMethod(ProxyHandler, "apply");
+            if (trap == null)
+            {
+                return Agent.Call(ProxyTarget, thisArgument, arguments);
+            }
+
+            var argumentArray = ArrayIntrinsics.CreateArrayFromList(Agent, arguments);
+            return Agent.Call(trap, ProxyHandler, ProxyTarget, thisArgument, argumentArray);
         }
 
-        internal override ScriptValue Construct(IReadOnlyList<ScriptValue> arguments, ScriptObject newTarget)
+        internal override ScriptValue Construct([NotNull] IReadOnlyList<ScriptValue> arguments, ScriptObject newTarget)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-construct-argumentslist-newtarget
+            if (ProxyHandler == null)
+            {
+                throw Agent.CreateTypeError();
+            }
+            Debug.Assert(ProxyTarget != null, nameof(ProxyTarget) + " != null");
+
+            var trap = Agent.GetMethod(ProxyHandler, "construct");
+            if (trap == null)
+            {
+                Debug.Assert(Agent.IsConstructor(ProxyTarget));
+                return Agent.Construct(ProxyTarget, arguments, newTarget);
+            }
+
+            var argumentArray = ArrayIntrinsics.CreateArrayFromList(Agent, arguments);
+            var newObject = Agent.Call(trap, ProxyHandler, ProxyTarget, argumentArray, newTarget);
+            if (!newObject.IsObject)
+            {
+                throw Agent.CreateTypeError();
+            }
+
+            return newObject;
         }
 
         [CanBeNull]
@@ -310,26 +516,32 @@ namespace NetScript.Runtime.Objects
         {
             get
             {
-                throw new NotImplementedException();
+                //https://tc39.github.io/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-isextensible
+                if (ProxyHandler == null)
+                {
+                    throw Agent.CreateTypeError();
+                }
+                Debug.Assert(ProxyTarget != null, nameof(ProxyTarget) + " != null");
+
+                var trap = Agent.GetMethod(ProxyHandler, "isExtensible");
+                if (trap == null)
+                {
+                    return ProxyTarget.IsExtensible;
+                }
+
+                var booleanTrapResult = Agent.RealToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget));
+                var targetResult = ProxyTarget.IsExtensible;
+                if (booleanTrapResult != targetResult)
+                {
+                    throw Agent.CreateTypeError();
+                }
+
+                return booleanTrapResult;
             }
         }
 
-        public override bool IsCallable
-        {
-            get
-            {
-                Debug.Assert(ProxyTarget != null, nameof(ProxyTarget) + " != null");
-                return ProxyTarget.IsCallable;
-            }
-        }
+        public override bool IsCallable => ProxyTarget?.IsCallable ?? false;
 
-        public override bool IsConstructable
-        {
-            get
-            {
-                Debug.Assert(ProxyTarget != null, nameof(ProxyTarget) + " != null");
-                return ProxyTarget.IsConstructable;
-            }
-        }
+        public override bool IsConstructable => ProxyTarget?.IsConstructable ?? false;
     }
 }

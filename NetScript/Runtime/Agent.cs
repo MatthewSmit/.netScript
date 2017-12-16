@@ -28,7 +28,7 @@ namespace NetScript.Runtime
         {
             //https://tc39.github.io/ecma262/#sec-initializehostdefinedrealm
 
-            var realm = new Realm(this);
+            var realm = new Realm(this, "Default");
             var newContext = new ExecutionContext(realm, null, true);
             ExecutionContexts.Add(newContext);
             RunningExecutionContext = newContext;
@@ -135,9 +135,9 @@ namespace NetScript.Runtime
         /// </summary>
         /// <returns></returns>
         [NotNull]
-        public Realm CreateRealm()
+        public Realm CreateRealm(string name = "")
         {
-            var newRealm = new Realm(this);
+            var newRealm = new Realm(this, name);
             SetRealmGlobalObject(newRealm, null, null);
             SetDefaultGlobalBindings(newRealm);
             return newRealm;
@@ -201,6 +201,7 @@ namespace NetScript.Runtime
             var prototype = constructor.Get("prototype");
             if (!prototype.IsObject)
             {
+                Debug.Assert(defaultPrototype.Realm == constructor.Realm);
                 prototype = defaultPrototype;
             }
 

@@ -8,8 +8,11 @@ namespace NetScript.Runtime
 {
     public sealed class Realm
     {
-        internal Realm([NotNull] Agent agent)
+        private readonly string name;
+
+        internal Realm([NotNull] Agent agent, string name)
         {
+            this.name = name;
             Agent = agent;
             //https://tc39.github.io/ecma262/#sec-createrealm
             //https://tc39.github.io/ecma262/#sec-createintrinsics
@@ -80,6 +83,12 @@ namespace NetScript.Runtime
             Debug.Assert(ThrowTypeError != null);
             Agent.DefinePropertyOrThrow(function, "caller", new PropertyDescriptor(ThrowTypeError, ThrowTypeError, false, true));
             Agent.DefinePropertyOrThrow(function, "arguments", new PropertyDescriptor(ThrowTypeError, ThrowTypeError, false, true));
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return "Realm (" + name + ")";
         }
 
         private static ScriptValue EvalImplementation([NotNull] ScriptArguments arg)

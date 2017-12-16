@@ -18,25 +18,142 @@ namespace NetScript.Runtime.Objects
         /// <inheritdoc />
         internal override PropertyDescriptor GetOwnProperty(ScriptValue property)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-integer-indexed-exotic-objects-getownproperty-p
+            Debug.Assert(Agent.IsPropertyKey(property));
+            if (property.IsString)
+            {
+                var numericIndex = Agent.CanonicalNumericIndexString((string)property);
+                if (numericIndex.HasValue)
+                {
+                    var value = IntegerIndexedElementGet(numericIndex.Value);
+                    if (value == ScriptValue.Undefined)
+                    {
+                        return null;
+                    }
+
+                    return new PropertyDescriptor(value, true, true, false);
+                }
+            }
+
+            return base.GetOwnProperty(property);
         }
 
         /// <inheritdoc />
         public override bool HasProperty(ScriptValue property)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-integer-indexed-exotic-objects-hasproperty-p
+            Debug.Assert(Agent.IsPropertyKey(property));
+            if (property.IsString)
+            {
+                var numericIndex = Agent.CanonicalNumericIndexString((string)property);
+                if (numericIndex.HasValue)
+                {
+                    var buffer = ViewedArrayBuffer;
+                    if (ArrayBufferIntrinsics.IsDetachedBuffer(buffer))
+                    {
+                        throw Agent.CreateTypeError();
+                    }
+
+                    if (!Agent.IsInteger(numericIndex.Value))
+                    {
+                        return false;
+                    }
+
+                    if (numericIndex.Value.IsNegative())
+                    {
+                        return false;
+                    }
+
+                    if (numericIndex.Value >= ArrayLength)
+                    {
+                        return false;
+                    }
+
+                    return true;
+                }
+            }
+
+            return base.HasProperty(property);
         }
 
         /// <inheritdoc />
         internal override bool DefineOwnProperty(ScriptValue property, PropertyDescriptor descriptor)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-integer-indexed-exotic-objects-defineownproperty-p-desc
+            Debug.Assert(Agent.IsPropertyKey(property));
+            if (property.IsString)
+            {
+                var numericIndex = Agent.CanonicalNumericIndexString((string)property);
+                if (numericIndex.HasValue)
+                {
+                    if (!Agent.IsInteger(numericIndex.Value))
+                    {
+                        return false;
+                    }
+                    if (numericIndex.Value == 0 && numericIndex.Value.IsNegative())
+                    {
+                        return false;
+                    }
+
+                    if (numericIndex.Value < 0)
+                    {
+                        return false;
+                    }
+
+                    var length = ArrayLength;
+                    if (numericIndex >= length)
+                    {
+                        return false;
+                    }
+
+                    if (descriptor.IsAccessorDescriptor)
+                    {
+                        return false;
+                    }
+
+                    if (descriptor.Configurable.HasValue && descriptor.Configurable)
+                    {
+                        return false;
+                    }
+
+                    if (descriptor.Enumerable.HasValue && !descriptor.Enumerable)
+                    {
+                        return false;
+                    }
+
+                    if (descriptor.Writable.HasValue && !descriptor.Writable)
+                    {
+                        return false;
+                    }
+
+                    if (descriptor.Value.HasValue)
+                    {
+                        var value = descriptor.Value.Value;
+                        return IntegerIndexedElementSet(numericIndex.Value, value);
+                    }
+
+                    return true;
+                }
+            }
+
+            return base.DefineOwnProperty(property, descriptor);
         }
 
         /// <inheritdoc />
-        internal override ScriptValue Get(ScriptValue property, ScriptValue reciever)
+        internal override ScriptValue Get(ScriptValue property, ScriptValue receiver)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-integer-indexed-exotic-objects-get-p-receiver
+            Debug.Assert(Agent.IsPropertyKey(property));
+            if (property.IsString)
+            {
+                var numericIndex = Agent.CanonicalNumericIndexString((string)property);
+                if (numericIndex.HasValue)
+                {
+                    return IntegerIndexedElementGet(numericIndex.Value);
+                }
+            }
+
+            return base.Get(property, receiver);
         }
 
         /// <inheritdoc />
@@ -88,11 +205,38 @@ namespace NetScript.Runtime.Objects
                 return false;
             }
 
-            var offset = ByteOffset;
-            var elementSize = Description.Size;
-            var indexedPosition = (ulong)index * elementSize + offset;
+            var indexedPosition = (ulong)index * Description.Size + ByteOffset;
             ArrayBufferIntrinsics.SetValueInBuffer(Agent, buffer, indexedPosition, Description, numberValue, true, OrderType.Unordered, Agent.LittleEndian);
             return true;
+        }
+
+        private ScriptValue IntegerIndexedElementGet(double index)
+        {
+            //https://tc39.github.io/ecma262/#sec-integerindexedelementget
+            var buffer = ViewedArrayBuffer;
+            if (ArrayBufferIntrinsics.IsDetachedBuffer(buffer))
+            {
+                throw Agent.CreateTypeError();
+            }
+
+            if (!Agent.IsInteger(index))
+            {
+                return ScriptValue.Undefined;
+            }
+
+            if (index == 0 && index.IsNegative())
+            {
+                return ScriptValue.Undefined;
+            }
+
+            var length = ArrayLength;
+            if (index < 0 || index >= length)
+            {
+                return ScriptValue.Undefined;
+            }
+
+            var indexedPosition = (ulong)index * Description.Size + ByteOffset;
+            return ArrayBufferIntrinsics.GetValueFromBuffer(Agent, buffer, indexedPosition, Description, true, OrderType.Unordered, Agent.LittleEndian);
         }
 
         public ulong ByteLength { get; set; }

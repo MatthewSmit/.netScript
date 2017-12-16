@@ -7,7 +7,7 @@ using NetScript.Runtime.Objects;
 
 namespace NetScript.Runtime.Builtins
 {
-    internal static class TypedArrayIntrinsics
+    internal static unsafe class TypedArrayIntrinsics
     {
         public static (ScriptFunctionObject TypedArray, ScriptObject TypedArrayPrototype) Initialise([NotNull] Agent agent, [NotNull] Realm realm)
         {
@@ -143,9 +143,28 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue GetLength(ScriptArguments arg)
+        private static ScriptValue GetLength([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-get-%typedarray%.prototype.length
+            var obj = arg.ThisValue;
+            if (!obj.IsObject)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var realObject = (ScriptObject)obj;
+            if (!(realObject is ScriptIntegerIndexedObject))
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var buffer = ((ScriptIntegerIndexedObject)realObject).ViewedArrayBuffer;
+            if (ArrayBufferIntrinsics.IsDetachedBuffer(buffer))
+            {
+                return 0;
+            }
+
+            return ((ScriptIntegerIndexedObject)realObject).ArrayLength;
         }
 
         private static ScriptValue Map(ScriptArguments arg)
@@ -215,17 +234,17 @@ namespace NetScript.Runtime.Builtins
 
         private static readonly Dictionary<Type, TypeDescription> types = new Dictionary<Type, TypeDescription>
         {
-            { typeof(sbyte), new TypeDescription("Int8Array", ToInt8, 1) },
-            { typeof(byte), new TypeDescription("Uint8Array", ToUint8, 1) },
-            { typeof(short), new TypeDescription("Int16Array", ToInt16, 2) },
-            { typeof(ushort), new TypeDescription("Uint16Array", ToUint16, 2) },
-            { typeof(int), new TypeDescription("Int32Array", ToInt32, 4) },
-            { typeof(uint), new TypeDescription("Uint32Array", ToUint32, 4) },
-            { typeof(float), new TypeDescription("Float32Array", ToFloat32, 4) },
-            { typeof(double), new TypeDescription("Float64Array", ToFloat64, 8) }
+            { typeof(sbyte), new TypeDescription("Int8Array", ToInt8, ptr => *(sbyte*)ptr, 1) },
+            { typeof(byte), new TypeDescription("Uint8Array", ToUint8, ptr => *(byte*)ptr, 1) },
+            { typeof(short), new TypeDescription("Int16Array", ToInt16, ptr => *(short*)ptr, 2) },
+            { typeof(ushort), new TypeDescription("Uint16Array", ToUint16, ptr => *(ushort*)ptr, 2) },
+            { typeof(int), new TypeDescription("Int32Array", ToInt32, ptr => *(int*)ptr, 4) },
+            { typeof(uint), new TypeDescription("Uint32Array", ToUint32, ptr => *(uint*)ptr, 4) },
+            { typeof(float), new TypeDescription("Float32Array", ToFloat32, ptr => *(float*)ptr, 4) },
+            { typeof(double), new TypeDescription("Float64Array", ToFloat64, ptr => *(double*)ptr, 8) }
         };
 
-        private static readonly TypeDescription clampedUInt8 = new TypeDescription("Uint8ClampedArray", ToUint8Clamp, 1);
+        private static readonly TypeDescription clampedUInt8 = new TypeDescription("Uint8ClampedArray", ToUint8Clamp, ptr => *(byte*)ptr, 1);
 
         public static (ScriptFunctionObject TypedArray, ScriptObject TypedArrayPrototype) InitialiseType<T>([NotNull] Agent agent, [NotNull] Realm realm, bool clamped = false)
             where T : struct
@@ -250,7 +269,7 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static unsafe void ToUint8(double value, IntPtr ptr)
+        private static void ToUint8(double value, IntPtr ptr)
         {
             var rawBytes = (byte*)ptr;
 
@@ -274,7 +293,7 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static unsafe void ToUint16(double value, IntPtr ptr)
+        private static void ToUint16(double value, IntPtr ptr)
         {
             var rawBytes = (ushort*)ptr;
 
@@ -288,7 +307,7 @@ namespace NetScript.Runtime.Builtins
             }
         }
 
-        private static unsafe void ToInt32(double value, IntPtr ptr)
+        private static void ToInt32(double value, IntPtr ptr)
         {
             var rawBytes = (int*)ptr;
 
@@ -302,7 +321,7 @@ namespace NetScript.Runtime.Builtins
             }
         }
 
-        private static unsafe void ToUint32(double value, IntPtr ptr)
+        private static void ToUint32(double value, IntPtr ptr)
         {
             var rawBytes = (uint*)ptr;
 
@@ -316,7 +335,7 @@ namespace NetScript.Runtime.Builtins
             }
         }
 
-        private static unsafe void ToFloat32(double value, IntPtr ptr)
+        private static void ToFloat32(double value, IntPtr ptr)
         {
             var rawBytes = (float*)ptr;
             if (double.IsNaN(value))
@@ -329,7 +348,7 @@ namespace NetScript.Runtime.Builtins
             }
         }
 
-        private static unsafe void ToFloat64(double value, IntPtr ptr)
+        private static void ToFloat64(double value, IntPtr ptr)
         {
             var rawBytes = (double*)ptr;
             if (double.IsNaN(value))

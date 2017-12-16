@@ -99,14 +99,13 @@ namespace NetScript.Runtime.Objects
             var constructorEnvironment = calleeContext.LexicalEnvironment;
             var environmentRecord = (FunctionEnvironment)constructorEnvironment.Environment;
 
-            ScriptValue result;
             try
             {
-                result = OrdinaryCallEvaluateBody(arguments);
+                OrdinaryCallEvaluateBody(arguments);
             }
             catch (ReturnException e)
             {
-                result = e.Value;
+                var result = e.Value;
                 if (result.IsObject)
                 {
                     return result;

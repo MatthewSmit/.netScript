@@ -74,7 +74,6 @@ namespace NetScript.Runtime.Builtins
             Debug.Assert(!IsDetachedBuffer(arrayBuffer));
             var block = arrayBuffer.ArrayBuffer.Data;
             Debug.Assert(byteIndex + description.Size <= (ulong)block.Length);
-            //Let elementSize be the Number value of the Element Size value specified in Table 52 for Element Type type.
             byte* rawBytes = stackalloc byte[8];
             NumberToRawBytes(description, value, isLittleEndian, rawBytes);
             if (SharedArrayBufferIntrinsics.IsSharedArrayBuffer(arrayBuffer))
@@ -97,12 +96,54 @@ namespace NetScript.Runtime.Builtins
         private static unsafe void NumberToRawBytes([NotNull] TypeDescription description, double value, bool isLittleEndian, byte* rawBytes)
         {
             //https://tc39.github.io/ecma262/#sec-numbertorawbytes
-            description.Conversion(value, (IntPtr)rawBytes);
+            description.ConversionToBytes(value, (IntPtr)rawBytes);
 
             if (isLittleEndian != BitConverter.IsLittleEndian)
             {
                 Swap(rawBytes, description.Size);
             }
+        }
+
+        public static unsafe double GetValueFromBuffer([NotNull] Agent agent, [NotNull] ScriptObject arrayBuffer, ulong byteIndex, [NotNull] TypeDescription description, bool isTypedArray, OrderType order, bool isLittleEndian)
+        {
+            //https://tc39.github.io/ecma262/#sec-getvaluefrombuffer
+            Debug.Assert(!IsDetachedBuffer(arrayBuffer));
+            var block = arrayBuffer.ArrayBuffer.Data;
+            Debug.Assert(byteIndex + description.Size <= (ulong)block.Length);
+
+            byte* rawBytes = stackalloc byte[8];
+            if (SharedArrayBufferIntrinsics.IsSharedArrayBuffer(arrayBuffer))
+            {
+                //Let execution be the [[CandidateExecution]] field of the surrounding agent's Agent Record.
+                //Let eventList be the [[EventList]] field of the element in execution.[[EventLists]] whose [[AgentSignifier]] is AgentSignifier().
+                //If isTypedArray is true and type is "Int8", "Uint8", "Int16", "Uint16", "Int32", or "Uint32", let noTear be true; otherwise let noTear be false.
+                //Let rawValue be a List of length elementSize of nondeterministically chosen byte values.
+                //NOTE: In implementations, rawValue is the result of a non-atomic or atomic read instruction on the underlying hardware. The nondeterminism is a semantic prescription of the memory model to describe observable behaviour of hardware with weak consistency.
+                //Let readEvent be ReadSharedMemory{ [[Order]]: order, [[NoTear]]: noTear, [[Block]]: block, [[ByteIndex]]: byteIndex, [[ElementSize]]: elementSize }.
+                //Append readEvent to eventList.
+                //Append Chosen Value Record { [[Event]]: readEvent, [[ChosenValue]]: rawValue } to execution.[[ChosenValues]].
+                throw new NotImplementedException();
+            }
+            else
+            {
+                for (var i = 0u; i < description.Size; i++)
+                {
+                    rawBytes[i] = block[byteIndex + i];
+                }
+            }
+
+            return RawBytesToNumber(description, rawBytes, isLittleEndian);
+        }
+
+        private static unsafe double RawBytesToNumber([NotNull] TypeDescription description, byte* rawBytes, bool isLittleEndian)
+        {
+            //https://tc39.github.io/ecma262/#sec-rawbytestonumber
+            if (isLittleEndian != BitConverter.IsLittleEndian)
+            {
+                Swap(rawBytes, description.Size);
+            }
+
+            return description.ConversionFromBytes((IntPtr)rawBytes);
         }
 
         private static unsafe void Swap(byte* rawBytes, uint size)

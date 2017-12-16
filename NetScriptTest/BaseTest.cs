@@ -262,7 +262,7 @@ namespace NetScriptTest
             var object262 = realm.GlobalObject["$262"] = agent.CreateObject();
             object262["createRealm"] = agent.CreateUserFunction(arguments =>
             {
-                var newRealm = agent.CreateRealm();
+                var newRealm = agent.CreateRealm(Guid.NewGuid().ToString());
                 SetupRealm(agent, newRealm);
                 return newRealm.GlobalObject["$262"];
             });
