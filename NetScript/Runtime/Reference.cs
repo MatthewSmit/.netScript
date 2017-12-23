@@ -37,6 +37,14 @@ namespace NetScript.Runtime
             ReferencedName = name;
         }
 
+        public void InitialiseReferencedBinding(ScriptValue w)
+        {
+            //https://tc39.github.io/ecma262/#sec-initializereferencedbinding
+            Debug.Assert(!IsUnresolvableReference);
+            var baseValue = BaseEnvironment;
+            baseValue.InitialiseBinding(ReferencedName, w);
+        }
+
         public ScriptValue BaseValue
         {
             get

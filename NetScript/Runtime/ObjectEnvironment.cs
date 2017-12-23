@@ -30,7 +30,7 @@ namespace NetScript.Runtime
             var unscopables = BindingObject.Get(Symbol.Unscopables);
             if (unscopables.IsObject)
             {
-                var blocked = Agent.RealToBoolean(((ScriptObject)unscopables).Get(name));
+                var blocked = Agent.ToBoolean(((ScriptObject)unscopables).Get(name));
                 if (blocked)
                 {
                     return false;

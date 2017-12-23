@@ -11,7 +11,6 @@ namespace NetScript.Runtime
         //https://tc39.github.io/ecma262/#sec-type-conversion
 
         private const double MAX_DOUBLE = 9007199254740991; // 2^53-1
-        internal const ulong MAX_DOUBLE_U = 9007199254740991UL; // 2^53-1
         internal const long MAX_DOUBLE_L = 9007199254740991L; // 2^53-1
 
         private const string WHITESPACE = "[\t\v\f \u00A0\uFEFF\u1680\u2000-\u200A\u202F\u205F\u3000\n\r\u2028\u2029]";
@@ -95,12 +94,7 @@ namespace NetScript.Runtime
             throw CreateTypeError();
         }
 
-        public bool ToBoolean(ScriptValue argument)
-        {
-            return RealToBoolean(argument);
-        }
-
-        internal static bool RealToBoolean(ScriptValue argument)
+        internal static bool ToBoolean(ScriptValue argument)
         {
             switch (argument.ValueType)
             {

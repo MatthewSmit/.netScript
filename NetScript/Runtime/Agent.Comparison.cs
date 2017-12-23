@@ -110,7 +110,7 @@ namespace NetScript.Runtime
             var matcher = ((ScriptObject)argument).Get(Symbol.Match);
             if (matcher != ScriptValue.Undefined)
             {
-                return RealToBoolean(matcher);
+                return ToBoolean(matcher);
             }
 
             return ((ScriptObject)argument).SpecialObjectType == SpecialObjectType.RegExp;

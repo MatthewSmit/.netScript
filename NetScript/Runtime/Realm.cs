@@ -6,6 +6,9 @@ using NetScript.Runtime.Objects;
 
 namespace NetScript.Runtime
 {
+    /// <summary>
+    /// Contains the global objects and prototypes.
+    /// </summary>
     public sealed class Realm
     {
         private readonly string name;
@@ -16,9 +19,9 @@ namespace NetScript.Runtime
             Agent = agent;
             //https://tc39.github.io/ecma262/#sec-createrealm
             //https://tc39.github.io/ecma262/#sec-createintrinsics
-            ObjectPrototype = agent.ObjectCreate(this, null);
-            ThrowTypeError = agent.CreateBuiltinFunction(this, arguments => throw arguments.Agent.CreateTypeError(), null);
-            FunctionPrototype = agent.CreateBuiltinFunction(this, arguments => ScriptValue.Undefined, ObjectPrototype);
+            ObjectPrototype = Agent.ObjectCreate(this, null);
+            ThrowTypeError = Agent.CreateBuiltinFunction(this, arguments => throw arguments.Agent.CreateTypeError(), null);
+            FunctionPrototype = Agent.CreateBuiltinFunction(this, arguments => ScriptValue.Undefined, ObjectPrototype);
             ThrowTypeError.SetPrototypeOf(FunctionPrototype);
             AddRestrictedFunctionProperties(FunctionPrototype);
 
@@ -75,6 +78,82 @@ namespace NetScript.Runtime
             (Uint8ClampedArray, Uint8ClampedArrayPrototype) = TypedArrayIntrinsics.InitialiseType<byte>(agent, this, true);
             (Uint16Array, Uint16ArrayPrototype) = TypedArrayIntrinsics.InitialiseType<ushort>(agent, this);
             (Uint32Array, Uint32ArrayPrototype) = TypedArrayIntrinsics.InitialiseType<uint>(agent, this);
+        }
+
+        internal void SetRealmGlobalObject([CanBeNull] ScriptObject globalObject, [CanBeNull] ScriptObject thisValue)
+        {
+            //https://tc39.github.io/ecma262/#sec-setrealmglobalobject
+            if (globalObject == null)
+            {
+                globalObject = Agent.ObjectCreate(ObjectPrototype);
+            }
+
+            Debug.Assert(globalObject != null);
+            if (thisValue == null)
+            {
+                thisValue = globalObject;
+            }
+            GlobalObject = globalObject;
+            GlobalEnvironment = LexicalEnvironment.NewGlobalEnvironment(Agent, globalObject, thisValue);
+        }
+
+        internal void SetDefaultGlobalBindings()
+        {
+            var global = GlobalObject;
+            var agent = Agent;
+            agent.DefinePropertyOrThrow(global, "Infinity", new PropertyDescriptor(double.PositiveInfinity, false, false, false));
+            agent.DefinePropertyOrThrow(global, "NaN", new PropertyDescriptor(double.NaN, false, false, false));
+            agent.DefinePropertyOrThrow(global, "undefined", new PropertyDescriptor(ScriptValue.Undefined, false, false, false));
+
+            agent.DefinePropertyOrThrow(global, "eval", new PropertyDescriptor(Eval, true, false, true));
+            agent.DefinePropertyOrThrow(global, "isFinite", new PropertyDescriptor(IsFinite, true, false, true));
+            agent.DefinePropertyOrThrow(global, "isNaN", new PropertyDescriptor(IsNaN, true, false, true));
+            agent.DefinePropertyOrThrow(global, "parseFloat", new PropertyDescriptor(ParseFloat, true, false, true));
+            agent.DefinePropertyOrThrow(global, "parseInt", new PropertyDescriptor(ParseInt, true, false, true));
+            agent.DefinePropertyOrThrow(global, "decodeURI", new PropertyDescriptor(DecodeURI, true, false, true));
+            agent.DefinePropertyOrThrow(global, "decodeURIComponent", new PropertyDescriptor(DecodeURIComponent, true, false, true));
+            agent.DefinePropertyOrThrow(global, "encodeURI", new PropertyDescriptor(EncodeURI, true, false, true));
+            agent.DefinePropertyOrThrow(global, "encodeURIComponent", new PropertyDescriptor(EncodeURIComponent, true, false, true));
+
+            agent.DefinePropertyOrThrow(global, "Array", new PropertyDescriptor(Array, true, false, true));
+            agent.DefinePropertyOrThrow(global, "ArrayBuffer", new PropertyDescriptor(ArrayBuffer, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Boolean", new PropertyDescriptor(Boolean, true, false, true));
+            agent.DefinePropertyOrThrow(global, "DataView", new PropertyDescriptor(DataView, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Date", new PropertyDescriptor(Date, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Error", new PropertyDescriptor(Error, true, false, true));
+            agent.DefinePropertyOrThrow(global, "EvalError", new PropertyDescriptor(EvalError, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Float32Array", new PropertyDescriptor(Float32Array, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Float64Array", new PropertyDescriptor(Float64Array, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Function", new PropertyDescriptor(Function, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Int8Array", new PropertyDescriptor(Int8Array, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Int16Array", new PropertyDescriptor(Int16Array, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Int32Array", new PropertyDescriptor(Int32Array, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Map", new PropertyDescriptor(Map, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Number", new PropertyDescriptor(Number, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Object", new PropertyDescriptor(ObjectConstructor, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Proxy", new PropertyDescriptor(Proxy, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Promise", new PropertyDescriptor(Promise, true, false, true));
+            agent.DefinePropertyOrThrow(global, "RangeError", new PropertyDescriptor(RangeError, true, false, true));
+            agent.DefinePropertyOrThrow(global, "ReferenceError", new PropertyDescriptor(ReferenceError, true, false, true));
+            agent.DefinePropertyOrThrow(global, "RegExp", new PropertyDescriptor(RegExp, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Set", new PropertyDescriptor(Set, true, false, true));
+            agent.DefinePropertyOrThrow(global, "SharedArrayBuffer", new PropertyDescriptor(SharedArrayBuffer, true, false, true));
+            agent.DefinePropertyOrThrow(global, "String", new PropertyDescriptor(StringConstructor, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Symbol", new PropertyDescriptor(Symbol, true, false, true));
+            agent.DefinePropertyOrThrow(global, "SyntaxError", new PropertyDescriptor(SyntaxError, true, false, true));
+            agent.DefinePropertyOrThrow(global, "TypeError", new PropertyDescriptor(TypeError, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Uint8Array", new PropertyDescriptor(Uint8Array, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Uint8ClampedArray", new PropertyDescriptor(Uint8ClampedArray, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Uint16Array", new PropertyDescriptor(Uint16Array, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Uint32Array", new PropertyDescriptor(Uint32Array, true, false, true));
+            agent.DefinePropertyOrThrow(global, "URIError", new PropertyDescriptor(UriError, true, false, true));
+            agent.DefinePropertyOrThrow(global, "WeakMap", new PropertyDescriptor(WeakMap, true, false, true));
+            agent.DefinePropertyOrThrow(global, "WeakSet", new PropertyDescriptor(WeakSet, true, false, true));
+
+            agent.DefinePropertyOrThrow(global, "Atomics", new PropertyDescriptor(Atomics, true, false, true));
+            agent.DefinePropertyOrThrow(global, "JSON", new PropertyDescriptor(Json, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Math", new PropertyDescriptor(Math, true, false, true));
+            agent.DefinePropertyOrThrow(global, "Reflect", new PropertyDescriptor(Reflect, true, false, true));
         }
 
         private void AddRestrictedFunctionProperties([NotNull] ScriptObject function)

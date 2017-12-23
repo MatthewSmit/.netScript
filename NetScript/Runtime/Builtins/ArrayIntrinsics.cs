@@ -57,7 +57,7 @@ namespace NetScript.Runtime.Builtins
             var arrayProtoValues = Intrinsics.DefineFunction(arrayPrototype, "values", 0, realm, Values);
             Intrinsics.DefineDataProperty(arrayPrototype, Symbol.Iterator, arrayProtoValues);
 
-            var unscopableList = agent.ObjectCreate(realm, null);
+            var unscopableList = Agent.ObjectCreate(realm, null);
             unscopableList.CreateDataProperty("copyWithin", true);
             unscopableList.CreateDataProperty("entries", true);
             unscopableList.CreateDataProperty("fill", true);
@@ -235,7 +235,7 @@ namespace NetScript.Runtime.Builtins
                 if (keyPresent)
                 {
                     var keyValue = obj.Get(propertyKey);
-                    var testResult = Agent.RealToBoolean(arg.Agent.Call(callbackFunction, thisArg, keyValue, k, obj));
+                    var testResult = Agent.ToBoolean(arg.Agent.Call(callbackFunction, thisArg, keyValue, k, obj));
                     if (!testResult)
                     {
                         return false;
@@ -270,7 +270,7 @@ namespace NetScript.Runtime.Builtins
                 if (keyPresent)
                 {
                     var keyValue = obj.Get(propertyKey);
-                    var selected = Agent.RealToBoolean(arg.Agent.Call(callbackFunction, thisArg, keyValue, k, obj));
+                    var selected = Agent.ToBoolean(arg.Agent.Call(callbackFunction, thisArg, keyValue, k, obj));
                     if (selected)
                     {
                         arg.Agent.CreateDataPropertyOrThrow(array, to.ToString(CultureInfo.InvariantCulture), keyValue);
@@ -686,7 +686,7 @@ namespace NetScript.Runtime.Builtins
             var spreadable = ((ScriptObject)obj).Get(Symbol.IsConcatSpreadable);
             if (spreadable != ScriptValue.Undefined)
             {
-                return Agent.RealToBoolean(spreadable);
+                return Agent.ToBoolean(spreadable);
             }
 
             return agent.IsArray(obj);

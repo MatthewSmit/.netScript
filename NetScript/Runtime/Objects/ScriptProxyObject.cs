@@ -65,7 +65,7 @@ namespace NetScript.Runtime.Objects
                 return ProxyTarget.SetPrototypeOf(prototype);
             }
 
-            var booleanTrapResult = Agent.RealToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget, prototype));
+            var booleanTrapResult = Agent.ToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget, prototype));
             if (!booleanTrapResult)
             {
                 return false;
@@ -101,7 +101,7 @@ namespace NetScript.Runtime.Objects
                 return ProxyTarget.PreventExtensions();
             }
 
-            var booleanTrapResult = Agent.RealToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget));
+            var booleanTrapResult = Agent.ToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget));
             if (booleanTrapResult)
             {
                 var targetIsExtensible = ProxyTarget.IsExtensible;
@@ -197,7 +197,7 @@ namespace NetScript.Runtime.Objects
             }
 
             var descriptorObject = ObjectIntrinsics.FromPropertyDescriptor(Agent, descriptor);
-            var booleanTrapResult = Agent.RealToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget, property, descriptorObject));
+            var booleanTrapResult = Agent.ToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget, property, descriptorObject));
             if (!booleanTrapResult)
             {
                 return false;
@@ -251,7 +251,7 @@ namespace NetScript.Runtime.Objects
                 return ProxyTarget.HasProperty(property);
             }
 
-            var booleanTrapResult = Agent.RealToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget, property));
+            var booleanTrapResult = Agent.ToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget, property));
             if (!booleanTrapResult)
             {
                 var targetDescriptor = ProxyTarget.GetOwnProperty(property);
@@ -331,7 +331,7 @@ namespace NetScript.Runtime.Objects
                 return ProxyTarget.Set(property, value, receiver);
             }
 
-            var booleanTrapResult = Agent.RealToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget, property, value, receiver));
+            var booleanTrapResult = Agent.ToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget, property, value, receiver));
             if (!booleanTrapResult)
             {
                 return false;
@@ -376,7 +376,7 @@ namespace NetScript.Runtime.Objects
                 return ProxyTarget.Delete(property);
             }
 
-            var booleanTrapResult = Agent.RealToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget, property));
+            var booleanTrapResult = Agent.ToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget, property));
             if (!booleanTrapResult)
             {
                 return false;
@@ -549,7 +549,7 @@ namespace NetScript.Runtime.Objects
                     return ProxyTarget.IsExtensible;
                 }
 
-                var booleanTrapResult = Agent.RealToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget));
+                var booleanTrapResult = Agent.ToBoolean(Agent.Call(trap, ProxyHandler, ProxyTarget));
                 var targetResult = ProxyTarget.IsExtensible;
                 if (booleanTrapResult != targetResult)
                 {

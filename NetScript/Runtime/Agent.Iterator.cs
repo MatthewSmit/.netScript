@@ -51,10 +51,10 @@ namespace NetScript.Runtime
             return (ScriptObject)result;
         }
 
-        internal bool IteratorComplete([NotNull] ScriptObject iteratorResult)
+        internal static bool IteratorComplete([NotNull] ScriptObject iteratorResult)
         {
             //https://tc39.github.io/ecma262/#sec-iteratorcomplete
-            return RealToBoolean(iteratorResult.Get("done", iteratorResult));
+            return ToBoolean(iteratorResult.Get("done", iteratorResult));
         }
 
         internal static ScriptValue IteratorValue([NotNull] ScriptObject iteratorResult)
@@ -88,6 +88,15 @@ namespace NetScript.Runtime
                     throw CreateTypeError();
                 }
             }
+        }
+
+        internal ScriptValue CreateIterResultObject(ScriptValue value, bool done)
+        {
+            //https://tc39.github.io/ecma262/#sec-createiterresultobject
+            var obj = ObjectCreate(RunningExecutionContext.Realm.ObjectPrototype);
+            obj.CreateDataProperty("value", value);
+            obj.CreateDataProperty("done", done);
+            return obj;
         }
 
         internal (ScriptObject Iterator, ScriptFunctionObject NextMethod, bool Done) CreateListIteratorRecord(IReadOnlyList<ScriptValue> list)

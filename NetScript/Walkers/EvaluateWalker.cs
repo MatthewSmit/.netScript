@@ -224,7 +224,7 @@ namespace NetScript.Walkers
 
                 var expressionReference = Walk(doWhileStatement.Test, context);
                 var expressionValue = agent.GetValue(expressionReference);
-                if (!Agent.RealToBoolean(expressionValue))
+                if (!Agent.ToBoolean(expressionValue))
                 {
                     return value;
                 }
@@ -332,7 +332,7 @@ namespace NetScript.Walkers
             var expressionReference = Walk(ifStatement.Test, context);
             var result = agent.GetValue(expressionReference);
 
-            var expressionValue = Agent.RealToBoolean(result);
+            var expressionValue = Agent.ToBoolean(result);
 
             try
             {
@@ -578,7 +578,7 @@ namespace NetScript.Walkers
                         var lhs = agent.ResolveBinding(bindingId);
                         if (variableDeclarator.Init == null)
                         {
-                            Agent.InitialiseReferencedBinding(lhs, ScriptValue.Undefined);
+                            lhs.InitialiseReferencedBinding(ScriptValue.Undefined);
                         }
                         else
                         {
@@ -592,7 +592,7 @@ namespace NetScript.Walkers
                                     agent.SetFunctionName((ScriptObject)value, bindingId);
                                 }
                             }
-                            Agent.InitialiseReferencedBinding(lhs, value);
+                            lhs.InitialiseReferencedBinding(value);
                         }
                     }
                     else
@@ -617,7 +617,7 @@ namespace NetScript.Walkers
             {
                 var expressionReference = Walk(whileStatement.Test, context);
                 var expressionValue = agent.GetValue(expressionReference);
-                if (!Agent.RealToBoolean(expressionValue))
+                if (!Agent.ToBoolean(expressionValue))
                 {
                     return value;
                 }
@@ -982,7 +982,7 @@ namespace NetScript.Walkers
             var agent = context.Realm.Agent;
 
             var testReference = Walk(conditionalExpression.Test, context);
-            var testValue = Agent.RealToBoolean(agent.GetValue(testReference));
+            var testValue = Agent.ToBoolean(agent.GetValue(testReference));
 
             var valueReference = Walk(testValue ? conditionalExpression.Consequent : conditionalExpression.Alternate, context);
             return agent.GetValue(valueReference);
@@ -1065,7 +1065,7 @@ namespace NetScript.Walkers
 
             var leftReference = Walk(logicalExpression.Left, context);
             var leftValue = agent.GetValue(leftReference);
-            var leftBool = Agent.RealToBoolean(leftValue);
+            var leftBool = Agent.ToBoolean(leftValue);
 
             if (logicalExpression.Operator == Operator.LogicalAnd && !leftBool ||
                 logicalExpression.Operator == Operator.LogicalOr && leftBool)
@@ -1198,7 +1198,7 @@ namespace NetScript.Walkers
                 case Operator.LogicalNot:
                 {
                     //https://tc39.github.io/ecma262/#sec-logical-not-operator-runtime-semantics-evaluation
-                    var oldValue = Agent.RealToBoolean(agent.GetValue(reference));
+                    var oldValue = Agent.ToBoolean(agent.GetValue(reference));
                     return !oldValue;
                 }
 
@@ -1887,7 +1887,7 @@ namespace NetScript.Walkers
                 {
                     var testReference = Walk(test, context);
                     var textValue = agent.GetValue(testReference);
-                    if (!Agent.RealToBoolean(textValue))
+                    if (!Agent.ToBoolean(textValue))
                     {
                         return value;
                     }
@@ -1994,7 +1994,7 @@ namespace NetScript.Walkers
                     {
                         if (variableDeclaration != null && variableDeclaration.Kind != VariableKind.Var)
                         {
-                            Agent.InitialiseReferencedBinding(lhsReference, nextValue);
+                            lhsReference.InitialiseReferencedBinding(nextValue);
                         }
                         else
                         {
@@ -2118,7 +2118,7 @@ namespace NetScript.Walkers
                     {
                         if (variableDeclaration != null && variableDeclaration.Kind != VariableKind.Var)
                         {
-                            Agent.InitialiseReferencedBinding(lhsReference, nextValue);
+                            lhsReference.InitialiseReferencedBinding(nextValue);
                         }
                         else
                         {
@@ -2608,7 +2608,7 @@ namespace NetScript.Walkers
                             return;
                         }
 
-                        Agent.InitialiseReferencedBinding(lhs, array);
+                        lhs.InitialiseReferencedBinding(array);
                     }
                     return;
                 }
@@ -2690,7 +2690,7 @@ namespace NetScript.Walkers
             }
             else
             {
-                Agent.InitialiseReferencedBinding(lhs, value);
+                lhs.InitialiseReferencedBinding(value);
             }
         }
 
@@ -2734,7 +2734,7 @@ namespace NetScript.Walkers
             }
             else
             {
-                Agent.InitialiseReferencedBinding(lhs, value);
+                lhs.InitialiseReferencedBinding(value);
             }
         }
 
@@ -2960,7 +2960,7 @@ namespace NetScript.Walkers
             var instanceOfHandler = agent.GetMethod(target, Symbol.HasInstance);
             if (instanceOfHandler != ScriptValue.Undefined)
             {
-                return Agent.RealToBoolean(agent.Call(instanceOfHandler, target, value));
+                return Agent.ToBoolean(agent.Call(instanceOfHandler, target, value));
             }
 
             if (Agent.IsCallable(target))
