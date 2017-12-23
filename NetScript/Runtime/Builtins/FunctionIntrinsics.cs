@@ -13,7 +13,7 @@ namespace NetScript.Runtime.Builtins
         {
             //https://tc39.github.io/ecma262/#sec-function-objects
 
-            var function = Intrinsics.CreateBuiltinFunction(realm, Constructor, functionPrototype, 1, "Function", ConstructorKind.Base);
+            var function = Intrinsics.CreateBuiltinFunction(realm, Function, functionPrototype, 1, "Function", ConstructorKind.Base);
             Intrinsics.DefineDataProperty(function, "prototype", functionPrototype, false, false, false);
 
             Intrinsics.DefineDataProperty(functionPrototype, "length", 0);
@@ -29,7 +29,7 @@ namespace NetScript.Runtime.Builtins
             return function;
         }
 
-        private static ScriptValue Constructor([NotNull] ScriptArguments arg)
+        private static ScriptValue Function([NotNull] ScriptArguments arg)
         {
             //https://tc39.github.io/ecma262/#sec-function-p1-p2-pn-body
             return CreateDynamicFunction(arg.Function, arg.NewTarget, FunctionKind.Normal, arg);
@@ -63,7 +63,7 @@ namespace NetScript.Runtime.Builtins
 
             var targetObject = (ScriptObject)target;
 
-            var arguments = new ScriptValue[arg.Count - 1];
+            var arguments = new ScriptValue[Math.Max(arg.Count - 1, 0)];
             for (var i = 0; i < arguments.Length; i++)
             {
                 arguments[i] = arg[i + 1];
@@ -147,7 +147,7 @@ namespace NetScript.Runtime.Builtins
         }
 
 
-        private static ScriptValue CreateDynamicFunction([NotNull] ScriptObject constructor, ScriptObject newTarget, FunctionKind kind, [NotNull] ScriptArguments args)
+        internal static ScriptValue CreateDynamicFunction([NotNull] ScriptObject constructor, ScriptObject newTarget, FunctionKind kind, [NotNull] ScriptArguments args)
         {
             //https://tc39.github.io/ecma262/#sec-createdynamicfunction
 

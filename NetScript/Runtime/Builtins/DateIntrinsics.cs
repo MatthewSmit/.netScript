@@ -26,6 +26,7 @@ namespace NetScript.Runtime.Builtins
             var datePrototype = agent.ObjectCreate(objectPrototype);
             Intrinsics.DefineDataProperty(datePrototype, "constructor", date);
             Intrinsics.DefineFunction(datePrototype, "getDate", 0, realm, GetDate);
+            Intrinsics.DefineFunction(datePrototype, "getDay", 0, realm, GetDay);
             Intrinsics.DefineFunction(datePrototype, "getFullYear", 0, realm, GetFullYear);
             Intrinsics.DefineFunction(datePrototype, "getHours", 0, realm, GetHours);
             Intrinsics.DefineFunction(datePrototype, "getMilliseconds", 0, realm, GetMilliseconds);
@@ -179,7 +180,19 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue GetDate(ScriptArguments arg)
+        private static ScriptValue GetDate([NotNull] ScriptArguments arg)
+        {
+            //https://tc39.github.io/ecma262/#sec-date.prototype.getdate
+            var time = ThisTimeValue(arg.Agent, arg.ThisValue);
+            if (double.IsNaN(time))
+            {
+                return double.NaN;
+            }
+
+            return ToDateTime(time).ToLocalTime().Day;
+        }
+
+        private static ScriptValue GetDay([NotNull] ScriptArguments arg)
         {
             throw new NotImplementedException();
         }
@@ -245,9 +258,16 @@ namespace NetScript.Runtime.Builtins
             return (time - LocalTime(time)) / MILLISECONDS_PER_MINUTE;
         }
 
-        private static ScriptValue GetUTCDate(ScriptArguments arg)
+        private static ScriptValue GetUTCDate([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-date.prototype.getutcdate
+            var time = ThisTimeValue(arg.Agent, arg.ThisValue);
+            if (double.IsNaN(time))
+            {
+                return double.NaN;
+            }
+
+            return ToDateTime(time).ToUniversalTime().Day;
         }
 
         private static ScriptValue GetUTCDay(ScriptArguments arg)
@@ -255,9 +275,16 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue GetUTCFullYear(ScriptArguments arg)
+        private static ScriptValue GetUTCFullYear([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-date.prototype.getutcfullyear
+            var time = ThisTimeValue(arg.Agent, arg.ThisValue);
+            if (double.IsNaN(time))
+            {
+                return double.NaN;
+            }
+
+            return ToDateTime(time).ToUniversalTime().Year;
         }
 
         private static ScriptValue GetUTCHours(ScriptArguments arg)
@@ -275,9 +302,16 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue GetUTCMonth(ScriptArguments arg)
+        private static ScriptValue GetUTCMonth([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-date.prototype.getutcmonth
+            var time = ThisTimeValue(arg.Agent, arg.ThisValue);
+            if (double.IsNaN(time))
+            {
+                return double.NaN;
+            }
+
+            return ToDateTime(time).ToUniversalTime().Month - 1;
         }
 
         private static ScriptValue GetUTCSeconds(ScriptArguments arg)

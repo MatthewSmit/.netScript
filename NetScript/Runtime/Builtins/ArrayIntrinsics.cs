@@ -151,7 +151,7 @@ namespace NetScript.Runtime.Builtins
             //https://tc39.github.io/ecma262/#sec-array.prototype.concat
             var obj = arg.Agent.ToObject(arg.ThisValue);
             var array = ArraySpeciesCreate(arg.Agent, obj, 0);
-            var length = 0UL;
+            var length = 0L;
             var argumentIndex = -1;
 
             ScriptValue element = obj;
@@ -162,12 +162,12 @@ namespace NetScript.Runtime.Builtins
                 {
                     //Let k be 0.
                     var elementLength = arg.Agent.ToLength(((ScriptObject)element).Get("length"));
-                    if (length + elementLength > Agent.MAX_DOUBLE_U)
+                    if (length + elementLength > Agent.MAX_DOUBLE_L)
                     {
                         throw arg.Agent.CreateTypeError();
                     }
 
-                    for (var k = 0UL; k < elementLength; k++)
+                    for (var k = 0L; k < elementLength; k++)
                     {
                         var property = k.ToString(CultureInfo.InvariantCulture);
                         var exists = ((ScriptObject)element).HasProperty(property);
@@ -182,7 +182,7 @@ namespace NetScript.Runtime.Builtins
                 }
                 else
                 {
-                    if (length >= Agent.MAX_DOUBLE_U)
+                    if (length >= Agent.MAX_DOUBLE_L)
                     {
                         throw arg.Agent.CreateTypeError();
                     }
@@ -228,7 +228,7 @@ namespace NetScript.Runtime.Builtins
 
             var callbackFunction = (ScriptObject)arg[0];
             var thisArg = arg[1];
-            for (var k = 0UL; k < length; k++)
+            for (var k = 0L; k < length; k++)
             {
                 var propertyKey = k.ToString(CultureInfo.InvariantCulture);
                 var keyPresent = obj.HasProperty(propertyKey);
@@ -263,7 +263,7 @@ namespace NetScript.Runtime.Builtins
             var callbackFunction = (ScriptObject)arg[0];
             var thisArg = arg[1];
             var array = ArraySpeciesCreate(arg.Agent, obj, 0);
-            for (ulong k = 0, to = 0; k < length; k++)
+            for (long k = 0, to = 0; k < length; k++)
             {
                 var propertyKey = k.ToString(CultureInfo.InvariantCulture);
                 var keyPresent = obj.HasProperty(propertyKey);
@@ -303,7 +303,7 @@ namespace NetScript.Runtime.Builtins
             }
 
             var thisArg = arg[1];
-            for (var k = 0UL; k < length; k++)
+            for (var k = 0L; k < length; k++)
             {
                 var propertyKey = k.ToString(CultureInfo.InvariantCulture);
                 var keyPresent = obj.HasProperty(propertyKey);
@@ -375,7 +375,7 @@ namespace NetScript.Runtime.Builtins
             var seperator = arg[0] == ScriptValue.Undefined ? "," : arg.Agent.ToString(arg[0]);
 
             var result = new StringBuilder();
-            for (var k = 0UL; k < length; k++)
+            for (var k = 0L; k < length; k++)
             {
                 if (k > 0)
                 {
@@ -433,7 +433,7 @@ namespace NetScript.Runtime.Builtins
             var length = arg.Agent.ToLength(obj.Get("length", obj));
             //Let items be a List whose elements are, in left to right order, the arguments that were passed to this function invocation.
             var argumentCount = arg.Count;
-            if (length + (uint)argumentCount > Agent.MAX_DOUBLE_U)
+            if (length + argumentCount > Agent.MAX_DOUBLE_L)
             {
                 throw arg.Agent.CreateTypeError();
             }
@@ -542,7 +542,7 @@ namespace NetScript.Runtime.Builtins
 
             var index = obj.ArrayIteratorNextIndex;
             var itemKind = obj.ArrayIterationKind;
-            ulong length;
+            long length;
             if (array.SpecialObjectType == SpecialObjectType.TypedArray)
             {
                 //If IsDetachedBuffer(a.[[ViewedArrayBuffer]]) is true, throw a TypeError exception.

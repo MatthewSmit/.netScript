@@ -7,6 +7,7 @@ using System.Linq;
 using AcornSharp;
 using AcornSharp.Node;
 using JetBrains.Annotations;
+using NetScript.Runtime.Builtins;
 using NetScript.Runtime.Objects;
 
 namespace NetScript.Runtime
@@ -1100,7 +1101,8 @@ namespace NetScript.Runtime
             }
         }
 
-        internal object NewPromiseCapability([NotNull] ScriptObject constructor)
+        [NotNull]
+        internal PromiseCapability NewPromiseCapability([NotNull] ScriptObject constructor)
         {
             //https://tc39.github.io/ecma262/#sec-newpromisecapability
             if (!IsConstructor(constructor))
@@ -1109,15 +1111,25 @@ namespace NetScript.Runtime
             }
 
             //NOTE: C is assumed to be a constructor function that supports the parameter conventions of the Promise constructor (see 25.4.3.1).
-//            var promiseCapability = new PromiseCapability();
-            //Let executor be a new built-in function object as defined in GetCapabilitiesExecutor Functions.
-            //Set executor.[[Capability]] to promiseCapability.
-            //Let promise be ? Construct(C, « executor »).
-            //If IsCallable(promiseCapability.[[Resolve]]) is false, throw a TypeError exception.
-            //If IsCallable(promiseCapability.[[Reject]]) is false, throw a TypeError exception.
-            //Set promiseCapability.[[Promise]] to promise.
-            //Return promiseCapability.
-            throw new NotImplementedException();
+            var executor = new ScriptFunctionObject(constructor.Realm, constructor.Realm.FunctionPrototype, true, PromiseIntrinsics.GetCapabilitiesExecutor, SpecialObjectType.PromiseCapability);
+            var promiseCapability = executor.Capability;
+
+            var promise = Construct(constructor, new ScriptValue[]
+            {
+                executor
+            });
+
+            if (!IsCallable(promiseCapability.Resolve))
+            {
+                throw CreateTypeError();
+            }
+            if (!IsCallable(promiseCapability.Reject))
+            {
+                throw CreateTypeError();
+            }
+
+            promiseCapability.Promise = (ScriptObject)promise;
+            return promiseCapability;
         }
 
         [NotNull]
@@ -1146,7 +1158,7 @@ namespace NetScript.Runtime
             var length = ToLength(((ScriptObject)obj).Get("length"));
 
             var list = new List<ScriptValue>();
-            var index = 0UL;
+            var index = 0L;
             while (index < length)
             {
                 var indexName = index.ToString(CultureInfo.InvariantCulture);
@@ -1212,6 +1224,35 @@ namespace NetScript.Runtime
             {
                 throw CreateTypeError();
             }
+        }
+
+        [NotNull]
+        internal ScriptObject SpeciesConstructor([NotNull] ScriptObject obj, [NotNull] ScriptFunctionObject defaultConstructor)
+        {
+            //https://tc39.github.io/ecma262/#sec-speciesconstructor
+            var constructor = obj.Get("constructor");
+            if (constructor == ScriptValue.Undefined)
+            {
+                return defaultConstructor;
+            }
+
+            if (!constructor.IsObject)
+            {
+                throw CreateTypeError();
+            }
+
+            var species = ((ScriptObject)constructor).Get(Symbol.Species);
+            if (species == ScriptValue.Undefined || species == ScriptValue.Null)
+            {
+                return defaultConstructor;
+            }
+
+            if (IsConstructor(species))
+            {
+                return (ScriptObject)species;
+            }
+
+            throw CreateTypeError();
         }
 
         /// <summary>

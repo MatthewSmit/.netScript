@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Globalization;
 using JetBrains.Annotations;
 using NetScript.Runtime.Objects;
@@ -110,6 +109,17 @@ namespace NetScript.Runtime
             }
 
             return Agent.SameValueNonNumber(this, other);
+        }
+
+        [NotNull]
+        internal ScriptObject AsObject(Agent agent)
+        {
+            if (!IsObject)
+            {
+                throw agent.CreateTypeError();
+            }
+
+            return (ScriptObject)this;
         }
 
         /// <inheritdoc />

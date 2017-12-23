@@ -12,6 +12,7 @@ namespace NetScript.Runtime
 
         private const double MAX_DOUBLE = 9007199254740991; // 2^53-1
         internal const ulong MAX_DOUBLE_U = 9007199254740991UL; // 2^53-1
+        internal const long MAX_DOUBLE_L = 9007199254740991L; // 2^53-1
 
         private const string WHITESPACE = "[\t\v\f \u00A0\uFEFF\u1680\u2000-\u200A\u202F\u205F\u3000\n\r\u2028\u2029]";
         private static readonly Regex whitespaceRegex = new Regex("^" + WHITESPACE + "*$", RegexOptions.Compiled);
@@ -402,7 +403,7 @@ namespace NetScript.Runtime
             return ToString(key);
         }
 
-        internal ulong ToLength(ScriptValue argument)
+        internal long ToLength(ScriptValue argument)
         {
             //https://tc39.github.io/ecma262/#sec-tolength
             var length = ToInteger(argument);
@@ -411,7 +412,7 @@ namespace NetScript.Runtime
                 return 0;
             }
 
-            return (ulong)Math.Min(length, MAX_DOUBLE);
+            return (long)Math.Min(length, MAX_DOUBLE);
         }
 
         internal double? CanonicalNumericIndexString([NotNull] string argument)
@@ -431,7 +432,7 @@ namespace NetScript.Runtime
             return number;
         }
 
-        internal ulong ToIndex(ScriptValue value)
+        internal long ToIndex(ScriptValue value)
         {
             //https://tc39.github.io/ecma262/#sec-toindex
             if (value == ScriptValue.Undefined)

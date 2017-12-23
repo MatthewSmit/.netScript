@@ -3,10 +3,10 @@ using NetScript.Runtime.Objects;
 
 namespace NetScript.Runtime
 {
-    internal struct PromiseCapability
+    internal sealed class PromiseCapability
     {
         [CanBeNull] public ScriptObject Promise;
-        [CanBeNull] public ScriptFunctionObject Resolve;
-        [CanBeNull] public ScriptFunctionObject Reject;
+        [CanBeNull] public ScriptObject Resolve;
+        [CanBeNull] public ScriptObject Reject;
     }
 }

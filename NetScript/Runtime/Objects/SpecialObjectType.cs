@@ -13,6 +13,10 @@
         RegExp,
         Symbol,
         ArrayBuffer,
-        RevocableProxy
+        RevocableProxy,
+        DataView,
+        PromiseCapability,
+        PromiseState,
+        Promise
     }
 }

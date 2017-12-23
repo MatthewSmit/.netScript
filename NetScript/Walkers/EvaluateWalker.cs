@@ -50,7 +50,8 @@ namespace NetScript.Walkers
                 case BreakStatementNode breakStatement:
                     return Walk(breakStatement, context);
                 case ClassDeclarationNode classDeclaration:
-                    return Walk(classDeclaration, context);
+                    Walk(classDeclaration, context);
+                    return default;
                 case ContinueStatementNode continueStatement:
                     return Walk(continueStatement, context);
                 case DoWhileStatementNode doWhileStatement:
@@ -149,7 +150,7 @@ namespace NetScript.Walkers
             throw new BreakException();
         }
 
-        private static ValueReference Walk([NotNull] ClassDeclarationNode classDeclaration, [NotNull] ExecutionContext context)
+        private static void Walk([NotNull] ClassDeclarationNode classDeclaration, [NotNull] ExecutionContext context)
         {
             //https://tc39.github.io/ecma262/#sec-class-definitions-runtime-semantics-evaluation
 
@@ -165,7 +166,6 @@ namespace NetScript.Walkers
 
             var environment = context.LexicalEnvironment;
             InitialiseBoundName(context.Realm.Agent, className, value, environment);
-            return ScriptValue.Undefined;
         }
 
         private static ValueReference Walk([NotNull] ContinueStatementNode continueStatement, [NotNull] ExecutionContext context)
@@ -1146,7 +1146,7 @@ namespace NetScript.Walkers
 
             foreach (var property in objectExpression.Properties)
             {
-                PropertyDefinitionEvaluation(context, property.Method ? PropertyKind.Method : property.Kind, property.Computed, property.Key, property.Value, obj, true);
+                PropertyDefinitionEvaluation(context, property.Method ? PropertyKind.Method : property.Kind, property.Computed, property.Key, property.Value, obj, true, false);
             }
 
             return obj;
@@ -1272,6 +1272,7 @@ namespace NetScript.Walkers
         [NotNull]
         private static IReadOnlyList<ScriptValue> ArgumentListEvaluation([NotNull] IEnumerable<ExpressionNode> arguments, [NotNull] ExecutionContext context)
         {
+            //https://tc39.github.io/ecma262/#sec-argument-lists-runtime-semantics-argumentlistevaluation
             var agent = context.Realm.Agent;
             var list = new List<ScriptValue>();
 
@@ -1279,7 +1280,19 @@ namespace NetScript.Walkers
             {
                 if (argument is SpreadElementNode spread)
                 {
-                    throw new NotImplementedException();
+                    var spreadReference = Walk(spread.Argument, context);
+                    var iteratorRecord = agent.GetIterator(agent.GetValue(spreadReference));
+                    while (true)
+                    {
+                        var next = agent.IteratorStep(iteratorRecord);
+                        if (next.IsBoolean && !(bool)next)
+                        {
+                            break;
+                        }
+
+                        var nextArgument = Agent.IteratorValue((ScriptObject)next);
+                        list.Add(nextArgument);
+                    }
                 }
                 else
                 {
@@ -1619,7 +1632,7 @@ namespace NetScript.Walkers
             }
 
             context.LexicalEnvironment = classScope;
-            var constructorInfo = DefineMethod(context, constructor.Computed, constructor.Key, constructor.Value, prototype, constructorParent);
+            var constructorInfo = DefineMethod(context, constructor.Computed, constructor.Key, constructor.Value, prototype, constructorParent, true);
             var function = constructorInfo.Closure;
             if (classHeritage != null)
             {
@@ -1636,11 +1649,11 @@ namespace NetScript.Walkers
                 {
                     if (!method.Static)
                     {
-                        PropertyDefinitionEvaluation(context, method.Kind, method.Computed, method.Key, method.Value, prototype, false);
+                        PropertyDefinitionEvaluation(context, method.Kind, method.Computed, method.Key, method.Value, prototype, false, true);
                     }
                     else
                     {
-                        PropertyDefinitionEvaluation(context, method.Kind, method.Computed, method.Key, method.Value, function, false);
+                        PropertyDefinitionEvaluation(context, method.Kind, method.Computed, method.Key, method.Value, function, false, true);
                     }
                 }
             }
@@ -1682,12 +1695,12 @@ namespace NetScript.Walkers
             }
         }
 
-        private static (ScriptValue Key, ScriptFunctionObject Closure) DefineMethod([NotNull] ExecutionContext context, bool computed, [NotNull] ExpressionNode key, [NotNull] FunctionExpressionNode value, [NotNull] ScriptObject obj, [CanBeNull] ScriptObject functionPrototype = null)
+        private static (ScriptValue Key, ScriptFunctionObject Closure) DefineMethod([NotNull] ExecutionContext context, bool computed, [NotNull] ExpressionNode key, [NotNull] FunctionExpressionNode value, [NotNull] ScriptObject obj, [CanBeNull] ScriptObject functionPrototype = null, bool forceStrict = false)
         {
             //https://tc39.github.io/ecma262/#sec-runtime-semantics-definemethod
 
             var propertyKey = EvaluatePropertyName(computed, key, context);
-            var strict = context.Strict;
+            var strict = forceStrict || context.Strict;
             var scope = context.LexicalEnvironment;
 
             FunctionKind kind;
@@ -2010,17 +2023,29 @@ namespace NetScript.Walkers
                 }
                 catch (BreakException e)
                 {
-                    if (e.Target != null)
+                    if (e.Target != null && (labelSet == null || !labelSet.Contains(e.Target)))
                     {
-                        throw new NotImplementedException();
+                        throw;
+                    }
+
+                    if (e.Value.HasValue)
+                    {
+                        value = e.Value.Value;
                     }
 
                     return value;
                 }
                 catch (ContinueException e)
                 {
-                    //https://tc39.github.io/ecma262/#sec-loopcontinues
-                    throw new NotImplementedException();
+                    if (e.Target != null && (labelSet == null || !labelSet.Contains(e.Target)))
+                    {
+                        throw;
+                    }
+
+                    if (e.Value.HasValue)
+                    {
+                        value = e.Value.Value;
+                    }
                 }
                 finally
                 {
@@ -2122,18 +2147,29 @@ namespace NetScript.Walkers
                 }
                 catch (BreakException e)
                 {
-                    if (e.Target != null)
+                    if (e.Target != null && (labelSet == null || !labelSet.Contains(e.Target)))
                     {
-                        throw new NotImplementedException();
+                        throw;
                     }
 
-                    agent.IteratorClose(iteratorRecord);
+                    if (e.Value.HasValue)
+                    {
+                        value = e.Value.Value;
+                    }
+
                     return value;
                 }
                 catch (ContinueException e)
                 {
-                    //https://tc39.github.io/ecma262/#sec-loopcontinues
-                    throw new NotImplementedException();
+                    if (e.Target != null && (labelSet == null || !labelSet.Contains(e.Target)))
+                    {
+                        throw;
+                    }
+
+                    if (e.Value.HasValue)
+                    {
+                        value = e.Value.Value;
+                    }
                 }
                 finally
                 {
@@ -2281,7 +2317,7 @@ namespace NetScript.Walkers
             return new Reference(baseValue, propertyKey, actualThis, strict);
         }
 
-        private static void PropertyDefinitionEvaluation([NotNull] ExecutionContext context, PropertyKind kind, bool computed, [NotNull] ExpressionNode key, [NotNull] ExpressionNode value, [NotNull] ScriptObject obj, bool enumerable)
+        private static void PropertyDefinitionEvaluation([NotNull] ExecutionContext context, PropertyKind kind, bool computed, [NotNull] ExpressionNode key, [NotNull] ExpressionNode value, [NotNull] ScriptObject obj, bool enumerable, bool forceStrict)
         {
             var agent = context.Realm.Agent;
 
@@ -2314,7 +2350,7 @@ namespace NetScript.Walkers
                     Debug.Assert(!function.Generator && !function.Async);
 
                     var propertyKey = EvaluatePropertyName(computed, key, context);
-                    var closure = agent.FunctionCreate(FunctionKind.Method, function.Parameters, function.Body, context.LexicalEnvironment, context.Strict);
+                    var closure = agent.FunctionCreate(FunctionKind.Method, function.Parameters, function.Body, context.LexicalEnvironment, forceStrict || context.Strict);
                     Agent.MakeMethod(closure, obj);
                     agent.SetFunctionName(closure, propertyKey, "get");
                     var descriptor = new PropertyDescriptor(closure, null, enumerable, true);
@@ -2329,7 +2365,7 @@ namespace NetScript.Walkers
                     Debug.Assert(!function.Generator && !function.Async);
 
                     var propertyKey = EvaluatePropertyName(computed, key, context);
-                    var closure = agent.FunctionCreate(FunctionKind.Method, function.Parameters, function.Body, context.LexicalEnvironment, context.Strict);
+                    var closure = agent.FunctionCreate(FunctionKind.Method, function.Parameters, function.Body, context.LexicalEnvironment, forceStrict || context.Strict);
                     Agent.MakeMethod(closure, obj);
                     agent.SetFunctionName(closure, propertyKey, "set");
                     var descriptor = new PropertyDescriptor(null, closure, enumerable, true);
@@ -2345,7 +2381,7 @@ namespace NetScript.Walkers
                     {
                         //https://tc39.github.io/ecma262/#sec-generator-function-definitions-runtime-semantics-propertydefinitionevaluation
                         var propertyKey = EvaluatePropertyName(computed, key, context);
-                        var closure = agent.GeneratorFunctionCreate(FunctionKind.Method, function.Parameters, function.Body, context.LexicalEnvironment, context.Strict);
+                        var closure = agent.GeneratorFunctionCreate(FunctionKind.Method, function.Parameters, function.Body, context.LexicalEnvironment, forceStrict || context.Strict);
                         Agent.MakeMethod(closure, obj);
 
                         var prototype = agent.ObjectCreate(context.Realm.GeneratorPrototype);
@@ -2358,7 +2394,7 @@ namespace NetScript.Walkers
                     {
                         //https://tc39.github.io/ecma262/#sec-async-function-definitions-PropertyDefinitionEvaluation
                         var propertyKey = EvaluatePropertyName(computed, key, context);
-                        var closure = agent.AsyncFunctionCreate(FunctionKind.Method, function.Parameters, function.Body, context.LexicalEnvironment, context.Strict);
+                        var closure = agent.AsyncFunctionCreate(FunctionKind.Method, function.Parameters, function.Body, context.LexicalEnvironment, forceStrict || context.Strict);
                         Agent.MakeMethod(closure, obj);
                         agent.SetFunctionName(closure, propertyKey);
 
@@ -2368,7 +2404,7 @@ namespace NetScript.Walkers
                     else
                     {
                         //https://tc39.github.io/ecma262/#sec-method-definitions-runtime-semantics-propertydefinitionevaluation
-                        var methodDefinition = DefineMethod(context, computed, key, function, obj);
+                        var methodDefinition = DefineMethod(context, computed, key, function, obj, null, forceStrict);
                         agent.SetFunctionName(methodDefinition.Closure, methodDefinition.Key);
                         var descriptor = new PropertyDescriptor(methodDefinition.Closure, true, enumerable, true);
                         agent.DefinePropertyOrThrow(obj, methodDefinition.Key, descriptor);

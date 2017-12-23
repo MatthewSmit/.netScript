@@ -22,7 +22,9 @@ namespace NetScript.Runtime.Builtins
 
         public static void DefineAccessorProperty([NotNull] ScriptObject scriptObject, ScriptValue property, [CanBeNull] ScriptFunctionObject get, [CanBeNull] ScriptFunctionObject set, bool enumerable = false, bool configurable = true)
         {
-            scriptObject.DefineOwnProperty(property, new PropertyDescriptor(get, set, enumerable, configurable));
+            scriptObject.DefineOwnProperty(property, new PropertyDescriptor(get == null ? null : (ScriptValue?)(ScriptValue)get,
+                set == null ? null : (ScriptValue?)(ScriptValue)set,
+                enumerable, configurable));
         }
 
         [NotNull]

@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using NetScript.Runtime.Objects;
 
 namespace NetScript.Runtime.Builtins
@@ -37,104 +38,153 @@ namespace NetScript.Runtime.Builtins
             return (dataView, dataViewPrototype);
         }
 
-        private static ScriptValue DataView(ScriptArguments arg)
+        private static ScriptValue DataView([NotNull] ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-dataview-buffer-byteoffset-bytelength
+            if (arg.NewTarget == null)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var buffer = arg[0].AsObject(arg.Agent);
+            if (buffer.SpecialObjectType != SpecialObjectType.ArrayBuffer)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var offset = arg.Agent.ToIndex(arg[1]);
+            if (ArrayBufferIntrinsics.IsDetachedBuffer(buffer))
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var bufferByteLength = buffer.ArrayBuffer.Data.LongLength;
+            if (offset > bufferByteLength)
+            {
+                throw arg.Agent.CreateRangeError();
+            }
+
+            long viewByteLength;
+            if (arg[2] == ScriptValue.Undefined)
+            {
+                viewByteLength = bufferByteLength - offset;
+            }
+            else
+            {
+                viewByteLength = arg.Agent.ToIndex(arg[2]);
+                if (offset + viewByteLength > bufferByteLength)
+                {
+                    throw arg.Agent.CreateRangeError();
+                }
+            }
+
+            var obj = arg.Agent.OrdinaryCreateFromConstructor(arg.NewTarget, arg.Function.Realm.DataViewPrototype, SpecialObjectType.DataView);
+            obj.DataView.ViewedArrayBuffer = buffer;
+            obj.DataView.ByteLength = viewByteLength;
+            obj.DataView.ByteOffset = offset;
+            return obj;
         }
 
-        private static ScriptValue GetBuffer(ScriptArguments arg)
+        private static ScriptValue GetBuffer([NotNull] ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-get-dataview.prototype.buffer
+            var obj = arg.ThisValue.AsObject(arg.Agent);
+            if (obj.SpecialObjectType != SpecialObjectType.DataView)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            return obj.DataView.ViewedArrayBuffer;
         }
 
         private static ScriptValue GetByteLength(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue GetByteOffset(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue GetFloat32(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue GetFloat64(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue GetInt8(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue GetInt16(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue GetInt32(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue GetUint8(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue GetUint16(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue GetUint32(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue SetFloat32(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue SetFloat64(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue SetInt8(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue SetInt16(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue SetInt32(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue SetUint8(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue SetUint16(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue SetUint32(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

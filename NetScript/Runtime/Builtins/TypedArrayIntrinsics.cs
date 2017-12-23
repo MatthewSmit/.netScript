@@ -73,9 +73,16 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue GetBuffer(ScriptArguments arg)
+        private static ScriptValue GetBuffer([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-get-%typedarray%.prototype.buffer
+            var obj = arg.ThisValue.AsObject(arg.Agent);
+            if (obj.SpecialObjectType != SpecialObjectType.TypedArray)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            return ((ScriptIntegerIndexedObject)obj).ViewedArrayBuffer;
         }
 
         private static ScriptValue GetByteLength(ScriptArguments arg)
@@ -377,27 +384,85 @@ namespace NetScript.Runtime.Builtins
                     //https://tc39.github.io/ecma262/#sec-typedarray-typedarray
                     throw new NotImplementedException();
                 }
-                else if (obj.SpecialObjectType == SpecialObjectType.ArrayBuffer)
+
+                if (obj.SpecialObjectType == SpecialObjectType.ArrayBuffer)
                 {
-                    //https://tc39.github.io/ecma262/#sec-typedarray-buffer-byteoffset-length
-                    throw new NotImplementedException();
+                    return TypedArrayBuffer(arg, description, typedArrayPrototype);
                 }
-                else
-                {
-                    return TypedArrayObject(arg, description, typedArrayPrototype);
-                }
+
+                return TypedArrayObject(arg, description, typedArrayPrototype);
             }
-            else
+
+            //https://tc39.github.io/ecma262/#sec-typedarray-length
+            if (arg.NewTarget == null)
             {
-                //https://tc39.github.io/ecma262/#sec-typedarray-length
-                if (arg.NewTarget == null)
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var elementLength = arg.Agent.ToIndex(arg[0]);
+            return AllocateTypedArray(arg.Agent, arg.Function.Realm, description, arg.NewTarget, typedArrayPrototype, elementLength);
+        }
+
+        private static ScriptValue TypedArrayBuffer([NotNull] ScriptArguments arg, [NotNull] TypeDescription description, [NotNull] ScriptObject typedArrayPrototype)
+        {
+            //https://tc39.github.io/ecma262/#sec-typedarray-buffer-byteoffset-length
+            var buffer = arg[0].AsObject(arg.Agent);
+            Debug.Assert(buffer.SpecialObjectType == SpecialObjectType.ArrayBuffer);
+
+            if (arg.NewTarget == null)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var obj = AllocateTypedArray(arg.Agent, arg.Function.Realm, description, arg.NewTarget, typedArrayPrototype);
+            var elementSize = description.Size;
+            var offset = arg.Agent.ToIndex(arg[1]);
+            if (offset % elementSize != 0)
+            {
+                throw arg.Agent.CreateRangeError();
+            }
+
+            long newByteLength;
+            if (arg[2] != ScriptValue.Undefined)
+            {
+                var newLength = arg.Agent.ToIndex(arg[2]);
+                if (ArrayBufferIntrinsics.IsDetachedBuffer(buffer))
                 {
                     throw arg.Agent.CreateTypeError();
                 }
 
-                var elementLength = arg.Agent.ToIndex(arg[0]);
-                return AllocateTypedArray(arg.Agent, arg.Function.Realm, description, arg.NewTarget, typedArrayPrototype, elementLength);
+                var bufferByteLength = buffer.ArrayBuffer.Data.LongLength;
+                if (bufferByteLength % elementSize != 0)
+                {
+                    throw arg.Agent.CreateRangeError();
+                }
+
+                newByteLength = newLength * elementSize;
+                if (offset + newByteLength > bufferByteLength)
+                {
+                    throw arg.Agent.CreateRangeError();
+                }
             }
+            else
+            {
+                if (ArrayBufferIntrinsics.IsDetachedBuffer(buffer))
+                {
+                    throw arg.Agent.CreateTypeError();
+                }
+
+                var bufferByteLength = buffer.ArrayBuffer.Data.LongLength;
+                newByteLength = bufferByteLength - offset;
+                if (newByteLength < 0)
+                {
+                    throw arg.Agent.CreateRangeError();
+                }
+            }
+
+            obj.ViewedArrayBuffer = buffer;
+            obj.ByteLength = newByteLength;
+            obj.ByteOffset = offset;
+            obj.ArrayLength = newByteLength / elementSize;
+            return obj;
         }
 
         private static ScriptValue TypedArrayObject([NotNull] ScriptArguments arg, [NotNull] TypeDescription description, [NotNull] ScriptObject typedArrayPrototype)
@@ -417,7 +482,7 @@ namespace NetScript.Runtime.Builtins
             {
                 var values = IterableToList(arg.Agent, obj, usingIterator);
                 var length = values.Count;
-                AllocateTypedArrayBuffer(arg.Agent, arg.Function.Realm, typedArray, (ulong)length);
+                AllocateTypedArrayBuffer(arg.Agent, arg.Function.Realm, typedArray, length);
                 for (var k = 0; k < length; k++)
                 {
                     var propertyKey = k.ToString(CultureInfo.InvariantCulture);
@@ -443,7 +508,7 @@ namespace NetScript.Runtime.Builtins
 
 
         [NotNull]
-        private static ScriptIntegerIndexedObject AllocateTypedArray([NotNull] Agent agent, [NotNull] Realm realm, [NotNull] TypeDescription description, [NotNull] ScriptObject newTarget, [NotNull] ScriptObject defaultPrototype, ulong? length = null)
+        private static ScriptIntegerIndexedObject AllocateTypedArray([NotNull] Agent agent, [NotNull] Realm realm, [NotNull] TypeDescription description, [NotNull] ScriptObject newTarget, [NotNull] ScriptObject defaultPrototype, long? length = null)
         {
             //https://tc39.github.io/ecma262/#sec-allocatetypedarray
             var prototype = Agent.GetPrototypeFromConstructor(newTarget, defaultPrototype);
@@ -455,7 +520,7 @@ namespace NetScript.Runtime.Builtins
             return obj;
         }
 
-        private static void AllocateTypedArrayBuffer([NotNull] Agent agent, [NotNull] Realm realm, [NotNull] ScriptIntegerIndexedObject obj, ulong length)
+        private static void AllocateTypedArrayBuffer([NotNull] Agent agent, [NotNull] Realm realm, [NotNull] ScriptIntegerIndexedObject obj, long length)
         {
             //https://tc39.github.io/ecma262/#sec-allocatetypedarraybuffer
             Debug.Assert(obj.ViewedArrayBuffer == null);

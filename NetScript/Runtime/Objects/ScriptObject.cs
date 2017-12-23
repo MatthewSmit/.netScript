@@ -31,10 +31,36 @@ namespace NetScript.Runtime.Objects
             public bool Shared;
         }
 
+        internal sealed class DataViewInternals
+        {
+            public ScriptObject ViewedArrayBuffer;
+            public long ByteLength;
+            public long ByteOffset;
+        }
+
         internal sealed class RegExpInternals
         {
             public string OriginalSource;
             public string OriginalFlags;
+        }
+
+        internal sealed class PromiseStateInternals
+        {
+            internal enum PromiseState
+            {
+                Pending
+            }
+
+            public PromiseState State;
+            public List<object> FulfillReactions;
+            public List<object> RejectReactions;
+            public bool IsHandled;
+        }
+
+        internal sealed class PromiseInternals
+        {
+            public ScriptObject Promise;
+            public ScriptValue Value;
         }
 
         private sealed class BasicInternal<T>
@@ -82,11 +108,23 @@ namespace NetScript.Runtime.Objects
                 case SpecialObjectType.ArrayBuffer:
                     specialValue = new ArrayBufferInternals();
                     break;
+                case SpecialObjectType.DataView:
+                    specialValue = new DataViewInternals();
+                    break;
                 case SpecialObjectType.RegExp:
                     specialValue = new RegExpInternals();
                     break;
                 case SpecialObjectType.RevocableProxy:
                     specialValue = new BasicInternal<ScriptObject>();
+                    break;
+                case SpecialObjectType.PromiseCapability:
+                    specialValue = new PromiseCapability();
+                    break;
+                case SpecialObjectType.Promise:
+                    specialValue = new PromiseInternals();
+                    break;
+                case SpecialObjectType.PromiseState:
+                    specialValue = new PromiseStateInternals();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(specialObjectType), specialObjectType, null);
@@ -245,12 +283,12 @@ namespace NetScript.Runtime.Objects
             return Agent.Call((ScriptObject)getter.Value, receiver);
         }
 
-        internal virtual ScriptValue Call(ScriptValue thisValue, IReadOnlyList<ScriptValue> arguments)
+        internal virtual ScriptValue Call(ScriptValue thisValue, [NotNull] IReadOnlyList<ScriptValue> arguments)
         {
             throw new NotImplementedException();
         }
 
-        internal virtual ScriptValue Construct(IReadOnlyList<ScriptValue> arguments, ScriptObject newTarget)
+        internal virtual ScriptValue Construct([NotNull] IReadOnlyList<ScriptValue> arguments, ScriptObject newTarget)
         {
             throw new NotImplementedException();
         }
@@ -697,6 +735,15 @@ namespace NetScript.Runtime.Objects
             }
         }
 
+        internal DataViewInternals DataView
+        {
+            get
+            {
+                Debug.Assert(SpecialObjectType == SpecialObjectType.DataView);
+                return (DataViewInternals)specialValue;
+            }
+        }
+
         internal RegExpInternals RegExp
         {
             get
@@ -717,6 +764,33 @@ namespace NetScript.Runtime.Objects
             {
                 Debug.Assert(SpecialObjectType == SpecialObjectType.RevocableProxy);
                 ((BasicInternal<ScriptObject>)specialValue).Value = value;
+            }
+        }
+
+        internal PromiseCapability Capability
+        {
+            get
+            {
+                Debug.Assert(SpecialObjectType == SpecialObjectType.PromiseCapability);
+                return (PromiseCapability)specialValue;
+            }
+        }
+
+        internal PromiseStateInternals PromiseState
+        {
+            get
+            {
+                Debug.Assert(SpecialObjectType == SpecialObjectType.PromiseState);
+                return (PromiseStateInternals)specialValue;
+            }
+        }
+
+        internal PromiseInternals Promise
+        {
+            get
+            {
+                Debug.Assert(SpecialObjectType == SpecialObjectType.Promise);
+                return (PromiseInternals)specialValue;
             }
         }
 

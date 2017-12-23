@@ -48,7 +48,7 @@ namespace NetScript.Runtime.Builtins
             Intrinsics.DefineFunction(stringIteratorPrototype, "next", 0, realm, Next);
             Intrinsics.DefineDataProperty(stringIteratorPrototype, Symbol.ToStringTag, "String Iterator", false);
 
-            Intrinsics.DefineDataProperty(stringConstructor, "prototype", stringPrototype);
+            Intrinsics.DefineDataProperty(stringConstructor, "prototype", stringPrototype, false, false, false);
 
             return (stringConstructor, stringIteratorPrototype, stringPrototype);
         }

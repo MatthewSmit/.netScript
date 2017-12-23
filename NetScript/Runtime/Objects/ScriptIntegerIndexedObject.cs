@@ -205,7 +205,7 @@ namespace NetScript.Runtime.Objects
                 return false;
             }
 
-            var indexedPosition = (ulong)index * Description.Size + ByteOffset;
+            var indexedPosition = (long)index * Description.Size + ByteOffset;
             ArrayBufferIntrinsics.SetValueInBuffer(Agent, buffer, indexedPosition, Description, numberValue, true, OrderType.Unordered, Agent.LittleEndian);
             return true;
         }
@@ -235,15 +235,15 @@ namespace NetScript.Runtime.Objects
                 return ScriptValue.Undefined;
             }
 
-            var indexedPosition = (ulong)index * Description.Size + ByteOffset;
+            var indexedPosition = (long)index * Description.Size + ByteOffset;
             return ArrayBufferIntrinsics.GetValueFromBuffer(Agent, buffer, indexedPosition, Description, true, OrderType.Unordered, Agent.LittleEndian);
         }
 
-        public ulong ByteLength { get; set; }
+        public long ByteLength { get; set; }
 
-        public ulong ByteOffset { get; set; }
+        public long ByteOffset { get; set; }
 
-        public ulong ArrayLength { get; set; }
+        public long ArrayLength { get; set; }
 
         public ScriptObject ViewedArrayBuffer { get; set; }
 

@@ -1,4 +1,7 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using JetBrains.Annotations;
 using NetScript.Runtime.Objects;
 
 namespace NetScript.Runtime.Builtins
@@ -31,44 +34,113 @@ namespace NetScript.Runtime.Builtins
             return (promise, promisePrototype, promiseProtoThen, promiseAll, promiseReject, promiseResolve);
         }
 
-        private static ScriptValue Promise(ScriptArguments arg)
+        private static ScriptValue Promise([NotNull] ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-promise-executor
+            if (arg.NewTarget == null)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            if (!Agent.IsCallable(arg[0]))
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var promise = arg.Agent.OrdinaryCreateFromConstructor(arg.NewTarget, arg.Function.Realm.PromisePrototype, SpecialObjectType.PromiseState);
+            promise.PromiseState.State = ScriptObject.PromiseStateInternals.PromiseState.Pending;
+            promise.PromiseState.FulfillReactions = new List<object>();
+            promise.PromiseState.RejectReactions = new List<object>();
+            promise.PromiseState.IsHandled = false;
+
+            var resolvingFunctions = CreateResolvingFunctions(arg.Function.Realm, promise);
+            try
+            {
+                arg.Agent.Call((ScriptObject)arg[0], ScriptValue.Undefined, resolvingFunctions.Resolve, resolvingFunctions.Reject);
+            }
+            catch (ScriptException e)
+            {
+                arg.Agent.Call(resolvingFunctions.Reject, ScriptValue.Undefined, e.Value);
+            }
+
+            return promise;
         }
 
         private static ScriptValue All(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue Race(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue Reject(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue Resolve(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue GetSpecies(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue Catch(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static ScriptValue Then(ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
+        }
+
+
+        private static (ScriptFunctionObject Resolve, ScriptFunctionObject Reject) CreateResolvingFunctions([NotNull] Realm realm, ScriptObject promise)
+        {
+            //https://tc39.github.io/ecma262/#sec-createresolvingfunctions
+            var resolve = new ScriptFunctionObject(realm, realm.FunctionPrototype, true, arguments =>
+            {
+                //https://tc39.github.io/ecma262/#sec-promise-resolve-functions
+                throw new NotImplementedException();
+            }, SpecialObjectType.Promise);
+            resolve.Promise.Promise = promise;
+            resolve.Promise.Value = false;
+            var reject = new ScriptFunctionObject(realm, realm.FunctionPrototype, true, arguments =>
+            {
+                //https://tc39.github.io/ecma262/#sec-promise-reject-functions
+                throw new NotImplementedException();
+            }, SpecialObjectType.Promise);
+            reject.Promise.Promise = promise;
+            reject.Promise.Value = false;
+            return (Resolve: resolve, Reject: reject);
+        }
+
+        public static ScriptValue GetCapabilitiesExecutor([NotNull] ScriptArguments arg)
+        {
+            //https://tc39.github.io/ecma262/#sec-getcapabilitiesexecutor-functions
+            var function = arg.Function;
+            Debug.Assert(function.SpecialObjectType == SpecialObjectType.PromiseCapability);
+
+            var promiseCapability = function.Capability;
+            if (promiseCapability.Resolve != null)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+            if (promiseCapability.Reject != null)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            promiseCapability.Resolve = (ScriptObject)arg[0];
+            promiseCapability.Reject = (ScriptObject)arg[1];
+            return ScriptValue.Undefined;
         }
     }
 }

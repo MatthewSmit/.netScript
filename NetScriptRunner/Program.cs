@@ -13,7 +13,7 @@ namespace NetScriptRunner
 //            TestCompat();
 
             BaseTest.
-                RunTest("language/literals/string/S7.8.4_A4.1_T1.js");
+                RunTest("built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-123.js");
         }
 
 //        private static void TestCompat()

@@ -125,22 +125,27 @@ namespace NetScript.Runtime.Objects
             return false;
         }
 
+        [NotNull]
         public IEnumerable<ScriptValue> EnumerateKeys()
         {
+            var result = new List<ScriptValue>();
+
             foreach (var value in integerDescriptors)
             {
-                yield return value.Key.ToString();
+                result.Add(value.Key.ToString());
             }
 
             foreach (var value in stringDescriptors)
             {
-                yield return value.Item1;
+                result.Add(value.Item1);
             }
 
             foreach (var value in symbolDescriptors)
             {
-                yield return value.Item1;
+                result.Add(value.Item1);
             }
+
+            return result;
         }
 
         public PropertyDescriptor this[ScriptValue property]

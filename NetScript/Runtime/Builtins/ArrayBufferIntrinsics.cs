@@ -26,9 +26,16 @@ namespace NetScript.Runtime.Builtins
             return (arrayBuffer, arrayBufferPrototype);
         }
 
-        private static ScriptValue ArrayBuffer(ScriptArguments arg)
+        private static ScriptValue ArrayBuffer([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-arraybuffer-length
+            if (arg.NewTarget == null)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var byteLength = arg.Agent.ToIndex(arg[0]);
+            return AllocateArrayBuffer(arg.Agent, (ScriptFunctionObject)arg.NewTarget, byteLength);
         }
 
         private static ScriptValue IsView(ScriptArguments arg)
@@ -36,9 +43,9 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue GetSpecies(ScriptArguments arg)
+        private static ScriptValue GetSpecies([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            return arg.ThisValue;
         }
 
         private static ScriptValue GetByteLength(ScriptArguments arg)
@@ -46,14 +53,78 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue Slice(ScriptArguments arg)
+        private static ScriptValue Slice([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-arraybuffer.prototype.slice
+            var obj = arg.ThisValue.AsObject(arg.Agent);
+            if (obj.SpecialObjectType != SpecialObjectType.ArrayBuffer)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            if (SharedArrayBufferIntrinsics.IsSharedArrayBuffer(obj))
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            if (IsDetachedBuffer(obj))
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var length = obj.ArrayBuffer.Data.LongLength;
+            var relativeStart = (long)arg.Agent.ToInteger(arg[0]);
+            var first = relativeStart < 0 ? Math.Max(length + relativeStart, 0) : Math.Min(relativeStart, length);
+            var relativeEnd = arg[1] == ScriptValue.Undefined ? length : (long)arg.Agent.ToInteger(arg[1]);
+            var final = relativeEnd < 0 ? Math.Max(length + relativeEnd, 0) : Math.Min(relativeEnd, length);
+            var newLength = Math.Max(final - first, 0);
+
+            var constructor = arg.Agent.SpeciesConstructor(obj, arg.Function.Realm.ArrayBuffer);
+            var newObject = Agent.Construct(constructor, new ScriptValue[]
+            {
+                newLength
+            }).AsObject(arg.Agent);
+
+            if (newObject.SpecialObjectType != SpecialObjectType.ArrayBuffer)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            if (SharedArrayBufferIntrinsics.IsSharedArrayBuffer(newObject))
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            if (IsDetachedBuffer(newObject))
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            if (newObject == obj)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            if (newObject.ArrayBuffer.Data.LongLength < newLength)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            //NOTE: Side-effects of the above steps may have detached O.
+            if (IsDetachedBuffer(obj))
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var fromBuffer = obj.ArrayBuffer.Data;
+            var toBuffer = newObject.ArrayBuffer.Data;
+            Array.Copy(fromBuffer, first, toBuffer, 0, newLength);
+            return newObject;
         }
 
 
         [NotNull]
-        public static ScriptObject AllocateArrayBuffer([NotNull] Agent agent, [NotNull] ScriptFunctionObject constructor, ulong byteLength)
+        public static ScriptObject AllocateArrayBuffer([NotNull] Agent agent, [NotNull] ScriptFunctionObject constructor, long byteLength)
         {
             var obj = agent.OrdinaryCreateFromConstructor(constructor, constructor.Realm.ArrayBufferPrototype, SpecialObjectType.ArrayBuffer);
             var block = new byte[byteLength];
@@ -68,12 +139,12 @@ namespace NetScript.Runtime.Builtins
             return arrayBuffer.ArrayBuffer.Data == null;
         }
 
-        public static unsafe void SetValueInBuffer([NotNull] Agent agent, [NotNull] ScriptObject arrayBuffer, ulong byteIndex, [NotNull] TypeDescription description, double value, bool isTypedArray, OrderType order, bool isLittleEndian)
+        public static unsafe void SetValueInBuffer([NotNull] Agent agent, [NotNull] ScriptObject arrayBuffer, long byteIndex, [NotNull] TypeDescription description, double value, bool isTypedArray, OrderType order, bool isLittleEndian)
         {
             //https://tc39.github.io/ecma262/#sec-setvalueinbuffer
             Debug.Assert(!IsDetachedBuffer(arrayBuffer));
             var block = arrayBuffer.ArrayBuffer.Data;
-            Debug.Assert(byteIndex + description.Size <= (ulong)block.Length);
+            Debug.Assert(byteIndex + description.Size <= block.LongLength);
             byte* rawBytes = stackalloc byte[8];
             NumberToRawBytes(description, value, isLittleEndian, rawBytes);
             if (SharedArrayBufferIntrinsics.IsSharedArrayBuffer(arrayBuffer))
@@ -104,12 +175,12 @@ namespace NetScript.Runtime.Builtins
             }
         }
 
-        public static unsafe double GetValueFromBuffer([NotNull] Agent agent, [NotNull] ScriptObject arrayBuffer, ulong byteIndex, [NotNull] TypeDescription description, bool isTypedArray, OrderType order, bool isLittleEndian)
+        public static unsafe double GetValueFromBuffer([NotNull] Agent agent, [NotNull] ScriptObject arrayBuffer, long byteIndex, [NotNull] TypeDescription description, bool isTypedArray, OrderType order, bool isLittleEndian)
         {
             //https://tc39.github.io/ecma262/#sec-getvaluefrombuffer
             Debug.Assert(!IsDetachedBuffer(arrayBuffer));
             var block = arrayBuffer.ArrayBuffer.Data;
-            Debug.Assert(byteIndex + description.Size <= (ulong)block.Length);
+            Debug.Assert(byteIndex + description.Size <= block.LongLength);
 
             byte* rawBytes = stackalloc byte[8];
             if (SharedArrayBufferIntrinsics.IsSharedArrayBuffer(arrayBuffer))

@@ -129,7 +129,7 @@ namespace NetScript.Runtime.Objects
             return environmentRecord.GetThisBinding();
         }
 
-        private ScriptValue OrdinaryCallEvaluateBody(IReadOnlyList<ScriptValue> arguments)
+        private ScriptValue OrdinaryCallEvaluateBody(IReadOnlyList<ScriptValue> argumentsList)
         {
             if (FunctionKind == FunctionKind.Generator)
             {
@@ -140,18 +140,24 @@ namespace NetScript.Runtime.Objects
             {
                 //https://tc39.github.io/ecma262/#sec-async-function-definitions-EvaluateBody
                 var promiseCapability = Agent.NewPromiseCapability(Realm.Promise);
-                //Let declResult be FunctionDeclarationInstantiation(functionObject, argumentsList).
-                //If declResult is not an abrupt completion, then
-                //    Perform ! AsyncFunctionStart(promiseCapability, FunctionBody).
-                //Else declResult is an abrupt completion,
-                //    Perform ! Call(promiseCapability.[[Reject]], undefined, «declResult.[[Value]]»).
-                //Return Completion{[[Type]]: return, [[Value]]: promiseCapability.[[Promise]], [[Target]]: empty}.
+                try
+                {
+                    FunctionDeclarationInstantiation(argumentsList);
+                }
+                catch (ScriptException e)
+                {
+                    Agent.Call(promiseCapability.Reject, ScriptValue.Undefined, e.Value);
+                    throw new ReturnException(promiseCapability.Promise);
+                }
+
                 throw new NotImplementedException();
+//                AsyncFunctionStart(promiseCapability, FunctionBody);
+//                throw new ReturnException(promiseCapability.Promise);
             }
             else
             {
                 //https://tc39.github.io/ecma262/#sec-function-definitions-runtime-semantics-evaluatebody
-                FunctionDeclarationInstantiation(arguments);
+                FunctionDeclarationInstantiation(argumentsList);
                 return ECMAScriptCode.Run(Agent.RunningExecutionContext);
             }
         }
@@ -290,14 +296,21 @@ namespace NetScript.Runtime.Objects
                 {
                     if (!instantiatedVarNames.Contains(name))
                     {
-                        //Append n to instantiatedVarNames.
-                        //Perform ! varEnvRec.CreateMutableBinding(n, false).
-                        //If n is not an element of parameterBindings or if n is an element of functionNames, let initialValue be undefined.
-                        //Else,
-                        //    Let initialValue be ! envRec.GetBindingValue(n, false).
-                        //Call varEnvRec.InitializeBinding(n, initialValue).
+                        instantiatedVarNames.Add(name);
+                        variableEnvironmentRecord.CreateMutableBinding(name, false);
+
+                        ScriptValue initialValue;
+                        if (!parameterBindings.Contains(name) || functionNames.Contains(name))
+                        {
+                            initialValue = ScriptValue.Undefined;
+                        }
+                        else
+                        {
+                            initialValue = environmentRecord.GetBindingValue(name, false);
+                        }
+
+                        variableEnvironmentRecord.InitialiseBinding(name, initialValue);
                         //NOTE: vars whose names are the same as a formal parameter, initially have the same value as the corresponding initialized parameter.
-                        throw new NotImplementedException();
                     }
                 }
             }
@@ -486,7 +499,7 @@ namespace NetScript.Runtime.Objects
             //https://tc39.github.io/ecma262/#sec-prepareforordinarycall
             var localEnvironment = LexicalEnvironment.NewFunctionEnvironment(this, newTarget);
             var callerContext = Agent.RunningExecutionContext;
-            var calleeContext = new ExecutionContext(callerContext.Realm, ScriptOrModule, callerContext.Strict || IsBodyStrict)
+            var calleeContext = new ExecutionContext(callerContext.Realm, ScriptOrModule, callerContext.Strict || IsBodyStrict || Strict)
             {
                 Function = this,
                 Realm = Realm,

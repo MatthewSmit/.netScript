@@ -41,9 +41,10 @@ namespace NetScript.Runtime.Builtins
             throw new System.NotImplementedException();
         }
 
-        private static ScriptValue GeneratorFunction(ScriptArguments arg)
+        private static ScriptValue GeneratorFunction([NotNull] ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-generatorfunction
+            return FunctionIntrinsics.CreateDynamicFunction(arg.Function, arg.NewTarget, FunctionKind.Generator, arg);
         }
     }
 }

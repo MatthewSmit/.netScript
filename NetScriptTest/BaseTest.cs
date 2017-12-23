@@ -63,6 +63,18 @@ namespace NetScriptTest
             }
 
             // TODO
+            if (metadata.Features.Contains("class-fields-private"))
+            {
+                return;
+            }
+
+            // TODO
+            if (metadata.Features.Contains("class-fields-public"))
+            {
+                return;
+            }
+
+            // TODO
             if (metadata.Includes.Contains("tcoHelper.js"))
             {
                 return;

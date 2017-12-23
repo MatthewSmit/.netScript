@@ -67,7 +67,10 @@ namespace NetScript.Walkers
         {
             foreach (var element in arrayPattern.Elements)
             {
-                Walk(element, list);
+                if (element != null)
+                {
+                    Walk(element, list);
+                }
             }
         }
 

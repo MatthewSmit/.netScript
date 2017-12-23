@@ -14,12 +14,11 @@ namespace NetScript.Walkers
         public static void Walk([NotNull] Agent agent, [NotNull] ProgramNode program, bool isStrict)
         {
             //https://tc39.github.io/ecma262/#sec-scripts-static-semantics-early-errors
-            //TODO
-//            var lexicalNames = LexicallyDeclaredNamesWalker.Walk(program);
-//            if (lexicalNames.Count > 0)
-//            {
-//                throw new NotImplementedException();
-//            }
+            var lexicalNames = LexicallyDeclaredNamesWalker.Walk(program);
+            if (ContainsDuplicate(lexicalNames))
+            {
+                throw agent.CreateSyntaxError();
+            }
 
             foreach (var baseNode in program.Body)
             {
@@ -67,11 +66,11 @@ namespace NetScript.Walkers
                     break;
 
                 case ClassDeclarationNode classDeclaration:
-                    //TODO
+                    Walk(agent, classDeclaration, isStrict);
                     break;
 
                 case ClassExpressionNode classExpression:
-                    //TODO
+                    Walk(agent, classExpression, isStrict);
                     break;
 
                 case ConditionalExpressionNode conditionalExpression:
@@ -142,6 +141,10 @@ namespace NetScript.Walkers
 
                 case MemberExpressionNode memberExpression:
                     //TODO
+                    break;
+
+                case MethodDefinitionNode methodDefinition:
+                    Walk(agent, methodDefinition, isStrict);
                     break;
 
                 case NewExpressionNode newExpression:
@@ -263,13 +266,33 @@ namespace NetScript.Walkers
 
         private static void Walk([NotNull] Agent agent, [NotNull] CallExpressionNode callExpression, bool isStrict)
         {
-            //TODO
+            if (callExpression.Callee is SuperNode)
+            {
+                //TODO
+            }
+            else
+            {
+                //TODO
+                Walk(agent, callExpression.Callee, isStrict);
+            }
 
-            Walk(agent, callExpression.Callee, isStrict);
             foreach (var argument in callExpression.Arguments)
             {
-                Walk(agent, argument, isStrict);
+                if (argument != null)
+                {
+                    Walk(agent, argument, isStrict);
+                }
             }
+        }
+
+        private static void Walk([NotNull] Agent agent, [NotNull] ClassDeclarationNode classDeclaration, bool isStrict)
+        {
+            WalkClass(agent, classDeclaration.Id, classDeclaration.SuperClass, classDeclaration.Body);
+        }
+
+        private static void Walk([NotNull] Agent agent, [NotNull] ClassExpressionNode classExpression, bool isStrict)
+        {
+            WalkClass(agent, classExpression.Id, classExpression.SuperClass, classExpression.Body);
         }
 
         private static void Walk([NotNull] Agent agent, [NotNull] DoWhileStatementNode doWhileStatement, bool isStrict)
@@ -304,17 +327,34 @@ namespace NetScript.Walkers
 
         private static void Walk([NotNull] Agent agent, [NotNull] FunctionDeclarationNode functionDeclaration, bool isStrict)
         {
-            //https://tc39.github.io/ecma262/#sec-function-definitions-static-semantics-early-errors
-            //TODO
-
-            Walk(agent, functionDeclaration.Body, isStrict || new FunctionNode(functionDeclaration.Body).IsStrict);
+            if (functionDeclaration.Async)
+            {
+                WalkAsyncFunction(agent, functionDeclaration.Id, functionDeclaration.Parameters, functionDeclaration.Body, isStrict || new FunctionNode(functionDeclaration.Body).IsStrict);
+            }
+            else if (functionDeclaration.Generator)
+            {
+                WalkGeneratorFunction(agent, functionDeclaration.Id, functionDeclaration.Parameters, functionDeclaration.Body, isStrict || new FunctionNode(functionDeclaration.Body).IsStrict);
+            }
+            else
+            {
+                WalkFunction(agent, functionDeclaration.Id, functionDeclaration.Parameters, functionDeclaration.Body, isStrict || new FunctionNode(functionDeclaration.Body).IsStrict);
+            }
         }
 
         private static void Walk([NotNull] Agent agent, [NotNull] FunctionExpressionNode functionExpression, bool isStrict)
         {
-            //TODO
-
-            Walk(agent, functionExpression.Body, isStrict || new FunctionNode(functionExpression.Body).IsStrict);
+            if (functionExpression.Async)
+            {
+                WalkAsyncFunction(agent, functionExpression.Id, functionExpression.Parameters, functionExpression.Body, isStrict || new FunctionNode(functionExpression.Body).IsStrict);
+            }
+            else if (functionExpression.Generator)
+            {
+                WalkGeneratorFunction(agent, functionExpression.Id, functionExpression.Parameters, functionExpression.Body, isStrict || new FunctionNode(functionExpression.Body).IsStrict);
+            }
+            else
+            {
+                WalkFunction(agent, functionExpression.Id, functionExpression.Parameters, functionExpression.Body, isStrict || new FunctionNode(functionExpression.Body).IsStrict);
+            }
         }
 
         private static void Walk([NotNull] Agent agent, [NotNull] IdentifierNode identifier, bool isStrict)
@@ -387,6 +427,31 @@ namespace NetScript.Walkers
                         }
                     }
                 }
+            }
+        }
+
+        private static void Walk([NotNull] Agent agent, [NotNull] MethodDefinitionNode methodDefinition, bool isStrict)
+        {
+            //TODO
+            if (methodDefinition.Kind != PropertyKind.Constructor)
+            {
+                Walk(agent, methodDefinition.Key, isStrict);
+                Walk(agent, methodDefinition.Value, isStrict);
+            }
+            else
+            {
+                Walk(agent, methodDefinition.Key, isStrict);
+                if (methodDefinition.Value.Id != null)
+                {
+                    Walk(agent, methodDefinition.Value.Id, isStrict);
+                }
+
+                foreach (var parameter in methodDefinition.Value.Parameters)
+                {
+                    Walk(agent, parameter, isStrict);
+                }
+
+                Walk(agent, methodDefinition.Value.Body, isStrict);
             }
         }
 
@@ -607,10 +672,126 @@ namespace NetScript.Walkers
             }
         }
 
+        private static void WalkClass([NotNull] Agent agent, [CanBeNull] IdentifierNode id, [CanBeNull] ExpressionNode superClass, [NotNull] ClassBodyNode body)
+        {
+            //https://tc39.github.io/ecma262/#sec-class-definitions-static-semantics-early-errors
+
+            if (id != null)
+            {
+                Walk(agent, id, true);
+            }
+
+            if (superClass == null)
+            {
+                var constructor = body.Body.FirstOrDefault(x => x.Kind == PropertyKind.Constructor);
+                if (constructor != null)
+                {
+                    if (HasParameterSuper(constructor.Value.Parameters))
+                    {
+                        throw agent.CreateSyntaxError();
+                    }
+                    if (HasDirectSuper(constructor.Value.Body))
+                    {
+                        throw agent.CreateSyntaxError();
+                    }
+                }
+            }
+
+            foreach (var element in body.Body)
+            {
+                if (element.Kind != PropertyKind.Constructor)
+                {
+                    if (HasDirectSuper(element.Value.Body))
+                    {
+                        throw agent.CreateSyntaxError();
+                    }
+                }
+
+                Walk(agent, element, true);
+            }
+        }
+
+        private static void WalkFunction([NotNull] Agent agent, [CanBeNull] IdentifierNode id, [NotNull] IReadOnlyList<ExpressionNode> parameters, [NotNull] BaseNode body, bool isStrict)
+        {
+            //https://tc39.github.io/ecma262/#sec-function-definitions-static-semantics-early-errors
+
+            if (isStrict)
+            {
+                if (ContainsDuplicate(BoundNamesWalker.Walk(parameters)))
+                {
+                    throw agent.CreateSyntaxError();
+                }
+
+                if (id != null && (id.Name == "eval" || id.Name == "arguments"))
+                {
+                    throw agent.CreateSyntaxError($"Cannot have a function named ${id.Name} in strict mode.");
+                }
+            }
+
+            //TODO It is a Syntax Error if ContainsUseStrict of FunctionBody is true and IsSimpleParameterList of FormalParameters is false.
+            //TODO It is a Syntax Error if any element of the BoundNames of FormalParameters also occurs in the LexicallyDeclaredNames of FunctionBody.
+            //TODO It is a Syntax Error if FormalParameters Contains SuperProperty is true.
+            //TODO It is a Syntax Error if FunctionBody Contains SuperProperty is true.
+            if (HasParameterSuper(parameters))
+            {
+                throw agent.CreateSyntaxError();
+            }
+            if (HasDirectSuper(body))
+            {
+                throw agent.CreateSyntaxError();
+            }
+
+            if (id != null)
+            {
+                Walk(agent, id, isStrict);
+            }
+
+            foreach (var parameter in parameters)
+            {
+                WalkBinding(agent, parameter, isStrict);
+            }
+
+            Walk(agent, body, isStrict);
+        }
+
+        private static void WalkAsyncFunction([NotNull] Agent agent, [CanBeNull] IdentifierNode id, [NotNull] IReadOnlyList<ExpressionNode> parameters, [NotNull] BaseNode body, bool isStrict)
+        {
+            //https://tc39.github.io/ecma262/#sec-async-function-definitions-static-semantics-early-errors
+
+            WalkFunction(agent, id, parameters, body, isStrict);
+
+            //TODO It is a Syntax Error if FormalParameters Contains AwaitExpression is true.
+        }
+
+        private static void WalkGeneratorFunction([NotNull] Agent agent, [CanBeNull] IdentifierNode id, [NotNull] IReadOnlyList<ExpressionNode> parameters, [NotNull] BaseNode body, bool isStrict)
+        {
+            //https://tc39.github.io/ecma262/#sec-generator-function-definitions-static-semantics-early-errors
+
+            WalkFunction(agent, id, parameters, body, isStrict);
+
+            //It is a Syntax Error if FormalParameters Contains YieldExpression is true.
+        }
+
 
         private static bool ContainsDuplicate([NotNull] IReadOnlyCollection<string> boundNames)
         {
             return new HashSet<string>(boundNames).Count != boundNames.Count;
+        }
+
+        private static bool HasDirectSuper([NotNull] BaseNode bodyNode)
+        {
+            //https://tc39.github.io/ecma262/#sec-method-definitions-static-semantics-hasdirectsuper
+            return bodyNode is BlockStatementNode block &&
+                   block.Body.Any(x => x is ExpressionStatementNode expressionStatement &&
+                                       expressionStatement.Expression is CallExpressionNode callExpression &&
+                                       callExpression.Callee is SuperNode);
+        }
+
+        private static bool HasParameterSuper([NotNull] IEnumerable<ExpressionNode> parameters)
+        {
+            return parameters.Any(x => x is AssignmentPatternNode assignmentPattern &&
+                                       assignmentPattern.Right is CallExpressionNode callExpression &&
+                                       callExpression.Callee is SuperNode);
         }
 
         private static bool IsLabelledFunction(BaseNode statement)
