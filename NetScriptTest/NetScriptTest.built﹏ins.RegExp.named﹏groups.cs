@@ -16,6 +16,30 @@ namespace NetScriptTest.built﹏ins.RegExp
             RunTest("built-ins/RegExp/named-groups/functional-replace-non-global.js");
         }
 
+        [Fact(DisplayName = "/built-ins/RegExp/named-groups/groups-object-subclass-sans.js")]
+        public void Test_groups﹏object﹏subclass﹏sans_js()
+        {
+            RunTest("built-ins/RegExp/named-groups/groups-object-subclass-sans.js");
+        }
+
+        [Fact(DisplayName = "/built-ins/RegExp/named-groups/groups-object-subclass.js")]
+        public void Test_groups﹏object﹏subclass_js()
+        {
+            RunTest("built-ins/RegExp/named-groups/groups-object-subclass.js");
+        }
+
+        [Fact(DisplayName = "/built-ins/RegExp/named-groups/groups-object-undefined.js")]
+        public void Test_groups﹏object﹏undefined_js()
+        {
+            RunTest("built-ins/RegExp/named-groups/groups-object-undefined.js");
+        }
+
+        [Fact(DisplayName = "/built-ins/RegExp/named-groups/groups-object-unmatched.js")]
+        public void Test_groups﹏object﹏unmatched_js()
+        {
+            RunTest("built-ins/RegExp/named-groups/groups-object-unmatched.js");
+        }
+
         [Fact(DisplayName = "/built-ins/RegExp/named-groups/groups-object.js")]
         public void Test_groups﹏object_js()
         {

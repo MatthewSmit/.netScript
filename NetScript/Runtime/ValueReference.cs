@@ -29,7 +29,10 @@ namespace NetScript.Runtime
             get
             {
                 if (!IsValue)
+                {
                     throw new NullReferenceException();
+                }
+
                 return value;
             }
         }
@@ -39,7 +42,10 @@ namespace NetScript.Runtime
             get
             {
                 if (!IsReference)
+                {
                     throw new NullReferenceException();
+                }
+
                 return reference;
             }
         }

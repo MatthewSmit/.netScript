@@ -209,9 +209,11 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue Entries(ScriptArguments arg)
+        private static ScriptValue Entries([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-array.prototype.entries
+            var obj = arg.Agent.ToObject(arg.ThisValue);
+            return CreateArrayIterator(arg.Agent, obj, EnumerateType.KeyValue);
         }
 
         private static ScriptValue Every([NotNull] ScriptArguments arg)
@@ -388,9 +390,11 @@ namespace NetScript.Runtime.Builtins
             return result.ToString();
         }
 
-        private static ScriptValue Keys(ScriptArguments arg)
+        private static ScriptValue Keys([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-array.prototype.keys
+            var obj = arg.Agent.ToObject(arg.ThisValue);
+            return CreateArrayIterator(arg.Agent, obj, EnumerateType.Key);
         }
 
         private static ScriptValue LastIndexOf(ScriptArguments arg)
@@ -403,9 +407,23 @@ namespace NetScript.Runtime.Builtins
             throw new NotImplementedException();
         }
 
-        private static ScriptValue Pop(ScriptArguments arg)
+        private static ScriptValue Pop([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-array.prototype.pop
+            var obj = arg.Agent.ToObject(arg.ThisValue);
+            var length = arg.Agent.ToLength(obj.Get("length"));
+            if (length == 0)
+            {
+                arg.Agent.Set(obj, "length", 0, true);
+                return ScriptValue.Undefined;
+            }
+
+            var newLength = length - 1;
+            var index = newLength.ToString(CultureInfo.InvariantCulture);
+            var element = obj.Get(index);
+            arg.Agent.DeletePropertyOrThrow(obj, index);
+            arg.Agent.Set(obj, "length", newLength, true);
+            return element;
         }
 
         private static ScriptValue Push([NotNull] ScriptArguments arg)

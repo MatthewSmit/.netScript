@@ -8176,30 +8176,6 @@ namespace NetScriptTest.language.expressions
             RunTest("language/expressions/class/fields-after-same-line-gen-private-names.js");
         }
 
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-gen-static-computed-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏gen﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-gen-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-gen-static-computed-symbol-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏gen﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-gen-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-gen-static-literal-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏gen﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-gen-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-gen-static-private-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏gen﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-gen-static-private-names.js");
-        }
-
         [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-gen-string-literal-names.js")]
         public void Test_fields﹏after﹏same﹏line﹏gen﹏string﹏literal﹏names_js()
         {
@@ -8228,30 +8204,6 @@ namespace NetScriptTest.language.expressions
         public void Test_fields﹏after﹏same﹏line﹏method﹏private﹏names_js()
         {
             RunTest("language/expressions/class/fields-after-same-line-method-private-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-method-static-computed-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏method﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-method-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-method-static-computed-symbol-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏method﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-method-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-method-static-literal-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏method﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-method-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-method-static-private-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏method﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-method-static-private-names.js");
         }
 
         [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-method-string-literal-names.js")]
@@ -8284,30 +8236,6 @@ namespace NetScriptTest.language.expressions
             RunTest("language/expressions/class/fields-after-same-line-static-async-gen-private-names.js");
         }
 
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-async-gen-static-computed-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏static﹏async﹏gen﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-static-async-gen-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-async-gen-static-computed-symbol-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏static﹏async﹏gen﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-static-async-gen-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-async-gen-static-literal-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏static﹏async﹏gen﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-static-async-gen-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-async-gen-static-private-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏static﹏async﹏gen﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-static-async-gen-static-private-names.js");
-        }
-
         [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-async-gen-string-literal-names.js")]
         public void Test_fields﹏after﹏same﹏line﹏static﹏async﹏gen﹏string﹏literal﹏names_js()
         {
@@ -8336,30 +8264,6 @@ namespace NetScriptTest.language.expressions
         public void Test_fields﹏after﹏same﹏line﹏static﹏async﹏method﹏private﹏names_js()
         {
             RunTest("language/expressions/class/fields-after-same-line-static-async-method-private-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-async-method-static-computed-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏static﹏async﹏method﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-static-async-method-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-async-method-static-computed-symbol-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏static﹏async﹏method﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-static-async-method-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-async-method-static-literal-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏static﹏async﹏method﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-static-async-method-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-async-method-static-private-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏static﹏async﹏method﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-static-async-method-static-private-names.js");
         }
 
         [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-async-method-string-literal-names.js")]
@@ -8392,30 +8296,6 @@ namespace NetScriptTest.language.expressions
             RunTest("language/expressions/class/fields-after-same-line-static-gen-private-names.js");
         }
 
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-gen-static-computed-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏static﹏gen﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-static-gen-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-gen-static-computed-symbol-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏static﹏gen﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-static-gen-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-gen-static-literal-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏static﹏gen﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-static-gen-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-gen-static-private-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏static﹏gen﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-static-gen-static-private-names.js");
-        }
-
         [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-gen-string-literal-names.js")]
         public void Test_fields﹏after﹏same﹏line﹏static﹏gen﹏string﹏literal﹏names_js()
         {
@@ -8444,30 +8324,6 @@ namespace NetScriptTest.language.expressions
         public void Test_fields﹏after﹏same﹏line﹏static﹏method﹏private﹏names_js()
         {
             RunTest("language/expressions/class/fields-after-same-line-static-method-private-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-method-static-computed-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏static﹏method﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-static-method-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-method-static-computed-symbol-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏static﹏method﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-static-method-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-method-static-literal-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏static﹏method﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-static-method-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-method-static-private-names.js")]
-        public void Test_fields﹏after﹏same﹏line﹏static﹏method﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-after-same-line-static-method-static-private-names.js");
         }
 
         [Fact(DisplayName = "/language/expressions/class/fields-after-same-line-static-method-string-literal-names.js")]
@@ -8536,18 +8392,6 @@ namespace NetScriptTest.language.expressions
             RunTest("language/expressions/class/fields-computed-name-propname-constructor.js");
         }
 
-        [Fact(DisplayName = "/language/expressions/class/fields-computed-name-static-propname-constructor.js")]
-        public void Test_fields﹏computed﹏name﹏static﹏propname﹏constructor_js()
-        {
-            RunTest("language/expressions/class/fields-computed-name-static-propname-constructor.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-computed-name-static-propname-prototype.js")]
-        public void Test_fields﹏computed﹏name﹏static﹏propname﹏prototype_js()
-        {
-            RunTest("language/expressions/class/fields-computed-name-static-propname-prototype.js");
-        }
-
         [Fact(DisplayName = "/language/expressions/class/fields-computed-name-toprimitive-symbol.js")]
         public void Test_fields﹏computed﹏name﹏toprimitive﹏symbol_js()
         {
@@ -8564,18 +8408,6 @@ namespace NetScriptTest.language.expressions
         public void Test_fields﹏computed﹏variable﹏name﹏propname﹏constructor_js()
         {
             RunTest("language/expressions/class/fields-computed-variable-name-propname-constructor.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-computed-variable-name-static-propname-constructor.js")]
-        public void Test_fields﹏computed﹏variable﹏name﹏static﹏propname﹏constructor_js()
-        {
-            RunTest("language/expressions/class/fields-computed-variable-name-static-propname-constructor.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-computed-variable-name-static-propname-prototype.js")]
-        public void Test_fields﹏computed﹏variable﹏name﹏static﹏propname﹏prototype_js()
-        {
-            RunTest("language/expressions/class/fields-computed-variable-name-static-propname-prototype.js");
         }
 
         [Fact(DisplayName = "/language/expressions/class/fields-ctor-called-after-fields-init.js")]
@@ -8728,6 +8560,18 @@ namespace NetScriptTest.language.expressions
             RunTest("language/expressions/class/fields-init-value-incremental.js");
         }
 
+        [Fact(DisplayName = "/language/expressions/class/fields-initializer-static-private-fields-forbidden.js")]
+        public void Test_fields﹏initializer﹏static﹏private﹏fields﹏forbidden_js()
+        {
+            RunTest("language/expressions/class/fields-initializer-static-private-fields-forbidden.js");
+        }
+
+        [Fact(DisplayName = "/language/expressions/class/fields-initializer-static-public-fields-forbidden.js")]
+        public void Test_fields﹏initializer﹏static﹏public﹏fields﹏forbidden_js()
+        {
+            RunTest("language/expressions/class/fields-initializer-static-public-fields-forbidden.js");
+        }
+
         [Fact(DisplayName = "/language/expressions/class/fields-literal-name-init-err-contains-arguments.js")]
         public void Test_fields﹏literal﹏name﹏init﹏err﹏contains﹏arguments_js()
         {
@@ -8744,18 +8588,6 @@ namespace NetScriptTest.language.expressions
         public void Test_fields﹏literal﹏name﹏propname﹏constructor_js()
         {
             RunTest("language/expressions/class/fields-literal-name-propname-constructor.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-literal-name-static-propname-constructor.js")]
-        public void Test_fields﹏literal﹏name﹏static﹏propname﹏constructor_js()
-        {
-            RunTest("language/expressions/class/fields-literal-name-static-propname-constructor.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-literal-name-static-propname-prototype.js")]
-        public void Test_fields﹏literal﹏name﹏static﹏propname﹏prototype_js()
-        {
-            RunTest("language/expressions/class/fields-literal-name-static-propname-prototype.js");
         }
 
         [Fact(DisplayName = "/language/expressions/class/fields-multiple-definitions-computed-names.js")]
@@ -8780,30 +8612,6 @@ namespace NetScriptTest.language.expressions
         public void Test_fields﹏multiple﹏definitions﹏private﹏names_js()
         {
             RunTest("language/expressions/class/fields-multiple-definitions-private-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-multiple-definitions-static-computed-names.js")]
-        public void Test_fields﹏multiple﹏definitions﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-multiple-definitions-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-multiple-definitions-static-computed-symbol-names.js")]
-        public void Test_fields﹏multiple﹏definitions﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-multiple-definitions-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-multiple-definitions-static-literal-names.js")]
-        public void Test_fields﹏multiple﹏definitions﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-multiple-definitions-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-multiple-definitions-static-private-names.js")]
-        public void Test_fields﹏multiple﹏definitions﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-multiple-definitions-static-private-names.js");
         }
 
         [Fact(DisplayName = "/language/expressions/class/fields-multiple-definitions-string-literal-names.js")]
@@ -8836,30 +8644,6 @@ namespace NetScriptTest.language.expressions
             RunTest("language/expressions/class/fields-multiple-stacked-definitions-private-names.js");
         }
 
-        [Fact(DisplayName = "/language/expressions/class/fields-multiple-stacked-definitions-static-computed-names.js")]
-        public void Test_fields﹏multiple﹏stacked﹏definitions﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-multiple-stacked-definitions-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-multiple-stacked-definitions-static-computed-symbol-names.js")]
-        public void Test_fields﹏multiple﹏stacked﹏definitions﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-multiple-stacked-definitions-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-multiple-stacked-definitions-static-literal-names.js")]
-        public void Test_fields﹏multiple﹏stacked﹏definitions﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-multiple-stacked-definitions-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-multiple-stacked-definitions-static-private-names.js")]
-        public void Test_fields﹏multiple﹏stacked﹏definitions﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-multiple-stacked-definitions-static-private-names.js");
-        }
-
         [Fact(DisplayName = "/language/expressions/class/fields-multiple-stacked-definitions-string-literal-names.js")]
         public void Test_fields﹏multiple﹏stacked﹏definitions﹏string﹏literal﹏names_js()
         {
@@ -8888,30 +8672,6 @@ namespace NetScriptTest.language.expressions
         public void Test_fields﹏new﹏no﹏sc﹏line﹏method﹏private﹏names_js()
         {
             RunTest("language/expressions/class/fields-new-no-sc-line-method-private-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-new-no-sc-line-method-static-computed-names.js")]
-        public void Test_fields﹏new﹏no﹏sc﹏line﹏method﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-new-no-sc-line-method-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-new-no-sc-line-method-static-computed-symbol-names.js")]
-        public void Test_fields﹏new﹏no﹏sc﹏line﹏method﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-new-no-sc-line-method-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-new-no-sc-line-method-static-literal-names.js")]
-        public void Test_fields﹏new﹏no﹏sc﹏line﹏method﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-new-no-sc-line-method-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-new-no-sc-line-method-static-private-names.js")]
-        public void Test_fields﹏new﹏no﹏sc﹏line﹏method﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-new-no-sc-line-method-static-private-names.js");
         }
 
         [Fact(DisplayName = "/language/expressions/class/fields-new-no-sc-line-method-string-literal-names.js")]
@@ -8944,30 +8704,6 @@ namespace NetScriptTest.language.expressions
             RunTest("language/expressions/class/fields-new-sc-line-gen-private-names.js");
         }
 
-        [Fact(DisplayName = "/language/expressions/class/fields-new-sc-line-gen-static-computed-names.js")]
-        public void Test_fields﹏new﹏sc﹏line﹏gen﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-new-sc-line-gen-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-new-sc-line-gen-static-computed-symbol-names.js")]
-        public void Test_fields﹏new﹏sc﹏line﹏gen﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-new-sc-line-gen-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-new-sc-line-gen-static-literal-names.js")]
-        public void Test_fields﹏new﹏sc﹏line﹏gen﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-new-sc-line-gen-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-new-sc-line-gen-static-private-names.js")]
-        public void Test_fields﹏new﹏sc﹏line﹏gen﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-new-sc-line-gen-static-private-names.js");
-        }
-
         [Fact(DisplayName = "/language/expressions/class/fields-new-sc-line-gen-string-literal-names.js")]
         public void Test_fields﹏new﹏sc﹏line﹏gen﹏string﹏literal﹏names_js()
         {
@@ -8996,30 +8732,6 @@ namespace NetScriptTest.language.expressions
         public void Test_fields﹏new﹏sc﹏line﹏method﹏private﹏names_js()
         {
             RunTest("language/expressions/class/fields-new-sc-line-method-private-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-new-sc-line-method-static-computed-names.js")]
-        public void Test_fields﹏new﹏sc﹏line﹏method﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-new-sc-line-method-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-new-sc-line-method-static-computed-symbol-names.js")]
-        public void Test_fields﹏new﹏sc﹏line﹏method﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-new-sc-line-method-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-new-sc-line-method-static-literal-names.js")]
-        public void Test_fields﹏new﹏sc﹏line﹏method﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-new-sc-line-method-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-new-sc-line-method-static-private-names.js")]
-        public void Test_fields﹏new﹏sc﹏line﹏method﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-new-sc-line-method-static-private-names.js");
         }
 
         [Fact(DisplayName = "/language/expressions/class/fields-new-sc-line-method-string-literal-names.js")]
@@ -9082,6 +8794,18 @@ namespace NetScriptTest.language.expressions
             RunTest("language/expressions/class/fields-privatename-constructor-err.js");
         }
 
+        [Fact(DisplayName = "/language/expressions/class/fields-prop-name-static-private-fields-forbidden.js")]
+        public void Test_fields﹏prop﹏name﹏static﹏private﹏fields﹏forbidden_js()
+        {
+            RunTest("language/expressions/class/fields-prop-name-static-private-fields-forbidden.js");
+        }
+
+        [Fact(DisplayName = "/language/expressions/class/fields-prop-name-static-public-fields-forbidden.js")]
+        public void Test_fields﹏prop﹏name﹏static﹏public﹏fields﹏forbidden_js()
+        {
+            RunTest("language/expressions/class/fields-prop-name-static-public-fields-forbidden.js");
+        }
+
         [Fact(DisplayName = "/language/expressions/class/fields-redeclaration-symbol.js")]
         public void Test_fields﹏redeclaration﹏symbol_js()
         {
@@ -9118,30 +8842,6 @@ namespace NetScriptTest.language.expressions
             RunTest("language/expressions/class/fields-regular-definitions-private-names.js");
         }
 
-        [Fact(DisplayName = "/language/expressions/class/fields-regular-definitions-static-computed-names.js")]
-        public void Test_fields﹏regular﹏definitions﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-regular-definitions-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-regular-definitions-static-computed-symbol-names.js")]
-        public void Test_fields﹏regular﹏definitions﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-regular-definitions-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-regular-definitions-static-literal-names.js")]
-        public void Test_fields﹏regular﹏definitions﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-regular-definitions-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-regular-definitions-static-private-names.js")]
-        public void Test_fields﹏regular﹏definitions﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-regular-definitions-static-private-names.js");
-        }
-
         [Fact(DisplayName = "/language/expressions/class/fields-regular-definitions-string-literal-names.js")]
         public void Test_fields﹏regular﹏definitions﹏string﹏literal﹏names_js()
         {
@@ -9170,30 +8870,6 @@ namespace NetScriptTest.language.expressions
         public void Test_fields﹏same﹏line﹏async﹏gen﹏private﹏names_js()
         {
             RunTest("language/expressions/class/fields-same-line-async-gen-private-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-same-line-async-gen-static-computed-names.js")]
-        public void Test_fields﹏same﹏line﹏async﹏gen﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-same-line-async-gen-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-same-line-async-gen-static-computed-symbol-names.js")]
-        public void Test_fields﹏same﹏line﹏async﹏gen﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-same-line-async-gen-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-same-line-async-gen-static-literal-names.js")]
-        public void Test_fields﹏same﹏line﹏async﹏gen﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-same-line-async-gen-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-same-line-async-gen-static-private-names.js")]
-        public void Test_fields﹏same﹏line﹏async﹏gen﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-same-line-async-gen-static-private-names.js");
         }
 
         [Fact(DisplayName = "/language/expressions/class/fields-same-line-async-gen-string-literal-names.js")]
@@ -9226,30 +8902,6 @@ namespace NetScriptTest.language.expressions
             RunTest("language/expressions/class/fields-same-line-async-method-private-names.js");
         }
 
-        [Fact(DisplayName = "/language/expressions/class/fields-same-line-async-method-static-computed-names.js")]
-        public void Test_fields﹏same﹏line﹏async﹏method﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-same-line-async-method-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-same-line-async-method-static-computed-symbol-names.js")]
-        public void Test_fields﹏same﹏line﹏async﹏method﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-same-line-async-method-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-same-line-async-method-static-literal-names.js")]
-        public void Test_fields﹏same﹏line﹏async﹏method﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-same-line-async-method-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-same-line-async-method-static-private-names.js")]
-        public void Test_fields﹏same﹏line﹏async﹏method﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-same-line-async-method-static-private-names.js");
-        }
-
         [Fact(DisplayName = "/language/expressions/class/fields-same-line-async-method-string-literal-names.js")]
         public void Test_fields﹏same﹏line﹏async﹏method﹏string﹏literal﹏names_js()
         {
@@ -9278,30 +8930,6 @@ namespace NetScriptTest.language.expressions
         public void Test_fields﹏same﹏line﹏gen﹏private﹏names_js()
         {
             RunTest("language/expressions/class/fields-same-line-gen-private-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-same-line-gen-static-computed-names.js")]
-        public void Test_fields﹏same﹏line﹏gen﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-same-line-gen-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-same-line-gen-static-computed-symbol-names.js")]
-        public void Test_fields﹏same﹏line﹏gen﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-same-line-gen-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-same-line-gen-static-literal-names.js")]
-        public void Test_fields﹏same﹏line﹏gen﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-same-line-gen-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-same-line-gen-static-private-names.js")]
-        public void Test_fields﹏same﹏line﹏gen﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-same-line-gen-static-private-names.js");
         }
 
         [Fact(DisplayName = "/language/expressions/class/fields-same-line-gen-string-literal-names.js")]
@@ -9334,106 +8962,10 @@ namespace NetScriptTest.language.expressions
             RunTest("language/expressions/class/fields-same-line-method-private-names.js");
         }
 
-        [Fact(DisplayName = "/language/expressions/class/fields-same-line-method-static-computed-names.js")]
-        public void Test_fields﹏same﹏line﹏method﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-same-line-method-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-same-line-method-static-computed-symbol-names.js")]
-        public void Test_fields﹏same﹏line﹏method﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-same-line-method-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-same-line-method-static-literal-names.js")]
-        public void Test_fields﹏same﹏line﹏method﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-same-line-method-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-same-line-method-static-private-names.js")]
-        public void Test_fields﹏same﹏line﹏method﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-same-line-method-static-private-names.js");
-        }
-
         [Fact(DisplayName = "/language/expressions/class/fields-same-line-method-string-literal-names.js")]
         public void Test_fields﹏same﹏line﹏method﹏string﹏literal﹏names_js()
         {
             RunTest("language/expressions/class/fields-same-line-method-string-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-static-comp-name-init-err-contains-arguments.js")]
-        public void Test_fields﹏static﹏comp﹏name﹏init﹏err﹏contains﹏arguments_js()
-        {
-            RunTest("language/expressions/class/fields-static-comp-name-init-err-contains-arguments.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-static-comp-name-init-err-contains-super.js")]
-        public void Test_fields﹏static﹏comp﹏name﹏init﹏err﹏contains﹏super_js()
-        {
-            RunTest("language/expressions/class/fields-static-comp-name-init-err-contains-super.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-static-computed-name-toprimitive-symbol.js")]
-        public void Test_fields﹏static﹏computed﹏name﹏toprimitive﹏symbol_js()
-        {
-            RunTest("language/expressions/class/fields-static-computed-name-toprimitive-symbol.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-static-computed-name-toprimitive.js")]
-        public void Test_fields﹏static﹏computed﹏name﹏toprimitive_js()
-        {
-            RunTest("language/expressions/class/fields-static-computed-name-toprimitive.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-static-literal-init-err-contains-arguments.js")]
-        public void Test_fields﹏static﹏literal﹏init﹏err﹏contains﹏arguments_js()
-        {
-            RunTest("language/expressions/class/fields-static-literal-init-err-contains-arguments.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-static-literal-init-err-contains-super.js")]
-        public void Test_fields﹏static﹏literal﹏init﹏err﹏contains﹏super_js()
-        {
-            RunTest("language/expressions/class/fields-static-literal-init-err-contains-super.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-static-private-init-err-contains-arguments.js")]
-        public void Test_fields﹏static﹏private﹏init﹏err﹏contains﹏arguments_js()
-        {
-            RunTest("language/expressions/class/fields-static-private-init-err-contains-arguments.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-static-private-init-err-contains-super.js")]
-        public void Test_fields﹏static﹏private﹏init﹏err﹏contains﹏super_js()
-        {
-            RunTest("language/expressions/class/fields-static-private-init-err-contains-super.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-static-redeclaration-symbol.js")]
-        public void Test_fields﹏static﹏redeclaration﹏symbol_js()
-        {
-            RunTest("language/expressions/class/fields-static-redeclaration-symbol.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-static-redeclaration.js")]
-        public void Test_fields﹏static﹏redeclaration_js()
-        {
-            RunTest("language/expressions/class/fields-static-redeclaration.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-static-string-literal-name-init-err-contains-arguments.js")]
-        public void Test_fields﹏static﹏string﹏literal﹏name﹏init﹏err﹏contains﹏arguments_js()
-        {
-            RunTest("language/expressions/class/fields-static-string-literal-name-init-err-contains-arguments.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-static-string-literal-name-init-err-contains-super.js")]
-        public void Test_fields﹏static﹏string﹏literal﹏name﹏init﹏err﹏contains﹏super_js()
-        {
-            RunTest("language/expressions/class/fields-static-string-literal-name-init-err-contains-super.js");
         }
 
         [Fact(DisplayName = "/language/expressions/class/fields-string-literal-name-init-err-contains-arguments.js")]
@@ -9452,18 +8984,6 @@ namespace NetScriptTest.language.expressions
         public void Test_fields﹏string﹏name﹏propname﹏constructor_js()
         {
             RunTest("language/expressions/class/fields-string-name-propname-constructor.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-string-name-static-propname-constructor.js")]
-        public void Test_fields﹏string﹏name﹏static﹏propname﹏constructor_js()
-        {
-            RunTest("language/expressions/class/fields-string-name-static-propname-constructor.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-string-name-static-propname-prototype.js")]
-        public void Test_fields﹏string﹏name﹏static﹏propname﹏prototype_js()
-        {
-            RunTest("language/expressions/class/fields-string-name-static-propname-prototype.js");
         }
 
         [Fact(DisplayName = "/language/expressions/class/fields-ternary-init-err-contains-arguments.js")]
@@ -9512,30 +9032,6 @@ namespace NetScriptTest.language.expressions
         public void Test_fields﹏wrapped﹏in﹏sc﹏private﹏names_js()
         {
             RunTest("language/expressions/class/fields-wrapped-in-sc-private-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-wrapped-in-sc-static-computed-names.js")]
-        public void Test_fields﹏wrapped﹏in﹏sc﹏static﹏computed﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-wrapped-in-sc-static-computed-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-wrapped-in-sc-static-computed-symbol-names.js")]
-        public void Test_fields﹏wrapped﹏in﹏sc﹏static﹏computed﹏symbol﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-wrapped-in-sc-static-computed-symbol-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-wrapped-in-sc-static-literal-names.js")]
-        public void Test_fields﹏wrapped﹏in﹏sc﹏static﹏literal﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-wrapped-in-sc-static-literal-names.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/class/fields-wrapped-in-sc-static-private-names.js")]
-        public void Test_fields﹏wrapped﹏in﹏sc﹏static﹏private﹏names_js()
-        {
-            RunTest("language/expressions/class/fields-wrapped-in-sc-static-private-names.js");
         }
 
         [Fact(DisplayName = "/language/expressions/class/fields-wrapped-in-sc-string-literal-names.js")]

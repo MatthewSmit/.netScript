@@ -4,6 +4,30 @@ namespace NetScriptTest.language
 {
     public sealed class Test_identifiers : BaseTest
     {
+        [Fact(DisplayName = "/language/identifiers/other_id_continue-escaped.js")]
+        public void Test_other_id_continue﹏escaped_js()
+        {
+            RunTest("language/identifiers/other_id_continue-escaped.js");
+        }
+
+        [Fact(DisplayName = "/language/identifiers/other_id_continue.js")]
+        public void Test_other_id_continue_js()
+        {
+            RunTest("language/identifiers/other_id_continue.js");
+        }
+
+        [Fact(DisplayName = "/language/identifiers/other_id_start-escaped.js")]
+        public void Test_other_id_start﹏escaped_js()
+        {
+            RunTest("language/identifiers/other_id_start-escaped.js");
+        }
+
+        [Fact(DisplayName = "/language/identifiers/other_id_start.js")]
+        public void Test_other_id_start_js()
+        {
+            RunTest("language/identifiers/other_id_start.js");
+        }
+
         [Fact(DisplayName = "/language/identifiers/part-digits-via-escape-hex.js")]
         public void Test_part﹏digits﹏via﹏escape﹏hex_js()
         {
@@ -806,6 +830,30 @@ namespace NetScriptTest.language
         public void Test_vals﹏rus﹏alpha﹏upper_js()
         {
             RunTest("language/identifiers/vals-rus-alpha-upper.js");
+        }
+
+        [Fact(DisplayName = "/language/identifiers/vertical-tilde-continue-escaped.js")]
+        public void Test_vertical﹏tilde﹏continue﹏escaped_js()
+        {
+            RunTest("language/identifiers/vertical-tilde-continue-escaped.js");
+        }
+
+        [Fact(DisplayName = "/language/identifiers/vertical-tilde-continue.js")]
+        public void Test_vertical﹏tilde﹏continue_js()
+        {
+            RunTest("language/identifiers/vertical-tilde-continue.js");
+        }
+
+        [Fact(DisplayName = "/language/identifiers/vertical-tilde-start-escaped.js")]
+        public void Test_vertical﹏tilde﹏start﹏escaped_js()
+        {
+            RunTest("language/identifiers/vertical-tilde-start-escaped.js");
+        }
+
+        [Fact(DisplayName = "/language/identifiers/vertical-tilde-start.js")]
+        public void Test_vertical﹏tilde﹏start_js()
+        {
+            RunTest("language/identifiers/vertical-tilde-start.js");
         }
     }
 }

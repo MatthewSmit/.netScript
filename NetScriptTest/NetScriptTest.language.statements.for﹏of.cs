@@ -3544,6 +3544,12 @@ namespace NetScriptTest.language.statements
             RunTest("language/statements/for-of/generator-close-via-break.js");
         }
 
+        [Fact(DisplayName = "/language/statements/for-of/generator-close-via-continue.js")]
+        public void Test_generator﹏close﹏via﹏continue_js()
+        {
+            RunTest("language/statements/for-of/generator-close-via-continue.js");
+        }
+
         [Fact(DisplayName = "/language/statements/for-of/generator-close-via-return.js")]
         public void Test_generator﹏close﹏via﹏return_js()
         {
@@ -3794,6 +3800,12 @@ namespace NetScriptTest.language.statements
         public void Test_iterator﹏close﹏via﹏break_js()
         {
             RunTest("language/statements/for-of/iterator-close-via-break.js");
+        }
+
+        [Fact(DisplayName = "/language/statements/for-of/iterator-close-via-continue.js")]
+        public void Test_iterator﹏close﹏via﹏continue_js()
+        {
+            RunTest("language/statements/for-of/iterator-close-via-continue.js");
         }
 
         [Fact(DisplayName = "/language/statements/for-of/iterator-close-via-return.js")]

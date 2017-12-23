@@ -10,6 +10,12 @@ namespace NetScriptTest.intl402.PluralRules
             RunTest("intl402/PluralRules/supportedLocalesOf/arguments.js");
         }
 
+        [Fact(DisplayName = "/intl402/PluralRules/supportedLocalesOf/length.js")]
+        public void Test_length_js()
+        {
+            RunTest("intl402/PluralRules/supportedLocalesOf/length.js");
+        }
+
         [Fact(DisplayName = "/intl402/PluralRules/supportedLocalesOf/main.js")]
         public void Test_main_js()
         {
@@ -20,6 +26,12 @@ namespace NetScriptTest.intl402.PluralRules
         public void Test_name_js()
         {
             RunTest("intl402/PluralRules/supportedLocalesOf/name.js");
+        }
+
+        [Fact(DisplayName = "/intl402/PluralRules/supportedLocalesOf/prop-desc.js")]
+        public void Test_prop﹏desc_js()
+        {
+            RunTest("intl402/PluralRules/supportedLocalesOf/prop-desc.js");
         }
 
         [Fact(DisplayName = "/intl402/PluralRules/supportedLocalesOf/supportedLocalesOf.js")]

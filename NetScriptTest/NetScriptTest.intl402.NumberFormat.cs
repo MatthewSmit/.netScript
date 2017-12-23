@@ -4,112 +4,28 @@ namespace NetScriptTest.intl402
 {
     public sealed class Test_NumberFormat : BaseTest
     {
-        [Fact(DisplayName = "/intl402/NumberFormat/11.1.1_1.js")]
-        public void Test_11_1_1_1_js()
+        [Fact(DisplayName = "/intl402/NumberFormat/builtin.js")]
+        public void Test_builtin_js()
         {
-            RunTest("intl402/NumberFormat/11.1.1_1.js");
+            RunTest("intl402/NumberFormat/builtin.js");
         }
 
-        [Fact(DisplayName = "/intl402/NumberFormat/11.1.1_15.js")]
-        public void Test_11_1_1_15_js()
+        [Fact(DisplayName = "/intl402/NumberFormat/currency-code-invalid.js")]
+        public void Test_currency﹏code﹏invalid_js()
         {
-            RunTest("intl402/NumberFormat/11.1.1_15.js");
+            RunTest("intl402/NumberFormat/currency-code-invalid.js");
         }
 
-        [Fact(DisplayName = "/intl402/NumberFormat/11.1.1_17.js")]
-        public void Test_11_1_1_17_js()
+        [Fact(DisplayName = "/intl402/NumberFormat/currency-code-well-formed.js")]
+        public void Test_currency﹏code﹏well﹏formed_js()
         {
-            RunTest("intl402/NumberFormat/11.1.1_17.js");
+            RunTest("intl402/NumberFormat/currency-code-well-formed.js");
         }
 
-        [Fact(DisplayName = "/intl402/NumberFormat/11.1.1_19.js")]
-        public void Test_11_1_1_19_js()
+        [Fact(DisplayName = "/intl402/NumberFormat/currency-digits.js")]
+        public void Test_currency﹏digits_js()
         {
-            RunTest("intl402/NumberFormat/11.1.1_19.js");
-        }
-
-        [Fact(DisplayName = "/intl402/NumberFormat/11.1.1_20_c.js")]
-        public void Test_11_1_1_20_c_js()
-        {
-            RunTest("intl402/NumberFormat/11.1.1_20_c.js");
-        }
-
-        [Fact(DisplayName = "/intl402/NumberFormat/11.1.1_21.js")]
-        public void Test_11_1_1_21_js()
-        {
-            RunTest("intl402/NumberFormat/11.1.1_21.js");
-        }
-
-        [Fact(DisplayName = "/intl402/NumberFormat/11.1.1_32.js")]
-        public void Test_11_1_1_32_js()
-        {
-            RunTest("intl402/NumberFormat/11.1.1_32.js");
-        }
-
-        [Fact(DisplayName = "/intl402/NumberFormat/11.1.1_34.js")]
-        public void Test_11_1_1_34_js()
-        {
-            RunTest("intl402/NumberFormat/11.1.1_34.js");
-        }
-
-        [Fact(DisplayName = "/intl402/NumberFormat/11.1.1_6.js")]
-        public void Test_11_1_1_6_js()
-        {
-            RunTest("intl402/NumberFormat/11.1.1_6.js");
-        }
-
-        [Fact(DisplayName = "/intl402/NumberFormat/11.1.1_7.js")]
-        public void Test_11_1_1_7_js()
-        {
-            RunTest("intl402/NumberFormat/11.1.1_7.js");
-        }
-
-        [Fact(DisplayName = "/intl402/NumberFormat/11.1.1_a.js")]
-        public void Test_11_1_1_a_js()
-        {
-            RunTest("intl402/NumberFormat/11.1.1_a.js");
-        }
-
-        [Fact(DisplayName = "/intl402/NumberFormat/11.1.2.js")]
-        public void Test_11_1_2_js()
-        {
-            RunTest("intl402/NumberFormat/11.1.2.js");
-        }
-
-        [Fact(DisplayName = "/intl402/NumberFormat/11.1.3.js")]
-        public void Test_11_1_3_js()
-        {
-            RunTest("intl402/NumberFormat/11.1.3.js");
-        }
-
-        [Fact(DisplayName = "/intl402/NumberFormat/11.1_L15.js")]
-        public void Test_11_1_L15_js()
-        {
-            RunTest("intl402/NumberFormat/11.1_L15.js");
-        }
-
-        [Fact(DisplayName = "/intl402/NumberFormat/11.2.3_b.js")]
-        public void Test_11_2_3_b_js()
-        {
-            RunTest("intl402/NumberFormat/11.2.3_b.js");
-        }
-
-        [Fact(DisplayName = "/intl402/NumberFormat/11.4_a.js")]
-        public void Test_11_4_a_js()
-        {
-            RunTest("intl402/NumberFormat/11.4_a.js");
-        }
-
-        [Fact(DisplayName = "/intl402/NumberFormat/6.3.1_a.js")]
-        public void Test_6_3_1_a_js()
-        {
-            RunTest("intl402/NumberFormat/6.3.1_a.js");
-        }
-
-        [Fact(DisplayName = "/intl402/NumberFormat/6.3.1_b.js")]
-        public void Test_6_3_1_b_js()
-        {
-            RunTest("intl402/NumberFormat/6.3.1_b.js");
+            RunTest("intl402/NumberFormat/currency-digits.js");
         }
 
         [Fact(DisplayName = "/intl402/NumberFormat/default-minimum-singificant-digits.js")]
@@ -136,10 +52,106 @@ namespace NetScriptTest.intl402
             RunTest("intl402/NumberFormat/fraction-digit-options-read-once.js");
         }
 
+        [Fact(DisplayName = "/intl402/NumberFormat/ignore-invalid-unicode-ext-values.js")]
+        public void Test_ignore﹏invalid﹏unicode﹏ext﹏values_js()
+        {
+            RunTest("intl402/NumberFormat/ignore-invalid-unicode-ext-values.js");
+        }
+
+        [Fact(DisplayName = "/intl402/NumberFormat/instance-class.js")]
+        public void Test_instance﹏class_js()
+        {
+            RunTest("intl402/NumberFormat/instance-class.js");
+        }
+
+        [Fact(DisplayName = "/intl402/NumberFormat/instance-proto-and-extensible.js")]
+        public void Test_instance﹏proto﹏and﹏extensible_js()
+        {
+            RunTest("intl402/NumberFormat/instance-proto-and-extensible.js");
+        }
+
+        [Fact(DisplayName = "/intl402/NumberFormat/legacy-regexp-statics-not-modified.js")]
+        public void Test_legacy﹏regexp﹏statics﹏not﹏modified_js()
+        {
+            RunTest("intl402/NumberFormat/legacy-regexp-statics-not-modified.js");
+        }
+
+        [Fact(DisplayName = "/intl402/NumberFormat/length.js")]
+        public void Test_length_js()
+        {
+            RunTest("intl402/NumberFormat/length.js");
+        }
+
         [Fact(DisplayName = "/intl402/NumberFormat/name.js")]
         public void Test_name_js()
         {
             RunTest("intl402/NumberFormat/name.js");
+        }
+
+        [Fact(DisplayName = "/intl402/NumberFormat/prop-desc.js")]
+        public void Test_prop﹏desc_js()
+        {
+            RunTest("intl402/NumberFormat/prop-desc.js");
+        }
+
+        [Fact(DisplayName = "/intl402/NumberFormat/significant-digits-options-get-sequence.js")]
+        public void Test_significant﹏digits﹏options﹏get﹏sequence_js()
+        {
+            RunTest("intl402/NumberFormat/significant-digits-options-get-sequence.js");
+        }
+
+        [Fact(DisplayName = "/intl402/NumberFormat/subclassing.js")]
+        public void Test_subclassing_js()
+        {
+            RunTest("intl402/NumberFormat/subclassing.js");
+        }
+
+        [Fact(DisplayName = "/intl402/NumberFormat/taint-Object-prototype.js")]
+        public void Test_taint﹏Object﹏prototype_js()
+        {
+            RunTest("intl402/NumberFormat/taint-Object-prototype.js");
+        }
+
+        [Fact(DisplayName = "/intl402/NumberFormat/test-option-currency.js")]
+        public void Test_test﹏option﹏currency_js()
+        {
+            RunTest("intl402/NumberFormat/test-option-currency.js");
+        }
+
+        [Fact(DisplayName = "/intl402/NumberFormat/test-option-currencyDisplay.js")]
+        public void Test_test﹏option﹏currencyDisplay_js()
+        {
+            RunTest("intl402/NumberFormat/test-option-currencyDisplay.js");
+        }
+
+        [Fact(DisplayName = "/intl402/NumberFormat/test-option-localeMatcher.js")]
+        public void Test_test﹏option﹏localeMatcher_js()
+        {
+            RunTest("intl402/NumberFormat/test-option-localeMatcher.js");
+        }
+
+        [Fact(DisplayName = "/intl402/NumberFormat/test-option-style.js")]
+        public void Test_test﹏option﹏style_js()
+        {
+            RunTest("intl402/NumberFormat/test-option-style.js");
+        }
+
+        [Fact(DisplayName = "/intl402/NumberFormat/test-option-useGrouping.js")]
+        public void Test_test﹏option﹏useGrouping_js()
+        {
+            RunTest("intl402/NumberFormat/test-option-useGrouping.js");
+        }
+
+        [Fact(DisplayName = "/intl402/NumberFormat/this-value-ignored.js")]
+        public void Test_this﹏value﹏ignored_js()
+        {
+            RunTest("intl402/NumberFormat/this-value-ignored.js");
+        }
+
+        [Fact(DisplayName = "/intl402/NumberFormat/throws-for-currency-style-without-currency-option.js")]
+        public void Test_throws﹏for﹏currency﹏style﹏without﹏currency﹏option_js()
+        {
+            RunTest("intl402/NumberFormat/throws-for-currency-style-without-currency-option.js");
         }
     }
 }

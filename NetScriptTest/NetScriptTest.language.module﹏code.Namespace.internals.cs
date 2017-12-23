@@ -28,6 +28,12 @@ namespace NetScriptTest.language.module﹏code.Namespace
             RunTest("language/module-code/namespace/internals/delete-non-exported.js");
         }
 
+        [Fact(DisplayName = "/language/module-code/namespace/internals/enumerate-binding-uninit.js")]
+        public void Test_enumerate﹏binding﹏uninit_js()
+        {
+            RunTest("language/module-code/namespace/internals/enumerate-binding-uninit.js");
+        }
+
         [Fact(DisplayName = "/language/module-code/namespace/internals/get-own-property-str-found-init.js")]
         public void Test_get﹏own﹏property﹏str﹏found﹏init_js()
         {
@@ -134,6 +140,24 @@ namespace NetScriptTest.language.module﹏code.Namespace
         public void Test_is﹏extensible_js()
         {
             RunTest("language/module-code/namespace/internals/is-extensible.js");
+        }
+
+        [Fact(DisplayName = "/language/module-code/namespace/internals/object-hasOwnProperty-binding-uninit.js")]
+        public void Test_object﹏hasOwnProperty﹏binding﹏uninit_js()
+        {
+            RunTest("language/module-code/namespace/internals/object-hasOwnProperty-binding-uninit.js");
+        }
+
+        [Fact(DisplayName = "/language/module-code/namespace/internals/object-keys-binding-uninit.js")]
+        public void Test_object﹏keys﹏binding﹏uninit_js()
+        {
+            RunTest("language/module-code/namespace/internals/object-keys-binding-uninit.js");
+        }
+
+        [Fact(DisplayName = "/language/module-code/namespace/internals/object-propertyIsEnumerable-binding-uninit.js")]
+        public void Test_object﹏propertyIsEnumerable﹏binding﹏uninit_js()
+        {
+            RunTest("language/module-code/namespace/internals/object-propertyIsEnumerable-binding-uninit.js");
         }
 
         [Fact(DisplayName = "/language/module-code/namespace/internals/own-property-keys-binding-types.js")]

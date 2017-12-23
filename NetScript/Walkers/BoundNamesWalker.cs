@@ -59,7 +59,7 @@ namespace NetScript.Walkers
                     Walk(variableDeclarator, list);
                     break;
                 default:
-                    throw new NotImplementedException();
+                    throw new InvalidOperationException();
             }
         }
 
@@ -77,9 +77,17 @@ namespace NetScript.Walkers
             {
                 list.Add(identifierNode.Name);
             }
+            else if (assignmentPattern.Left is ArrayPatternNode arrayPattern)
+            {
+                Walk(arrayPattern, list);
+            }
+            else if (assignmentPattern.Left is ObjectPatternNode objectPattern)
+            {
+                Walk(objectPattern, list);
+            }
             else
             {
-                throw new NotImplementedException();
+                throw new InvalidOperationException();
             }
         }
 
@@ -110,7 +118,7 @@ namespace NetScript.Walkers
             {
                 if (!element.Shorthand && element.Kind == PropertyKind.Initialise)
                 {
-                    Walk(((AssignmentPatternNode)element.Value).Left, list);
+                    Walk(element.Value, list);
                 }
                 else
                 {
@@ -131,7 +139,7 @@ namespace NetScript.Walkers
             WalkBinding(variableDeclarator.Id, list);
         }
 
-        private static void WalkBinding([CanBeNull] BaseNode idNode, [NotNull] ICollection<string> list)
+        private static void WalkBinding([CanBeNull] BaseNode idNode, [NotNull] IList<string> list)
         {
             if (idNode is IdentifierNode identifier)
             {
@@ -146,7 +154,7 @@ namespace NetScript.Walkers
             }
             else if (idNode is ObjectPatternNode objectPattern)
             {
-                throw new NotImplementedException();
+                Walk(objectPattern, list);
             }
             else if (idNode is AssignmentPatternNode assignmentPattern)
             {

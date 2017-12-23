@@ -28,6 +28,12 @@ namespace NetScriptTest.built﹏ins.TypedArrays.internals
             RunTest("built-ins/TypedArrays/internals/GetOwnProperty/detached-buffer.js");
         }
 
+        [Fact(DisplayName = "/built-ins/TypedArrays/internals/GetOwnProperty/enumerate-detached-buffer.js")]
+        public void Test_enumerate﹏detached﹏buffer_js()
+        {
+            RunTest("built-ins/TypedArrays/internals/GetOwnProperty/enumerate-detached-buffer.js");
+        }
+
         [Fact(DisplayName = "/built-ins/TypedArrays/internals/GetOwnProperty/index-prop-desc.js")]
         public void Test_index﹏prop﹏desc_js()
         {

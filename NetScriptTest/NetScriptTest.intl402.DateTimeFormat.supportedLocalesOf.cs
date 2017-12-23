@@ -4,28 +4,40 @@ namespace NetScriptTest.intl402.DateTimeFormat
 {
     public sealed class Test_supportedLocalesOf : BaseTest
     {
-        [Fact(DisplayName = "/intl402/DateTimeFormat/supportedLocalesOf/12.2.2_a.js")]
-        public void Test_12_2_2_a_js()
+        [Fact(DisplayName = "/intl402/DateTimeFormat/supportedLocalesOf/basic.js")]
+        public void Test_basic_js()
         {
-            RunTest("intl402/DateTimeFormat/supportedLocalesOf/12.2.2_a.js");
+            RunTest("intl402/DateTimeFormat/supportedLocalesOf/basic.js");
         }
 
-        [Fact(DisplayName = "/intl402/DateTimeFormat/supportedLocalesOf/12.2.2_b.js")]
-        public void Test_12_2_2_b_js()
+        [Fact(DisplayName = "/intl402/DateTimeFormat/supportedLocalesOf/builtin.js")]
+        public void Test_builtin_js()
         {
-            RunTest("intl402/DateTimeFormat/supportedLocalesOf/12.2.2_b.js");
+            RunTest("intl402/DateTimeFormat/supportedLocalesOf/builtin.js");
         }
 
-        [Fact(DisplayName = "/intl402/DateTimeFormat/supportedLocalesOf/12.2.2_L15.js")]
-        public void Test_12_2_2_L15_js()
+        [Fact(DisplayName = "/intl402/DateTimeFormat/supportedLocalesOf/length.js")]
+        public void Test_length_js()
         {
-            RunTest("intl402/DateTimeFormat/supportedLocalesOf/12.2.2_L15.js");
+            RunTest("intl402/DateTimeFormat/supportedLocalesOf/length.js");
         }
 
         [Fact(DisplayName = "/intl402/DateTimeFormat/supportedLocalesOf/name.js")]
         public void Test_name_js()
         {
             RunTest("intl402/DateTimeFormat/supportedLocalesOf/name.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/supportedLocalesOf/prop-desc.js")]
+        public void Test_prop﹏desc_js()
+        {
+            RunTest("intl402/DateTimeFormat/supportedLocalesOf/prop-desc.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/supportedLocalesOf/taint-Object-prototype.js")]
+        public void Test_taint﹏Object﹏prototype_js()
+        {
+            RunTest("intl402/DateTimeFormat/supportedLocalesOf/taint-Object-prototype.js");
         }
     }
 }

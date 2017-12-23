@@ -16,10 +16,46 @@ namespace NetScriptTest.built﹏ins.BigInt
             RunTest("built-ins/BigInt/asUintN/asUintN.js");
         }
 
+        [Fact(DisplayName = "/built-ins/BigInt/asUintN/bigint-tobigint-errors.js")]
+        public void Test_bigint﹏tobigint﹏errors_js()
+        {
+            RunTest("built-ins/BigInt/asUintN/bigint-tobigint-errors.js");
+        }
+
+        [Fact(DisplayName = "/built-ins/BigInt/asUintN/bigint-tobigint-toprimitive.js")]
+        public void Test_bigint﹏tobigint﹏toprimitive_js()
+        {
+            RunTest("built-ins/BigInt/asUintN/bigint-tobigint-toprimitive.js");
+        }
+
+        [Fact(DisplayName = "/built-ins/BigInt/asUintN/bigint-tobigint-wrapped-values.js")]
+        public void Test_bigint﹏tobigint﹏wrapped﹏values_js()
+        {
+            RunTest("built-ins/BigInt/asUintN/bigint-tobigint-wrapped-values.js");
+        }
+
         [Fact(DisplayName = "/built-ins/BigInt/asUintN/bigint-tobigint.js")]
         public void Test_bigint﹏tobigint_js()
         {
             RunTest("built-ins/BigInt/asUintN/bigint-tobigint.js");
+        }
+
+        [Fact(DisplayName = "/built-ins/BigInt/asUintN/bits-toindex-errors.js")]
+        public void Test_bits﹏toindex﹏errors_js()
+        {
+            RunTest("built-ins/BigInt/asUintN/bits-toindex-errors.js");
+        }
+
+        [Fact(DisplayName = "/built-ins/BigInt/asUintN/bits-toindex-toprimitive.js")]
+        public void Test_bits﹏toindex﹏toprimitive_js()
+        {
+            RunTest("built-ins/BigInt/asUintN/bits-toindex-toprimitive.js");
+        }
+
+        [Fact(DisplayName = "/built-ins/BigInt/asUintN/bits-toindex-wrapped-values.js")]
+        public void Test_bits﹏toindex﹏wrapped﹏values_js()
+        {
+            RunTest("built-ins/BigInt/asUintN/bits-toindex-wrapped-values.js");
         }
 
         [Fact(DisplayName = "/built-ins/BigInt/asUintN/bits-toindex.js")]

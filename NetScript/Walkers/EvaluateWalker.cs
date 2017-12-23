@@ -63,6 +63,8 @@ namespace NetScript.Walkers
                     return Walk(forStatement, context);
                 case ForInStatementNode forInStatement:
                     return Walk(forInStatement, context);
+                case ForOfStatementNode forOfStatement:
+                    return Walk(forOfStatement, context);
                 case FunctionDeclarationNode functionDeclaration:
                     return Walk(functionDeclaration, context);
                 case IfStatementNode ifStatement:
@@ -100,7 +102,7 @@ namespace NetScript.Walkers
                 case ForInStatementNode forInStatement:
                     return Walk(forInStatement, context, labelSet);
                 case ForOfStatementNode forOfStatement:
-                    throw new NotImplementedException();
+                    return Walk(forOfStatement, context, labelSet);
                 case LabelledStatementNode labelledStatement:
                     return Walk(labelledStatement, context, labelSet);
                 case SwitchStatementNode switchStatement:
@@ -243,12 +245,38 @@ namespace NetScript.Walkers
             {
                 if (variableDeclaration.Kind == VariableKind.Var)
                 {
-                    var result = Walk(variableDeclaration, context, true);
-                    agent.GetValue(result);
+                    Walk(variableDeclaration, context, true);
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    var oldEnvironment = context.LexicalEnvironment;
+                    var loopEnvironment = LexicalEnvironment.NewDeclarativeEnvironment(agent, oldEnvironment);
+                    var loopEnvironmentRecord = loopEnvironment.Environment;
+                    var isConst = variableDeclaration.Kind == VariableKind.Const;
+                    var boundNames = BoundNamesWalker.Walk(variableDeclaration);
+                    foreach (var declarationName in boundNames)
+                    {
+                        if (isConst)
+                        {
+                            loopEnvironmentRecord.CreateImmutableBinding(declarationName, true);
+                        }
+                        else
+                        {
+                            loopEnvironmentRecord.CreateMutableBinding(declarationName, false);
+                        }
+                    }
+
+                    context.LexicalEnvironment = loopEnvironment;
+                    try
+                    {
+                        Walk(variableDeclaration, context, true);
+                        var perIterationLets = isConst ? Array.Empty<string>() : boundNames;
+                        return ForBodyEvaluation(context, forStatement.Test, forStatement.Update, forStatement.Body, perIterationLets, labelSet);
+                    }
+                    finally
+                    {
+                        context.LexicalEnvironment = oldEnvironment;
+                    }
                 }
             }
             else if (forStatement.Init != null)
@@ -276,6 +304,19 @@ namespace NetScript.Walkers
             }
 
             return ForInBodyEvaluation(context, forInStatement.Left, forInStatement.Body, obj, labelSet);
+        }
+
+        private static ValueReference Walk([NotNull] ForOfStatementNode forOfStatement, [NotNull] ExecutionContext context, [CanBeNull] ICollection<string> labelSet = null)
+        {
+            IReadOnlyList<string> tdzNames = Array.Empty<string>();
+
+            if (forOfStatement.Left is VariableDeclarationNode variableDeclaration && variableDeclaration.Kind != VariableKind.Var)
+            {
+                tdzNames = BoundNamesWalker.Walk(variableDeclaration);
+            }
+
+            var iteratorRecord = ForOfHeadEvaluation(context, tdzNames, forOfStatement.Right);
+            return ForOfBodyEvaluation(context, forOfStatement.Left, forOfStatement.Body, iteratorRecord, labelSet);
         }
 
         private static ValueReference Walk([NotNull] FunctionDeclarationNode functionDeclaration, [NotNull] ExecutionContext context)
@@ -523,7 +564,9 @@ namespace NetScript.Walkers
                     }
                     else
                     {
-                        throw new NotImplementedException();
+                        var rhs = Walk(variableDeclarator.Init, context);
+                        var value = agent.GetValue(rhs);
+                        BindingInitialisation(agent, variableDeclarator.Id, value, null);
                     }
                 }
                 else
@@ -556,7 +599,7 @@ namespace NetScript.Walkers
                     {
                         var rhs = Walk(variableDeclarator.Init, context);
                         var value = agent.GetValue(rhs);
-                        BindingInitialisation(agent, (ExpressionNode)variableDeclarator.Id, value, context.LexicalEnvironment);
+                        BindingInitialisation(agent, variableDeclarator.Id, value, context.LexicalEnvironment);
                     }
                 }
             }
@@ -652,6 +695,8 @@ namespace NetScript.Walkers
                     return Walk(binaryExpression, context);
                 case CallExpressionNode callExpression:
                     return Walk(callExpression, context);
+                case ClassExpressionNode classExpression:
+                    return Walk(classExpression, context);
                 case ConditionalExpressionNode conditionalExpression:
                     return Walk(conditionalExpression, context);
                 case FunctionExpressionNode functionExpression:
@@ -881,6 +926,12 @@ namespace NetScript.Walkers
 
         private static ScriptValue Walk([NotNull] CallExpressionNode callExpression, [NotNull] ExecutionContext context)
         {
+            if (callExpression.Callee is SuperNode)
+            {
+                SuperCall(callExpression.Arguments, context);
+                return ScriptValue.Undefined;
+            }
+
             //https://tc39.github.io/ecma262/#sec-function-calls-runtime-semantics-evaluation
             var agent = context.Realm.Agent;
             var reference = Walk(callExpression.Callee, context);
@@ -906,6 +957,23 @@ namespace NetScript.Walkers
 
             var tailCall = IsInTailPosition(callExpression, context);
             return EvaluateCall(function, reference, callExpression.Arguments, tailCall, context);
+        }
+
+        private static ScriptValue Walk([NotNull] ClassExpressionNode classExpression, [NotNull] ExecutionContext context)
+        {
+            //https://tc39.github.io/ecma262/#sec-class-definitions-runtime-semantics-evaluation
+            var className = classExpression.Id?.Name;
+            var value = ClassDefinitionEvaluation(classExpression.SuperClass, classExpression.Body, className, context);
+            if (className != null)
+            {
+                var hasNameProperty = value.HasOwnProperty("name");
+                if (!hasNameProperty)
+                {
+                    context.Realm.Agent.SetFunctionName(value, className);
+                }
+            }
+
+            return value;
         }
 
         private static ScriptValue Walk([NotNull] ConditionalExpressionNode conditionalExpression, [NotNull] ExecutionContext context)
@@ -1224,7 +1292,7 @@ namespace NetScript.Walkers
             return list;
         }
 
-        private static void BindingInitialisation([NotNull] Agent agent, [NotNull] ExpressionNode binding, ScriptValue value, LexicalEnvironment environment)
+        private static void BindingInitialisation([NotNull] Agent agent, [NotNull] ExpressionNode binding, ScriptValue value, [CanBeNull] LexicalEnvironment environment)
         {
             if (binding is IdentifierNode identifier)
             {
@@ -1258,14 +1326,30 @@ namespace NetScript.Walkers
                 agent.RequireObjectCoercible(value);
                 foreach (var property in objectPattern.Properties)
                 {
-                    var name = property.Computed ? agent.GetValue(Walk(property.Key, agent.RunningExecutionContext)) : ((IdentifierNode)property.Key).Name;
-                    if (((AssignmentPatternNode)property.Value).Left is IdentifierNode)
+                    var name = EvaluatePropertyName(property.Computed, property.Key, agent.RunningExecutionContext);
+                    if (!property.Shorthand && property.Kind == PropertyKind.Initialise)
                     {
-                        KeyedBindingInitialisationSingle(agent, (AssignmentPatternNode)property.Value, value, environment, name);
+                        KeyedBindingInitialisation(agent, property.Value, value, environment, name);
+                    }
+                    else if (property.Key == property.Value)
+                    {
+                        KeyedBindingInitialisationSingle(agent, (IdentifierNode)property.Key, null, value, environment, name);
+                    }
+                    else if (property.Value is IdentifierNode)
+                    {
+                        KeyedBindingInitialisationSingle(agent, (IdentifierNode)property.Key, property.Value, value, environment, name);
                     }
                     else
                     {
-                        KeyedBindingInitialisationBinding(agent, (AssignmentPatternNode)property.Value, value, environment, name);
+                        var assignmentPattern = (AssignmentPatternNode)property.Value;
+                        if (assignmentPattern.Left is IdentifierNode patternIdentifier)
+                        {
+                            KeyedBindingInitialisationSingle(agent, patternIdentifier, assignmentPattern.Right, value, environment, name);
+                        }
+                        else
+                        {
+                            KeyedBindingInitialisationBinding(agent, assignmentPattern.Left, assignmentPattern.Right, value, environment, name);
+                        }
                     }
                 }
             }
@@ -1282,7 +1366,7 @@ namespace NetScript.Walkers
             {
                 if (element == null)
                 {
-                    throw new NotImplementedException();
+                    IteratorDestructuringAssignmentEvaluation(agent, ref iteratorRecord);
                 }
                 else if (element is RestElementNode restElement)
                 {
@@ -1314,6 +1398,28 @@ namespace NetScript.Walkers
                 else
                 {
                     throw new InvalidOperationException();
+                }
+            }
+        }
+
+        private static void IteratorDestructuringAssignmentEvaluation(Agent agent, ref (ScriptObject Iterator, ScriptFunctionObject NextMethod, bool Done) iteratorRecord)
+        {
+            if (!iteratorRecord.Done)
+            {
+                ScriptValue next;
+                try
+                {
+                    next = agent.IteratorStep(iteratorRecord);
+                }
+                catch (ScriptException)
+                {
+                    iteratorRecord.Done = true;
+                    throw;
+                }
+
+                if (next.IsBoolean && !(bool)next)
+                {
+                    iteratorRecord.Done = true;
                 }
             }
         }
@@ -1551,13 +1657,28 @@ namespace NetScript.Walkers
             return function;
         }
 
-        private static void CreatePerIterationEnvironment([NotNull] ExecutionContext context, [NotNull] IReadOnlyList<string> perIterationBindings)
+        private static void CreatePerIterationEnvironment([NotNull] ExecutionContext context, [NotNull] IReadOnlyCollection<string> perIterationBindings)
         {
             //https://tc39.github.io/ecma262/#sec-createperiterationenvironment
 
             if (perIterationBindings.Count > 0)
             {
-                throw new NotImplementedException();
+                var lastIterationEnvironment = context.LexicalEnvironment;
+                var lastIterationEnvironmentRecord = lastIterationEnvironment.Environment;
+                var outer = lastIterationEnvironment.OuterEnvironment;
+                Debug.Assert(outer != null);
+
+                var thisIterationEnvironment = LexicalEnvironment.NewDeclarativeEnvironment(context.Realm.Agent, outer);
+                var thisIterationEnvironmentRecord = thisIterationEnvironment.Environment;
+
+                foreach (var bindingName in perIterationBindings)
+                {
+                    thisIterationEnvironmentRecord.CreateMutableBinding(bindingName, false);
+                    var lastValue = lastIterationEnvironmentRecord.GetBindingValue(bindingName, true);
+                    thisIterationEnvironmentRecord.InitialiseBinding(bindingName, lastValue);
+                }
+
+                context.LexicalEnvironment = thisIterationEnvironment;
             }
         }
 
@@ -1910,6 +2031,117 @@ namespace NetScript.Walkers
             return value;
         }
 
+        private static ScriptValue ForOfBodyEvaluation([NotNull] ExecutionContext context, [NotNull] BaseNode lhs, [NotNull] BaseNode statement, (ScriptObject Iterator, ScriptFunctionObject NextMethod, bool Done) iteratorRecord, [CanBeNull] ICollection<string> labelSet)
+        {
+            //https://tc39.github.io/ecma262/#sec-runtime-semantics-forin-div-ofbodyevaluation-lhs-stmt-iterator-lhskind-labelset
+            var agent = context.Realm.Agent;
+            Debug.Assert(agent.RunningExecutionContext == context);
+
+            var oldEnvironment = context.LexicalEnvironment;
+            var value = ScriptValue.Undefined;
+            var destructuring = IsDestructuring(lhs);
+            if (destructuring && !(lhs is VariableDeclarationNode))
+            {
+                //Assert: lhs is a LeftHandSideExpression.
+                //Let assignmentPattern be the result of reparsing lhs as an AssignmentPattern.
+                throw new NotImplementedException();
+            }
+
+            var variableDeclaration = lhs as VariableDeclarationNode;
+
+            while (true)
+            {
+                try
+                {
+                    var nextResult = agent.IteratorStep(iteratorRecord);
+                    if (nextResult.IsBoolean && (bool)nextResult == false)
+                    {
+                        return value;
+                    }
+
+                    var nextValue = Agent.IteratorValue((ScriptObject)nextResult);
+
+                    Reference lhsReference = default;
+                    if (variableDeclaration != null && variableDeclaration.Kind != VariableKind.Var)
+                    {
+                        var iterationEnvironment = LexicalEnvironment.NewDeclarativeEnvironment(agent, oldEnvironment);
+                        BindingInstantiation(variableDeclaration, iterationEnvironment);
+                        context.LexicalEnvironment = iterationEnvironment;
+                        if (!destructuring)
+                        {
+                            Debug.Assert(variableDeclaration.Declarations.Count == 1);
+                            var lhsName = ((IdentifierNode)variableDeclaration.Declarations[0].Id).Name;
+                            lhsReference = agent.ResolveBinding(lhsName);
+                        }
+                    }
+                    else if (variableDeclaration != null)
+                    {
+                        if (!destructuring)
+                        {
+                            lhsReference = agent.ResolveBinding(((IdentifierNode)variableDeclaration.Declarations[0].Id).Name);
+                        }
+                    }
+                    else
+                    {
+                        if (!destructuring)
+                        {
+                            lhsReference = Walk(lhs, context).Reference;
+                        }
+                    }
+
+                    if (!destructuring)
+                    {
+                        if (variableDeclaration != null && variableDeclaration.Kind != VariableKind.Var)
+                        {
+                            Agent.InitialiseReferencedBinding(lhsReference, nextValue);
+                        }
+                        else
+                        {
+                            agent.PutValue(lhsReference, nextValue);
+                        }
+                    }
+                    else
+                    {
+                        //If lhsKind is assignment, then
+                        //    Let status be the result of performing DestructuringAssignmentEvaluation of assignmentPattern using nextValue as the argument.
+                        //Else if lhsKind is varBinding, then
+                        //    Assert: lhs is a ForBinding.
+                        //    Let status be the result of performing BindingInitialization for lhs passing nextValue and undefined as the arguments.
+                        //Else,
+                        //    Assert: lhsKind is lexicalBinding.
+                        //    Assert: lhs is a ForDeclaration.
+                        //    Let status be the result of performing BindingInitialization for lhs passing nextValue and iterationEnv as arguments.
+                        throw new NotImplementedException();
+                    }
+
+                    var result = Walk(statement, context);
+                    if (result.IsValue)
+                    {
+                        value = result.Value;
+                    }
+                }
+                catch (BreakException e)
+                {
+                    if (e.Target != null)
+                    {
+                        throw new NotImplementedException();
+                    }
+
+                    agent.IteratorClose(iteratorRecord);
+                    return value;
+                }
+                catch (ContinueException e)
+                {
+                    //https://tc39.github.io/ecma262/#sec-loopcontinues
+                    throw new NotImplementedException();
+                }
+                finally
+                {
+                    context.LexicalEnvironment = oldEnvironment;
+                }
+            }
+        }
+
         [CanBeNull]
         private static ScriptObject ForInHeadEvaluation([NotNull] ExecutionContext context, [NotNull] IReadOnlyCollection<string> tdzNames, [NotNull] ExpressionNode expression)
         {
@@ -1931,8 +2163,16 @@ namespace NetScript.Walkers
                 context.LexicalEnvironment = tdz;
             }
 
-            var expressionResult = Walk(expression, context);
-            context.LexicalEnvironment = oldEnvironment;
+            ValueReference expressionResult;
+            try
+            {
+                expressionResult = Walk(expression, context);
+            }
+            finally
+            {
+                context.LexicalEnvironment = oldEnvironment;
+            }
+
             var expressionValue = agent.GetValue(expressionResult);
             if (expressionValue == ScriptValue.Undefined || expressionValue == ScriptValue.Null)
             {
@@ -1940,6 +2180,40 @@ namespace NetScript.Walkers
             }
 
             return agent.ToObject(expressionValue);
+        }
+
+        private static (ScriptObject Iterator, ScriptFunctionObject NextMethod, bool Done) ForOfHeadEvaluation([NotNull] ExecutionContext context, [NotNull] IReadOnlyCollection<string> tdzNames, [NotNull] ExpressionNode expression)
+        {
+            //https://tc39.github.io/ecma262/#sec-runtime-semantics-forin-div-ofheadevaluation-tdznames-expr-iterationkind
+            var agent = context.Realm.Agent;
+            Debug.Assert(agent.RunningExecutionContext == context);
+
+            var oldEnvironment = context.LexicalEnvironment;
+            if (tdzNames.Count > 0)
+            {
+                Debug.Assert(new HashSet<string>(tdzNames).Count == tdzNames.Count);
+                var tdz = LexicalEnvironment.NewDeclarativeEnvironment(agent, oldEnvironment);
+                var tdzEnvironmentRecord = tdz.Environment;
+                foreach (var name in tdzNames)
+                {
+                    tdzEnvironmentRecord.CreateMutableBinding(name, false);
+                }
+
+                context.LexicalEnvironment = tdz;
+            }
+
+            ValueReference expressionResult;
+            try
+            {
+                expressionResult = Walk(expression, context);
+            }
+            finally
+            {
+                context.LexicalEnvironment = oldEnvironment;
+            }
+
+            var expressionValue = agent.GetValue(expressionResult);
+            return agent.GetIterator(expressionValue);
         }
 
         private static void InitialiseBoundName([NotNull] Agent agent, [NotNull] string name, ScriptValue value, [CanBeNull] LexicalEnvironment environment)
@@ -1959,10 +2233,15 @@ namespace NetScript.Walkers
 
         internal static bool IsAnonymousFunctionDefinition(ExpressionNode expression)
         {
-            if (expression is FunctionExpressionNode functionExpression)
+            switch (expression)
             {
-                return functionExpression.Id == null;
+                case ArrowFunctionExpressionNode _:
+                case ClassExpressionNode _:
+                    return true;
+                case FunctionExpressionNode functionExpression:
+                    return functionExpression.Id == null;
             }
+
             return false;
         }
 
@@ -2247,33 +2526,45 @@ namespace NetScript.Walkers
 
         private static void IteratorBindingInitialisationRest([NotNull] Agent agent, [NotNull] ExpressionNode restArgument, ref (ScriptObject Iterator, ScriptFunctionObject NextMethod, bool Done) iteratorRecord, [CanBeNull] LexicalEnvironment environment)
         {
-            if (restArgument is IdentifierNode identifier)
+            //https://tc39.github.io/ecma262/#sec-destructuring-binding-patterns-runtime-semantics-iteratorbindinginitialization
+
+            var array = ArrayIntrinsics.ArrayCreate(agent, 0);
+
+            var isPattern = !(restArgument is IdentifierNode);
+            Reference lhs = default;
+            if (!isPattern)
             {
-                var lhs = agent.ResolveBinding(identifier.Name, environment);
-                var array = ArrayIntrinsics.ArrayCreate(agent, 0);
+                lhs = agent.ResolveBinding(((IdentifierNode)restArgument).Name, environment);
+            }
 
-                for (var i = 0;; i++)
+            for (var i = 0;; i++)
+            {
+                ScriptValue next = default;
+                if (!iteratorRecord.Done)
                 {
-                    ScriptValue next = default;
-                    if (!iteratorRecord.Done)
+                    try
                     {
-                        try
-                        {
-                            next = agent.IteratorStep(iteratorRecord);
-                        }
-                        catch(ScriptException)
-                        {
-                            iteratorRecord.Done = true;
-                            throw;
-                        }
-
-                        if (next.IsBoolean && !(bool)next)
-                        {
-                            iteratorRecord.Done = true;
-                        }
+                        next = agent.IteratorStep(iteratorRecord);
+                    }
+                    catch(ScriptException)
+                    {
+                        iteratorRecord.Done = true;
+                        throw;
                     }
 
-                    if (iteratorRecord.Done)
+                    if (next.IsBoolean && !(bool)next)
+                    {
+                        iteratorRecord.Done = true;
+                    }
+                }
+
+                if (iteratorRecord.Done)
+                {
+                    if (isPattern)
+                    {
+                        BindingInitialisation(agent, restArgument, array, environment);
+                    }
+                    else
                     {
                         if (environment == null)
                         {
@@ -2282,27 +2573,23 @@ namespace NetScript.Walkers
                         }
 
                         Agent.InitialiseReferencedBinding(lhs, array);
-                        return;
                     }
-
-                    ScriptValue nextValue;
-                    try
-                    {
-                        nextValue = Agent.IteratorValue((ScriptObject)next);
-                    }
-                    catch (ScriptException)
-                    {
-                        iteratorRecord.Done = true;
-                        throw;
-                    }
-
-                    var status = array.CreateDataProperty(i.ToString(), nextValue);
-                    Debug.Assert(status);
+                    return;
                 }
-            }
-            else
-            {
-                throw new NotImplementedException();
+
+                ScriptValue nextValue;
+                try
+                {
+                    nextValue = Agent.IteratorValue((ScriptObject)next);
+                }
+                catch(ScriptException)
+                {
+                    iteratorRecord.Done = true;
+                    throw;
+                }
+
+                var status = array.CreateDataProperty(i.ToString(), nextValue);
+                Debug.Assert(status);
             }
         }
 
@@ -2371,31 +2658,31 @@ namespace NetScript.Walkers
             }
         }
 
-        private static void KeyedBindingInitialisationBinding([NotNull] Agent agent, [NotNull] AssignmentPatternNode property, ScriptValue value, [NotNull] LexicalEnvironment environment, ScriptValue propertyName)
+        private static void KeyedBindingInitialisationBinding([NotNull] Agent agent, [NotNull] ExpressionNode bindingPattern, [CanBeNull] ExpressionNode initialiser, ScriptValue value, [NotNull] LexicalEnvironment environment, ScriptValue propertyName)
         {
             //https://tc39.github.io/ecma262/#sec-runtime-semantics-keyedbindinginitialization
             value = agent.GetValue(value, propertyName);
-            if (property.Right != null && value == ScriptValue.Undefined)
+            if (initialiser != null && value == ScriptValue.Undefined)
             {
-                var defaultValue = Walk(property.Right, agent.RunningExecutionContext);
+                var defaultValue = Walk(initialiser, agent.RunningExecutionContext);
                 value = agent.GetValue(defaultValue);
             }
 
-            BindingInitialisation(agent, property.Left, value, environment);
+            BindingInitialisation(agent, bindingPattern, value, environment);
         }
 
-        private static void KeyedBindingInitialisationSingle([NotNull] Agent agent, [NotNull] AssignmentPatternNode property, ScriptValue value, [CanBeNull] LexicalEnvironment environment, ScriptValue propertyName)
+        private static void KeyedBindingInitialisationSingle([NotNull] Agent agent, [NotNull] IdentifierNode identifier, [CanBeNull] ExpressionNode initialiser, ScriptValue value, [CanBeNull] LexicalEnvironment environment, ScriptValue propertyName)
         {
             //https://tc39.github.io/ecma262/#sec-runtime-semantics-keyedbindinginitialization
-            var bindingIdentifier = ((IdentifierNode)property.Left).Name;
+            var bindingIdentifier = identifier.Name;
             var lhs = agent.ResolveBinding(bindingIdentifier, environment);
             value = agent.GetValue(value, propertyName);
-            if (property.Right != null && value == ScriptValue.Undefined)
+            if (initialiser != null && value == ScriptValue.Undefined)
             {
-                var defaultValue = Walk(property.Right, agent.RunningExecutionContext);
+                var defaultValue = Walk(initialiser, agent.RunningExecutionContext);
                 value = agent.GetValue(defaultValue);
 
-                if (IsAnonymousFunctionDefinition(property.Right))
+                if (IsAnonymousFunctionDefinition(initialiser))
                 {
                     var hasNameProperty = value.HasOwnProperty("name");
                     if (!hasNameProperty)
@@ -2413,6 +2700,55 @@ namespace NetScript.Walkers
             {
                 Agent.InitialiseReferencedBinding(lhs, value);
             }
+        }
+
+        private static void KeyedBindingInitialisation([NotNull] Agent agent, [NotNull] ExpressionNode bindingElement, ScriptValue value, [NotNull] LexicalEnvironment environment, ScriptValue propertyName)
+        {
+            //https://tc39.github.io/ecma262/#sec-runtime-semantics-keyedbindinginitialization
+            ExpressionNode left;
+            ExpressionNode right;
+
+            if (bindingElement is AssignmentPatternNode assignmentPattern)
+            {
+                left = assignmentPattern.Left;
+                right = assignmentPattern.Right;
+            }
+            else
+            {
+                left = bindingElement;
+                right = null;
+            }
+
+            if (left is IdentifierNode identifier)
+            {
+                KeyedBindingInitialisationSingle(agent, identifier, right, value, environment, propertyName);
+            }
+            else
+            {
+                KeyedBindingInitialisationBinding(agent, left, right, value, environment, propertyName);
+            }
+        }
+
+        private static void SuperCall([NotNull] IEnumerable<ExpressionNode> arguments, [NotNull] ExecutionContext context)
+        {
+            //https://tc39.github.io/ecma262/#sec-super-keyword-runtime-semantics-evaluation
+            var newTarget = context.GetNewTarget();
+            Debug.Assert(newTarget.IsObject);
+
+            //https://tc39.github.io/ecma262/#sec-getsuperconstructor
+            var environmentRecord = context.GetThisEnvironment();
+            Debug.Assert(environmentRecord is FunctionEnvironment);
+            var functionRecord = (FunctionEnvironment)environmentRecord;
+            var activeFunction = functionRecord.FunctionObject;
+            var function = activeFunction.GetPrototypeOf();
+            if (!Agent.IsConstructor(function))
+            {
+                throw context.Realm.Agent.CreateTypeError();
+            }
+
+            var argumentList = ArgumentListEvaluation(arguments, context);
+            var result = Agent.Construct(function, argumentList, (ScriptObject)newTarget);
+            functionRecord.BindThisValue(result);
         }
 
 

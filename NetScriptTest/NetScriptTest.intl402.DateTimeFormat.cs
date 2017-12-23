@@ -4,112 +4,16 @@ namespace NetScriptTest.intl402
 {
     public sealed class Test_DateTimeFormat : BaseTest
     {
-        [Fact(DisplayName = "/intl402/DateTimeFormat/12.1.1_1.js")]
-        public void Test_12_1_1_1_js()
+        [Fact(DisplayName = "/intl402/DateTimeFormat/builtin.js")]
+        public void Test_builtin_js()
         {
-            RunTest("intl402/DateTimeFormat/12.1.1_1.js");
+            RunTest("intl402/DateTimeFormat/builtin.js");
         }
 
-        [Fact(DisplayName = "/intl402/DateTimeFormat/12.1.1_18.js")]
-        public void Test_12_1_1_18_js()
+        [Fact(DisplayName = "/intl402/DateTimeFormat/date-time-options.js")]
+        public void Test_date﹏time﹏options_js()
         {
-            RunTest("intl402/DateTimeFormat/12.1.1_18.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/12.1.1_22.js")]
-        public void Test_12_1_1_22_js()
-        {
-            RunTest("intl402/DateTimeFormat/12.1.1_22.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/12.1.1_23.js")]
-        public void Test_12_1_1_23_js()
-        {
-            RunTest("intl402/DateTimeFormat/12.1.1_23.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/12.1.1_25.js")]
-        public void Test_12_1_1_25_js()
-        {
-            RunTest("intl402/DateTimeFormat/12.1.1_25.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/12.1.1_5.js")]
-        public void Test_12_1_1_5_js()
-        {
-            RunTest("intl402/DateTimeFormat/12.1.1_5.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/12.1.1_6.js")]
-        public void Test_12_1_1_6_js()
-        {
-            RunTest("intl402/DateTimeFormat/12.1.1_6.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/12.1.1_a.js")]
-        public void Test_12_1_1_a_js()
-        {
-            RunTest("intl402/DateTimeFormat/12.1.1_a.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/12.1.1_TDTO.js")]
-        public void Test_12_1_1_TDTO_js()
-        {
-            RunTest("intl402/DateTimeFormat/12.1.1_TDTO.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/12.1.2.js")]
-        public void Test_12_1_2_js()
-        {
-            RunTest("intl402/DateTimeFormat/12.1.2.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/12.1.3.js")]
-        public void Test_12_1_3_js()
-        {
-            RunTest("intl402/DateTimeFormat/12.1.3.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/12.1_L15.js")]
-        public void Test_12_1_L15_js()
-        {
-            RunTest("intl402/DateTimeFormat/12.1_L15.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/12.2.3_b.js")]
-        public void Test_12_2_3_b_js()
-        {
-            RunTest("intl402/DateTimeFormat/12.2.3_b.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/12.2.3_c.js")]
-        public void Test_12_2_3_c_js()
-        {
-            RunTest("intl402/DateTimeFormat/12.2.3_c.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/12.4_a.js")]
-        public void Test_12_4_a_js()
-        {
-            RunTest("intl402/DateTimeFormat/12.4_a.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/6.4_a.js")]
-        public void Test_6_4_a_js()
-        {
-            RunTest("intl402/DateTimeFormat/6.4_a.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/6.4_b.js")]
-        public void Test_6_4_b_js()
-        {
-            RunTest("intl402/DateTimeFormat/6.4_b.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/6.4_c.js")]
-        public void Test_6_4_c_js()
-        {
-            RunTest("intl402/DateTimeFormat/6.4_c.js");
+            RunTest("intl402/DateTimeFormat/date-time-options.js");
         }
 
         [Fact(DisplayName = "/intl402/DateTimeFormat/default-options-object-prototype.js")]
@@ -118,10 +22,118 @@ namespace NetScriptTest.intl402
             RunTest("intl402/DateTimeFormat/default-options-object-prototype.js");
         }
 
+        [Fact(DisplayName = "/intl402/DateTimeFormat/ignore-invalid-unicode-ext-values.js")]
+        public void Test_ignore﹏invalid﹏unicode﹏ext﹏values_js()
+        {
+            RunTest("intl402/DateTimeFormat/ignore-invalid-unicode-ext-values.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/instance-class.js")]
+        public void Test_instance﹏class_js()
+        {
+            RunTest("intl402/DateTimeFormat/instance-class.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/instance-proto-and-extensible.js")]
+        public void Test_instance﹏proto﹏and﹏extensible_js()
+        {
+            RunTest("intl402/DateTimeFormat/instance-proto-and-extensible.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/legacy-regexp-statics-not-modified.js")]
+        public void Test_legacy﹏regexp﹏statics﹏not﹏modified_js()
+        {
+            RunTest("intl402/DateTimeFormat/legacy-regexp-statics-not-modified.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/length.js")]
+        public void Test_length_js()
+        {
+            RunTest("intl402/DateTimeFormat/length.js");
+        }
+
         [Fact(DisplayName = "/intl402/DateTimeFormat/name.js")]
         public void Test_name_js()
         {
             RunTest("intl402/DateTimeFormat/name.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/prop-desc.js")]
+        public void Test_prop﹏desc_js()
+        {
+            RunTest("intl402/DateTimeFormat/prop-desc.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/required-date-time-formats.js")]
+        public void Test_required﹏date﹏time﹏formats_js()
+        {
+            RunTest("intl402/DateTimeFormat/required-date-time-formats.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/subclassing.js")]
+        public void Test_subclassing_js()
+        {
+            RunTest("intl402/DateTimeFormat/subclassing.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/taint-Object-prototype-date-time-components.js")]
+        public void Test_taint﹏Object﹏prototype﹏date﹏time﹏components_js()
+        {
+            RunTest("intl402/DateTimeFormat/taint-Object-prototype-date-time-components.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/taint-Object-prototype.js")]
+        public void Test_taint﹏Object﹏prototype_js()
+        {
+            RunTest("intl402/DateTimeFormat/taint-Object-prototype.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/test-option-date-time-components.js")]
+        public void Test_test﹏option﹏date﹏time﹏components_js()
+        {
+            RunTest("intl402/DateTimeFormat/test-option-date-time-components.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/test-option-formatMatcher.js")]
+        public void Test_test﹏option﹏formatMatcher_js()
+        {
+            RunTest("intl402/DateTimeFormat/test-option-formatMatcher.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/test-option-hour12.js")]
+        public void Test_test﹏option﹏hour12_js()
+        {
+            RunTest("intl402/DateTimeFormat/test-option-hour12.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/test-option-localeMatcher.js")]
+        public void Test_test﹏option﹏localeMatcher_js()
+        {
+            RunTest("intl402/DateTimeFormat/test-option-localeMatcher.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/this-value-ignored.js")]
+        public void Test_this﹏value﹏ignored_js()
+        {
+            RunTest("intl402/DateTimeFormat/this-value-ignored.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/timezone-canonicalized.js")]
+        public void Test_timezone﹏canonicalized_js()
+        {
+            RunTest("intl402/DateTimeFormat/timezone-canonicalized.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/timezone-invalid.js")]
+        public void Test_timezone﹏invalid_js()
+        {
+            RunTest("intl402/DateTimeFormat/timezone-invalid.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/timezone-utc.js")]
+        public void Test_timezone﹏utc_js()
+        {
+            RunTest("intl402/DateTimeFormat/timezone-utc.js");
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
@@ -304,7 +303,7 @@ namespace NetScript.Runtime.Objects
                     }
                 }
 
-                if (targetDescriptor.IsAccessorDescriptor && targetDescriptor.Get == null)
+                if (targetDescriptor.IsAccessorDescriptor && (!targetDescriptor.Get.HasValue || targetDescriptor.Get.Value == ScriptValue.Undefined))
                 {
                     if (trapResult != ScriptValue.Undefined)
                     {
@@ -351,7 +350,7 @@ namespace NetScript.Runtime.Objects
                 }
                 else if (targetDescriptor.IsAccessorDescriptor)
                 {
-                    if (targetDescriptor.Set == null)
+                    if (!targetDescriptor.Set.HasValue || targetDescriptor.Set.Value == ScriptValue.Undefined)
                     {
                         throw Agent.CreateTypeError();
                     }
@@ -449,17 +448,38 @@ namespace NetScript.Runtime.Objects
                 return trapResult;
             }
 
-            //Let uncheckedResultKeys be a new List which is a copy of trapResult.
-            //For each key that is an element of targetNonconfigurableKeys, do
-            //    If key is not an element of uncheckedResultKeys, throw a TypeError exception.
-            //    Remove key from uncheckedResultKeys.
-            //If extensibleTarget is true, return trapResult.
-            //For each key that is an element of targetConfigurableKeys, do
-            //    If key is not an element of uncheckedResultKeys, throw a TypeError exception.
-            //    Remove key from uncheckedResultKeys.
-            //If uncheckedResultKeys is not empty, throw a TypeError exception.
-            //Return trapResult.
-            throw new NotImplementedException();
+            var uncheckedResultKeys = new HashSet<ScriptValue>(trapResult);
+            foreach (var key in targetNonconfigurableKeys)
+            {
+                if (!uncheckedResultKeys.Contains(key))
+                {
+                    throw Agent.CreateTypeError();
+                }
+
+                uncheckedResultKeys.Remove(key);
+            }
+
+            if (extensibleTarget)
+            {
+                return trapResult;
+            }
+
+            foreach (var key in targetConfigurableKeys)
+            {
+                if (!uncheckedResultKeys.Contains(key))
+                {
+                    throw Agent.CreateTypeError();
+                }
+
+                uncheckedResultKeys.Remove(key);
+            }
+
+            if (uncheckedResultKeys.Count > 0)
+            {
+                throw Agent.CreateTypeError();
+            }
+
+            return trapResult;
         }
 
         internal override ScriptValue Call(ScriptValue thisArgument, [NotNull] IReadOnlyList<ScriptValue> arguments)

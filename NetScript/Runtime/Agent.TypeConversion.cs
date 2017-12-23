@@ -262,7 +262,6 @@ namespace NetScript.Runtime
         internal uint ToUint32(ScriptValue argument)
         {
             var number = ToNumber(argument);
-            // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (double.IsNaN(number) || double.IsInfinity(number) || number == 0)
             {
                 return 0;
@@ -278,7 +277,13 @@ namespace NetScript.Runtime
 
         internal ushort ToUint16(ScriptValue argument)
         {
-            throw new NotImplementedException();
+            var number = ToNumber(argument);
+            if (double.IsNaN(number) || double.IsInfinity(number) || number == 0)
+            {
+                return 0;
+            }
+
+            return (ushort)(Math.Sign(number) * Math.Floor(Math.Abs(number)));
         }
 
         internal sbyte ToInt8(ScriptValue argument)

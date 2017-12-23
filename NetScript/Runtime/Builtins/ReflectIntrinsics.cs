@@ -127,14 +127,29 @@ namespace NetScript.Runtime.Builtins
             return ArrayIntrinsics.CreateArrayFromList(arg.Agent, keys);
         }
 
-        private static ScriptValue PreventExtensions(ScriptArguments arg)
+        private static ScriptValue PreventExtensions([NotNull] ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-reflect.preventextensions
+            if (!arg[0].IsObject)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            return ((ScriptObject)arg[0]).PreventExtensions();
         }
 
-        private static ScriptValue Set(ScriptArguments arg)
+        private static ScriptValue Set([NotNull] ScriptArguments arg)
         {
-            throw new System.NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-reflect.set
+            if (!arg[0].IsObject)
+            {
+                throw arg.Agent.CreateTypeError();
+            }
+
+            var key = arg.Agent.ToPropertyKey(arg[1]);
+            var receiver = arg.Count < 4 ? arg[0] : arg[3];
+
+            return ((ScriptObject)arg[0]).Set(key, arg[2], receiver);
         }
 
         private static ScriptValue SetPrototypeOf([NotNull] ScriptArguments arg)

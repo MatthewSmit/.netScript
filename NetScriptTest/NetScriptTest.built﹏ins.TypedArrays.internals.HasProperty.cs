@@ -40,6 +40,12 @@ namespace NetScriptTest.built﹏ins.TypedArrays.internals
             RunTest("built-ins/TypedArrays/internals/HasProperty/indexed-value.js");
         }
 
+        [Fact(DisplayName = "/built-ins/TypedArrays/internals/HasProperty/infinity-with-detached-buffer.js")]
+        public void Test_infinity﹏with﹏detached﹏buffer_js()
+        {
+            RunTest("built-ins/TypedArrays/internals/HasProperty/infinity-with-detached-buffer.js");
+        }
+
         [Fact(DisplayName = "/built-ins/TypedArrays/internals/HasProperty/inherited-property.js")]
         public void Test_inherited﹏property_js()
         {

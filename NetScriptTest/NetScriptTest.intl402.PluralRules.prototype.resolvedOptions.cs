@@ -10,10 +10,22 @@ namespace NetScriptTest.intl402.PluralRules.prototype
             RunTest("intl402/PluralRules/prototype/resolvedOptions/builtins.js");
         }
 
+        [Fact(DisplayName = "/intl402/PluralRules/prototype/resolvedOptions/length.js")]
+        public void Test_length_js()
+        {
+            RunTest("intl402/PluralRules/prototype/resolvedOptions/length.js");
+        }
+
         [Fact(DisplayName = "/intl402/PluralRules/prototype/resolvedOptions/name.js")]
         public void Test_name_js()
         {
             RunTest("intl402/PluralRules/prototype/resolvedOptions/name.js");
+        }
+
+        [Fact(DisplayName = "/intl402/PluralRules/prototype/resolvedOptions/prop-desc.js")]
+        public void Test_prop﹏desc_js()
+        {
+            RunTest("intl402/PluralRules/prototype/resolvedOptions/prop-desc.js");
         }
 
         [Fact(DisplayName = "/intl402/PluralRules/prototype/resolvedOptions/properties.js")]

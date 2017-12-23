@@ -433,10 +433,10 @@ namespace NetScript.Runtime.Objects
                     case ObjectPatternNode objectPattern:
                         foreach (var property in objectPattern.Properties)
                         {
-                            if (property.Computed)
-                            {
-                                return true;
-                            }
+//                            if (property.Computed)
+//                            {
+//                                return true;
+//                            }
 
                             return true;
                         }

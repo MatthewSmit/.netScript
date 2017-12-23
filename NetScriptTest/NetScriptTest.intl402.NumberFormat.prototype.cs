@@ -4,28 +4,28 @@ namespace NetScriptTest.intl402.NumberFormat
 {
     public sealed class Test_prototype : BaseTest
     {
-        [Fact(DisplayName = "/intl402/NumberFormat/prototype/11.2.1.js")]
-        public void Test_11_2_1_js()
+        [Fact(DisplayName = "/intl402/NumberFormat/prototype/builtin.js")]
+        public void Test_builtin_js()
         {
-            RunTest("intl402/NumberFormat/prototype/11.2.1.js");
+            RunTest("intl402/NumberFormat/prototype/builtin.js");
         }
 
-        [Fact(DisplayName = "/intl402/NumberFormat/prototype/11.3_a.js")]
-        public void Test_11_3_a_js()
+        [Fact(DisplayName = "/intl402/NumberFormat/prototype/prop-desc.js")]
+        public void Test_prop﹏desc_js()
         {
-            RunTest("intl402/NumberFormat/prototype/11.3_a.js");
+            RunTest("intl402/NumberFormat/prototype/prop-desc.js");
         }
 
-        [Fact(DisplayName = "/intl402/NumberFormat/prototype/11.3_b.js")]
-        public void Test_11_3_b_js()
+        [Fact(DisplayName = "/intl402/NumberFormat/prototype/this-value-not-numberformat.js")]
+        public void Test_this﹏value﹏not﹏numberformat_js()
         {
-            RunTest("intl402/NumberFormat/prototype/11.3_b.js");
+            RunTest("intl402/NumberFormat/prototype/this-value-not-numberformat.js");
         }
 
-        [Fact(DisplayName = "/intl402/NumberFormat/prototype/11.3_L15.js")]
-        public void Test_11_3_L15_js()
+        [Fact(DisplayName = "/intl402/NumberFormat/prototype/this-value-numberformat-prototype.js")]
+        public void Test_this﹏value﹏numberformat﹏prototype_js()
         {
-            RunTest("intl402/NumberFormat/prototype/11.3_L15.js");
+            RunTest("intl402/NumberFormat/prototype/this-value-numberformat-prototype.js");
         }
     }
 }

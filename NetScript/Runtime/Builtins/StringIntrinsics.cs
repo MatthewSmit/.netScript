@@ -76,9 +76,19 @@ namespace NetScript.Runtime.Builtins
             return new ScriptStringObject(arg.NewTarget.Realm, Agent.GetPrototypeFromConstructor(arg.NewTarget, arg.NewTarget.Realm.StringPrototype), str);
         }
 
-        private static ScriptValue FromCharCode(ScriptArguments arg)
+        private static ScriptValue FromCharCode([NotNull] ScriptArguments arg)
         {
-            throw new NotImplementedException();
+            //https://tc39.github.io/ecma262/#sec-string.fromcharcode
+
+            var elements = new char[arg.Count];
+            for (var i = 0; i < arg.Count; i++)
+            {
+                var next = arg[i];
+                var nextCodeUnit = arg.Agent.ToUint16(next);
+                elements[i] = (char)nextCodeUnit;
+            }
+
+            return new string(elements);
         }
 
         private static ScriptValue FromCodePoint(ScriptArguments arg)

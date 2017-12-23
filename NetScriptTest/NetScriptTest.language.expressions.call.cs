@@ -76,6 +76,30 @@ namespace NetScriptTest.language.expressions
             RunTest("language/expressions/call/eval-realm-indirect.js");
         }
 
+        [Fact(DisplayName = "/language/expressions/call/eval-spread-empty-leading.js")]
+        public void Test_eval﹏spread﹏empty﹏leading_js()
+        {
+            RunTest("language/expressions/call/eval-spread-empty-leading.js");
+        }
+
+        [Fact(DisplayName = "/language/expressions/call/eval-spread-empty-trailing.js")]
+        public void Test_eval﹏spread﹏empty﹏trailing_js()
+        {
+            RunTest("language/expressions/call/eval-spread-empty-trailing.js");
+        }
+
+        [Fact(DisplayName = "/language/expressions/call/eval-spread-empty.js")]
+        public void Test_eval﹏spread﹏empty_js()
+        {
+            RunTest("language/expressions/call/eval-spread-empty.js");
+        }
+
+        [Fact(DisplayName = "/language/expressions/call/eval-spread.js")]
+        public void Test_eval﹏spread_js()
+        {
+            RunTest("language/expressions/call/eval-spread.js");
+        }
+
         [Fact(DisplayName = "/language/expressions/call/eval-strictness-inherit-non-strict.js")]
         public void Test_eval﹏strictness﹏inherit﹏non﹏strict_js()
         {
@@ -490,10 +514,58 @@ namespace NetScriptTest.language.expressions
             RunTest("language/expressions/call/tco-call-args.js");
         }
 
+        [Fact(DisplayName = "/language/expressions/call/tco-cross-realm-class-construct.js")]
+        public void Test_tco﹏cross﹏realm﹏class﹏construct_js()
+        {
+            RunTest("language/expressions/call/tco-cross-realm-class-construct.js");
+        }
+
+        [Fact(DisplayName = "/language/expressions/call/tco-cross-realm-class-derived-construct.js")]
+        public void Test_tco﹏cross﹏realm﹏class﹏derived﹏construct_js()
+        {
+            RunTest("language/expressions/call/tco-cross-realm-class-derived-construct.js");
+        }
+
+        [Fact(DisplayName = "/language/expressions/call/tco-cross-realm-fun-call.js")]
+        public void Test_tco﹏cross﹏realm﹏fun﹏call_js()
+        {
+            RunTest("language/expressions/call/tco-cross-realm-fun-call.js");
+        }
+
+        [Fact(DisplayName = "/language/expressions/call/tco-cross-realm-fun-construct.js")]
+        public void Test_tco﹏cross﹏realm﹏fun﹏construct_js()
+        {
+            RunTest("language/expressions/call/tco-cross-realm-fun-construct.js");
+        }
+
         [Fact(DisplayName = "/language/expressions/call/tco-member-args.js")]
         public void Test_tco﹏member﹏args_js()
         {
             RunTest("language/expressions/call/tco-member-args.js");
+        }
+
+        [Fact(DisplayName = "/language/expressions/call/tco-non-eval-function-dynamic.js")]
+        public void Test_tco﹏non﹏eval﹏function﹏dynamic_js()
+        {
+            RunTest("language/expressions/call/tco-non-eval-function-dynamic.js");
+        }
+
+        [Fact(DisplayName = "/language/expressions/call/tco-non-eval-function.js")]
+        public void Test_tco﹏non﹏eval﹏function_js()
+        {
+            RunTest("language/expressions/call/tco-non-eval-function.js");
+        }
+
+        [Fact(DisplayName = "/language/expressions/call/tco-non-eval-global.js")]
+        public void Test_tco﹏non﹏eval﹏global_js()
+        {
+            RunTest("language/expressions/call/tco-non-eval-global.js");
+        }
+
+        [Fact(DisplayName = "/language/expressions/call/tco-non-eval-with.js")]
+        public void Test_tco﹏non﹏eval﹏with_js()
+        {
+            RunTest("language/expressions/call/tco-non-eval-with.js");
         }
 
         [Fact(DisplayName = "/language/expressions/call/trailing-comma.js")]

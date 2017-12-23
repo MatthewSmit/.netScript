@@ -4,28 +4,28 @@ namespace NetScriptTest.intl402.DateTimeFormat
 {
     public sealed class Test_prototype : BaseTest
     {
-        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/12.2.1.js")]
-        public void Test_12_2_1_js()
+        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/builtin.js")]
+        public void Test_builtin_js()
         {
-            RunTest("intl402/DateTimeFormat/prototype/12.2.1.js");
+            RunTest("intl402/DateTimeFormat/prototype/builtin.js");
         }
 
-        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/12.3_a.js")]
-        public void Test_12_3_a_js()
+        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/prop-desc.js")]
+        public void Test_prop﹏desc_js()
         {
-            RunTest("intl402/DateTimeFormat/prototype/12.3_a.js");
+            RunTest("intl402/DateTimeFormat/prototype/prop-desc.js");
         }
 
-        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/12.3_b.js")]
-        public void Test_12_3_b_js()
+        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/this-value-datetimeformat-prototype.js")]
+        public void Test_this﹏value﹏datetimeformat﹏prototype_js()
         {
-            RunTest("intl402/DateTimeFormat/prototype/12.3_b.js");
+            RunTest("intl402/DateTimeFormat/prototype/this-value-datetimeformat-prototype.js");
         }
 
-        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/12.3_L15.js")]
-        public void Test_12_3_L15_js()
+        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/this-value-not-datetimeformat.js")]
+        public void Test_this﹏value﹏not﹏datetimeformat_js()
         {
-            RunTest("intl402/DateTimeFormat/prototype/12.3_L15.js");
+            RunTest("intl402/DateTimeFormat/prototype/this-value-not-datetimeformat.js");
         }
     }
 }

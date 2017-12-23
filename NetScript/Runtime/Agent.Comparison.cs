@@ -46,9 +46,24 @@ namespace NetScript.Runtime
         }
 
         [Pure]
+        [ContractAnnotation("null => false")]
+        internal static bool IsCallable([CanBeNull] ScriptObject argument)
+        {
+            return argument != null && argument.IsCallable;
+        }
+
+        [Pure]
         internal static bool IsCallable(ScriptValue argument)
         {
             return argument.IsObject && ((ScriptObject)argument).IsCallable;
+        }
+
+        [Pure]
+        [ContractAnnotation("null => false")]
+        internal static bool IsConstructor([CanBeNull] ScriptObject argument)
+        {
+            //https://tc39.github.io/ecma262/#sec-isconstructor
+            return argument != null && argument.IsConstructable;
         }
 
         [Pure]

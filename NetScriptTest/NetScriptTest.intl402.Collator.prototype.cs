@@ -4,28 +4,28 @@ namespace NetScriptTest.intl402.Collator
 {
     public sealed class Test_prototype : BaseTest
     {
-        [Fact(DisplayName = "/intl402/Collator/prototype/10.2.1.js")]
-        public void Test_10_2_1_js()
+        [Fact(DisplayName = "/intl402/Collator/prototype/builtin.js")]
+        public void Test_builtin_js()
         {
-            RunTest("intl402/Collator/prototype/10.2.1.js");
+            RunTest("intl402/Collator/prototype/builtin.js");
         }
 
-        [Fact(DisplayName = "/intl402/Collator/prototype/10.3_a.js")]
-        public void Test_10_3_a_js()
+        [Fact(DisplayName = "/intl402/Collator/prototype/prop-desc.js")]
+        public void Test_prop﹏desc_js()
         {
-            RunTest("intl402/Collator/prototype/10.3_a.js");
+            RunTest("intl402/Collator/prototype/prop-desc.js");
         }
 
-        [Fact(DisplayName = "/intl402/Collator/prototype/10.3_b.js")]
-        public void Test_10_3_b_js()
+        [Fact(DisplayName = "/intl402/Collator/prototype/this-value-collator-prototype.js")]
+        public void Test_this﹏value﹏collator﹏prototype_js()
         {
-            RunTest("intl402/Collator/prototype/10.3_b.js");
+            RunTest("intl402/Collator/prototype/this-value-collator-prototype.js");
         }
 
-        [Fact(DisplayName = "/intl402/Collator/prototype/10.3_L15.js")]
-        public void Test_10_3_L15_js()
+        [Fact(DisplayName = "/intl402/Collator/prototype/this-value-not-collator.js")]
+        public void Test_this﹏value﹏not﹏collator_js()
         {
-            RunTest("intl402/Collator/prototype/10.3_L15.js");
+            RunTest("intl402/Collator/prototype/this-value-not-collator.js");
         }
     }
 }

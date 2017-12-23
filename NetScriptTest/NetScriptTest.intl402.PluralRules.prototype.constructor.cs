@@ -9,5 +9,11 @@ namespace NetScriptTest.intl402.PluralRules.prototype
         {
             RunTest("intl402/PluralRules/prototype/constructor/main.js");
         }
+
+        [Fact(DisplayName = "/intl402/PluralRules/prototype/constructor/prop-desc.js")]
+        public void Test_prop﹏desc_js()
+        {
+            RunTest("intl402/PluralRules/prototype/constructor/prop-desc.js");
+        }
     }
 }

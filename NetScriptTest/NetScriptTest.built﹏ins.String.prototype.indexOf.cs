@@ -10,6 +10,30 @@ namespace NetScriptTest.built﹏ins.String.prototype
             RunTest("built-ins/String/prototype/indexOf/name.js");
         }
 
+        [Fact(DisplayName = "/built-ins/String/prototype/indexOf/position-tointeger-bigint.js")]
+        public void Test_position﹏tointeger﹏bigint_js()
+        {
+            RunTest("built-ins/String/prototype/indexOf/position-tointeger-bigint.js");
+        }
+
+        [Fact(DisplayName = "/built-ins/String/prototype/indexOf/position-tointeger-errors.js")]
+        public void Test_position﹏tointeger﹏errors_js()
+        {
+            RunTest("built-ins/String/prototype/indexOf/position-tointeger-errors.js");
+        }
+
+        [Fact(DisplayName = "/built-ins/String/prototype/indexOf/position-tointeger-toprimitive.js")]
+        public void Test_position﹏tointeger﹏toprimitive_js()
+        {
+            RunTest("built-ins/String/prototype/indexOf/position-tointeger-toprimitive.js");
+        }
+
+        [Fact(DisplayName = "/built-ins/String/prototype/indexOf/position-tointeger-wrapped-values.js")]
+        public void Test_position﹏tointeger﹏wrapped﹏values_js()
+        {
+            RunTest("built-ins/String/prototype/indexOf/position-tointeger-wrapped-values.js");
+        }
+
         [Fact(DisplayName = "/built-ins/String/prototype/indexOf/position-tointeger.js")]
         public void Test_position﹏tointeger_js()
         {
@@ -218,6 +242,30 @@ namespace NetScriptTest.built﹏ins.String.prototype
         public void Test_S15_5_4_7_A9_js()
         {
             RunTest("built-ins/String/prototype/indexOf/S15.5.4.7_A9.js");
+        }
+
+        [Fact(DisplayName = "/built-ins/String/prototype/indexOf/searchstring-tostring-bigint.js")]
+        public void Test_searchstring﹏tostring﹏bigint_js()
+        {
+            RunTest("built-ins/String/prototype/indexOf/searchstring-tostring-bigint.js");
+        }
+
+        [Fact(DisplayName = "/built-ins/String/prototype/indexOf/searchstring-tostring-errors.js")]
+        public void Test_searchstring﹏tostring﹏errors_js()
+        {
+            RunTest("built-ins/String/prototype/indexOf/searchstring-tostring-errors.js");
+        }
+
+        [Fact(DisplayName = "/built-ins/String/prototype/indexOf/searchstring-tostring-toprimitive.js")]
+        public void Test_searchstring﹏tostring﹏toprimitive_js()
+        {
+            RunTest("built-ins/String/prototype/indexOf/searchstring-tostring-toprimitive.js");
+        }
+
+        [Fact(DisplayName = "/built-ins/String/prototype/indexOf/searchstring-tostring-wrapped-values.js")]
+        public void Test_searchstring﹏tostring﹏wrapped﹏values_js()
+        {
+            RunTest("built-ins/String/prototype/indexOf/searchstring-tostring-wrapped-values.js");
         }
 
         [Fact(DisplayName = "/built-ins/String/prototype/indexOf/searchstring-tostring.js")]

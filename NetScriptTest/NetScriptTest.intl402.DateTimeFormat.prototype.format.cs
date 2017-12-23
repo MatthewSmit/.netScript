@@ -4,40 +4,28 @@ namespace NetScriptTest.intl402.DateTimeFormat.prototype
 {
     public sealed class Test_format : BaseTest
     {
-        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/12.3.2_1_a_L15.js")]
-        public void Test_12_3_2_1_a_L15_js()
+        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/bound-to-datetimeformat-instance.js")]
+        public void Test_bound﹏to﹏datetimeformat﹏instance_js()
         {
-            RunTest("intl402/DateTimeFormat/prototype/format/12.3.2_1_a_L15.js");
+            RunTest("intl402/DateTimeFormat/prototype/format/bound-to-datetimeformat-instance.js");
         }
 
-        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/12.3.2_1_c.js")]
-        public void Test_12_3_2_1_c_js()
+        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/builtin.js")]
+        public void Test_builtin_js()
         {
-            RunTest("intl402/DateTimeFormat/prototype/format/12.3.2_1_c.js");
+            RunTest("intl402/DateTimeFormat/prototype/format/builtin.js");
         }
 
-        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/12.3.2_FDT_1.js")]
-        public void Test_12_3_2_FDT_1_js()
+        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/format-function-builtin.js")]
+        public void Test_format﹏function﹏builtin_js()
         {
-            RunTest("intl402/DateTimeFormat/prototype/format/12.3.2_FDT_1.js");
+            RunTest("intl402/DateTimeFormat/prototype/format/format-function-builtin.js");
         }
 
-        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/12.3.2_FDT_7_a_iv.js")]
-        public void Test_12_3_2_FDT_7_a_iv_js()
+        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/format-function-length.js")]
+        public void Test_format﹏function﹏length_js()
         {
-            RunTest("intl402/DateTimeFormat/prototype/format/12.3.2_FDT_7_a_iv.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/12.3.2_L15.js")]
-        public void Test_12_3_2_L15_js()
-        {
-            RunTest("intl402/DateTimeFormat/prototype/format/12.3.2_L15.js");
-        }
-
-        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/12.3.2_TLT_2.js")]
-        public void Test_12_3_2_TLT_2_js()
-        {
-            RunTest("intl402/DateTimeFormat/prototype/format/12.3.2_TLT_2.js");
+            RunTest("intl402/DateTimeFormat/prototype/format/format-function-length.js");
         }
 
         [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/format-function-name.js")]
@@ -46,10 +34,40 @@ namespace NetScriptTest.intl402.DateTimeFormat.prototype
             RunTest("intl402/DateTimeFormat/prototype/format/format-function-name.js");
         }
 
+        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/length.js")]
+        public void Test_length_js()
+        {
+            RunTest("intl402/DateTimeFormat/prototype/format/length.js");
+        }
+
         [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/name.js")]
         public void Test_name_js()
         {
             RunTest("intl402/DateTimeFormat/prototype/format/name.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/proleptic-gregorian-calendar.js")]
+        public void Test_proleptic﹏gregorian﹏calendar_js()
+        {
+            RunTest("intl402/DateTimeFormat/prototype/format/proleptic-gregorian-calendar.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/prop-desc.js")]
+        public void Test_prop﹏desc_js()
+        {
+            RunTest("intl402/DateTimeFormat/prototype/format/prop-desc.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/taint-Object-prototype.js")]
+        public void Test_taint﹏Object﹏prototype_js()
+        {
+            RunTest("intl402/DateTimeFormat/prototype/format/taint-Object-prototype.js");
+        }
+
+        [Fact(DisplayName = "/intl402/DateTimeFormat/prototype/format/throws-value-non-finite.js")]
+        public void Test_throws﹏value﹏non﹏finite_js()
+        {
+            RunTest("intl402/DateTimeFormat/prototype/format/throws-value-non-finite.js");
         }
     }
 }

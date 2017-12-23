@@ -57,6 +57,12 @@ namespace NetScriptTest
             }
 
             // TODO
+            if (metadata.Features.Contains("object-rest"))
+            {
+                return;
+            }
+
+            // TODO
             if (metadata.Includes.Contains("tcoHelper.js"))
             {
                 return;

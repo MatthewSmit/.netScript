@@ -4,6 +4,12 @@ namespace NetScriptTest.language.expressions
 {
     public sealed class Test_property﹏accessors : BaseTest
     {
+        [Fact(DisplayName = "/language/expressions/property-accessors/non-identifier-name.js")]
+        public void Test_non﹏identifier﹏name_js()
+        {
+            RunTest("language/expressions/property-accessors/non-identifier-name.js");
+        }
+
         [Fact(DisplayName = "/language/expressions/property-accessors/S11.2.1_A1.1.js")]
         public void Test_S11_2_1_A1_1_js()
         {

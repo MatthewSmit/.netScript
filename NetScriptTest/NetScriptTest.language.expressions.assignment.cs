@@ -46,22 +46,10 @@ namespace NetScriptTest.language.expressions
             RunTest("language/expressions/assignment/11.13.1-4-27-s.js");
         }
 
-        [Fact(DisplayName = "/language/expressions/assignment/11.13.1-4-28-s.js")]
-        public void Test_11_13_1﹏4﹏28﹏s_js()
-        {
-            RunTest("language/expressions/assignment/11.13.1-4-28-s.js");
-        }
-
         [Fact(DisplayName = "/language/expressions/assignment/11.13.1-4-28gs.js")]
         public void Test_11_13_1﹏4﹏28gs_js()
         {
             RunTest("language/expressions/assignment/11.13.1-4-28gs.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/assignment/11.13.1-4-29-s.js")]
-        public void Test_11_13_1﹏4﹏29﹏s_js()
-        {
-            RunTest("language/expressions/assignment/11.13.1-4-29-s.js");
         }
 
         [Fact(DisplayName = "/language/expressions/assignment/11.13.1-4-29gs.js")]
@@ -74,18 +62,6 @@ namespace NetScriptTest.language.expressions
         public void Test_11_13_1﹏4﹏3﹏s_js()
         {
             RunTest("language/expressions/assignment/11.13.1-4-3-s.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/assignment/11.13.1-4-30-s.js")]
-        public void Test_11_13_1﹏4﹏30﹏s_js()
-        {
-            RunTest("language/expressions/assignment/11.13.1-4-30-s.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/assignment/11.13.1-4-31-s.js")]
-        public void Test_11_13_1﹏4﹏31﹏s_js()
-        {
-            RunTest("language/expressions/assignment/11.13.1-4-31-s.js");
         }
 
         [Fact(DisplayName = "/language/expressions/assignment/11.13.1-4-6-s.js")]
@@ -1732,16 +1708,28 @@ namespace NetScriptTest.language.expressions
             RunTest("language/expressions/assignment/fn-name-lhs-member.js");
         }
 
+        [Fact(DisplayName = "/language/expressions/assignment/id-arguments-strict.js")]
+        public void Test_id﹏arguments﹏strict_js()
+        {
+            RunTest("language/expressions/assignment/id-arguments-strict.js");
+        }
+
+        [Fact(DisplayName = "/language/expressions/assignment/id-eval-strict.js")]
+        public void Test_id﹏eval﹏strict_js()
+        {
+            RunTest("language/expressions/assignment/id-eval-strict.js");
+        }
+
+        [Fact(DisplayName = "/language/expressions/assignment/line-terminator.js")]
+        public void Test_line﹏terminator_js()
+        {
+            RunTest("language/expressions/assignment/line-terminator.js");
+        }
+
         [Fact(DisplayName = "/language/expressions/assignment/non-simple-target.js")]
         public void Test_non﹏simple﹏target_js()
         {
             RunTest("language/expressions/assignment/non-simple-target.js");
-        }
-
-        [Fact(DisplayName = "/language/expressions/assignment/S11.13.1_A1.js")]
-        public void Test_S11_13_1_A1_js()
-        {
-            RunTest("language/expressions/assignment/S11.13.1_A1.js");
         }
 
         [Fact(DisplayName = "/language/expressions/assignment/S11.13.1_A2.1_T1.js")]
@@ -1916,6 +1904,12 @@ namespace NetScriptTest.language.expressions
         public void Test_target﹏string_js()
         {
             RunTest("language/expressions/assignment/target-string.js");
+        }
+
+        [Fact(DisplayName = "/language/expressions/assignment/white-space.js")]
+        public void Test_white﹏space_js()
+        {
+            RunTest("language/expressions/assignment/white-space.js");
         }
     }
 }

@@ -232,6 +232,12 @@ namespace NetScriptTest
             RunTest("harness/fnGlobalObject.js");
         }
 
+        [Fact(DisplayName = "/harness/isConstructor.js")]
+        public void Test_isConstructor_js()
+        {
+            RunTest("harness/isConstructor.js");
+        }
+
         [Fact(DisplayName = "/harness/nans.js")]
         public void Test_nans_js()
         {
@@ -404,72 +410,6 @@ namespace NetScriptTest
         public void Test_tcoHelper_js()
         {
             RunTest("harness/tcoHelper.js");
-        }
-
-        [Fact(DisplayName = "/harness/testbuiltinobject-function-badstring.js")]
-        public void Test_testbuiltinobject﹏function﹏badstring_js()
-        {
-            RunTest("harness/testbuiltinobject-function-badstring.js");
-        }
-
-        [Fact(DisplayName = "/harness/testbuiltinobject-function-expected-length.js")]
-        public void Test_testbuiltinobject﹏function﹏expected﹏length_js()
-        {
-            RunTest("harness/testbuiltinobject-function-expected-length.js");
-        }
-
-        [Fact(DisplayName = "/harness/testbuiltinobject-function-not-constructor-no-error.js")]
-        public void Test_testbuiltinobject﹏function﹏not﹏constructor﹏no﹏error_js()
-        {
-            RunTest("harness/testbuiltinobject-function-not-constructor-no-error.js");
-        }
-
-        [Fact(DisplayName = "/harness/testbuiltinobject-function-not-constructor-no-typeerror.js")]
-        public void Test_testbuiltinobject﹏function﹏not﹏constructor﹏no﹏typeerror_js()
-        {
-            RunTest("harness/testbuiltinobject-function-not-constructor-no-typeerror.js");
-        }
-
-        [Fact(DisplayName = "/harness/testbuiltinobject-non-extensible.js")]
-        public void Test_testbuiltinobject﹏non﹏extensible_js()
-        {
-            RunTest("harness/testbuiltinobject-non-extensible.js");
-        }
-
-        [Fact(DisplayName = "/harness/testbuiltinobject-not-function-badstring.js")]
-        public void Test_testbuiltinobject﹏not﹏function﹏badstring_js()
-        {
-            RunTest("harness/testbuiltinobject-not-function-badstring.js");
-        }
-
-        [Fact(DisplayName = "/harness/testbuiltinobject-prop-enumerable.js")]
-        public void Test_testbuiltinobject﹏prop﹏enumerable_js()
-        {
-            RunTest("harness/testbuiltinobject-prop-enumerable.js");
-        }
-
-        [Fact(DisplayName = "/harness/testbuiltinobject-prop-missing.js")]
-        public void Test_testbuiltinobject﹏prop﹏missing_js()
-        {
-            RunTest("harness/testbuiltinobject-prop-missing.js");
-        }
-
-        [Fact(DisplayName = "/harness/testbuiltinobject-prop-not-configurable.js")]
-        public void Test_testbuiltinobject﹏prop﹏not﹏configurable_js()
-        {
-            RunTest("harness/testbuiltinobject-prop-not-configurable.js");
-        }
-
-        [Fact(DisplayName = "/harness/testbuiltinobject-prop-not-writable.js")]
-        public void Test_testbuiltinobject﹏prop﹏not﹏writable_js()
-        {
-            RunTest("harness/testbuiltinobject-prop-not-writable.js");
-        }
-
-        [Fact(DisplayName = "/harness/testbuiltinobject-undefined.js")]
-        public void Test_testbuiltinobject﹏undefined_js()
-        {
-            RunTest("harness/testbuiltinobject-undefined.js");
         }
 
         [Fact(DisplayName = "/harness/testTypedArray-conversions-call-error.js")]

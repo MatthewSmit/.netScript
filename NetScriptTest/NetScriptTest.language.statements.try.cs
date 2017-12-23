@@ -106,10 +106,46 @@ namespace NetScriptTest.language.statements
             RunTest("language/statements/try/catch-parameter-boundnames-restriction-eval-negative-early.js");
         }
 
+        [Fact(DisplayName = "/language/statements/try/cptn-catch-empty-break.js")]
+        public void Test_cptn﹏catch﹏empty﹏break_js()
+        {
+            RunTest("language/statements/try/cptn-catch-empty-break.js");
+        }
+
+        [Fact(DisplayName = "/language/statements/try/cptn-catch-empty-continue.js")]
+        public void Test_cptn﹏catch﹏empty﹏continue_js()
+        {
+            RunTest("language/statements/try/cptn-catch-empty-continue.js");
+        }
+
+        [Fact(DisplayName = "/language/statements/try/cptn-catch-finally-empty-break.js")]
+        public void Test_cptn﹏catch﹏finally﹏empty﹏break_js()
+        {
+            RunTest("language/statements/try/cptn-catch-finally-empty-break.js");
+        }
+
+        [Fact(DisplayName = "/language/statements/try/cptn-catch-finally-empty-continue.js")]
+        public void Test_cptn﹏catch﹏finally﹏empty﹏continue_js()
+        {
+            RunTest("language/statements/try/cptn-catch-finally-empty-continue.js");
+        }
+
         [Fact(DisplayName = "/language/statements/try/cptn-catch.js")]
         public void Test_cptn﹏catch_js()
         {
             RunTest("language/statements/try/cptn-catch.js");
+        }
+
+        [Fact(DisplayName = "/language/statements/try/cptn-finally-empty-break.js")]
+        public void Test_cptn﹏finally﹏empty﹏break_js()
+        {
+            RunTest("language/statements/try/cptn-finally-empty-break.js");
+        }
+
+        [Fact(DisplayName = "/language/statements/try/cptn-finally-empty-continue.js")]
+        public void Test_cptn﹏finally﹏empty﹏continue_js()
+        {
+            RunTest("language/statements/try/cptn-finally-empty-continue.js");
         }
 
         [Fact(DisplayName = "/language/statements/try/cptn-finally-from-catch.js")]

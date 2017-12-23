@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using AcornSharp;
 using AcornSharp.Node;
 using JetBrains.Annotations;
@@ -31,7 +33,6 @@ namespace NetScript.Walkers
             {
                 case DebuggerStatementNode _:
                 case EmptyStatementNode _:
-                case LiteralNode _:
                 case MetaPropertyNode _:
                 case ReturnStatementNode _:
                 case ThrowStatementNode _:
@@ -66,6 +67,10 @@ namespace NetScript.Walkers
                     break;
 
                 case ClassDeclarationNode classDeclaration:
+                    //TODO
+                    break;
+
+                case ClassExpressionNode classExpression:
                     //TODO
                     break;
 
@@ -127,6 +132,10 @@ namespace NetScript.Walkers
                     Walk(agent, labelledStatement.Body, isStrict);
                     break;
 
+                case LiteralNode literal:
+                    Walk(agent, literal, isStrict);
+                    break;
+
                 case LogicalExpressionNode logicalExpression:
                     //TODO
                     break;
@@ -177,6 +186,10 @@ namespace NetScript.Walkers
 
                 case WithStatementNode withStatement:
                     Walk(agent, withStatement, isStrict);
+                    break;
+
+                case YieldExpressionNode yieldExpression:
+                    //TODO
                     break;
 
                 default:
@@ -325,6 +338,58 @@ namespace NetScript.Walkers
             }
         }
 
+        private static readonly Regex octalRegex = new Regex("^0[0-7]+$", RegexOptions.Compiled | RegexOptions.Singleline);
+
+        private static void Walk([NotNull] Agent agent, [NotNull] LiteralNode literal, bool isStrict)
+        {
+            if (isStrict && literal.Value.IsDouble && octalRegex.IsMatch(literal.Raw))
+            {
+                throw agent.CreateSyntaxError();
+            }
+
+            if (isStrict && literal.Value.IsString)
+            {
+                for (var i = 0; i < literal.Raw.Length; i++)
+                {
+                    var c = literal.Raw[i];
+                    if (c == '\\')
+                    {
+                        var next = literal.Raw[i + 1];
+                        switch (next)
+                        {
+                            case 'n':
+                            case 'r':
+                            case 'x':
+                            case 'u':
+                            case 't':
+                            case 'b':
+                            case 'v':
+                            case 'f':
+                            case '\n':
+                            case '\r':
+                                i++;
+                                break;
+                            default:
+                                if (next >= 48 && next <= 55)
+                                {
+                                    var nextNext = literal.Raw[i + 2];
+                                    if (next == '0' && !char.IsDigit(nextNext))
+                                    {
+                                        i++;
+                                        break;
+                                    }
+
+                                    throw agent.CreateSyntaxError();
+                                }
+
+                                i++;
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
         private static void Walk([NotNull] Agent agent, [NotNull] ObjectExpressionNode objectExpression, bool isStrict)
         {
             //TODO
@@ -437,7 +502,20 @@ namespace NetScript.Walkers
 
         private static void Walk([NotNull] Agent agent, [NotNull] VariableDeclarationNode variableDeclaration, bool isStrict)
         {
-            //TODO
+            if (variableDeclaration.Kind != VariableKind.Var)
+            {
+                //https://tc39.github.io/ecma262/#sec-let-and-const-declarations-static-semantics-early-errors
+                var boundNames = BoundNamesWalker.Walk(variableDeclaration);
+                if (ContainsDuplicate(boundNames))
+                {
+                    throw agent.CreateSyntaxError();
+                }
+
+                if (boundNames.Contains("let"))
+                {
+                    throw agent.CreateSyntaxError();
+                }
+            }
 
             foreach (var variableDeclarator in variableDeclaration.Declarations)
             {
@@ -496,11 +574,44 @@ namespace NetScript.Walkers
                     Walk(agent, identifier, isStrict);
                     break;
 
+                case ArrayPatternNode arrayPattern:
+                    foreach (var element in arrayPattern.Elements)
+                    {
+                        if (element != null)
+                        {
+                            WalkBinding(agent, element, isStrict);
+                        }
+                    }
+                    break;
+
+                case ObjectPatternNode objectPattern:
+                    foreach (var property in objectPattern.Properties)
+                    {
+                        WalkBinding(agent, property.Key, isStrict);
+                        WalkBinding(agent, property.Value, isStrict);
+                    }
+                    break;
+
+                case AssignmentPatternNode assignmentPattern:
+                    WalkBinding(agent, assignmentPattern.Left, isStrict);
+                    //TODO
+                    break;
+
+                case RestElementNode restElement:
+                    WalkBinding(agent, restElement.Argument, isStrict);
+                    break;
+
                 default:
-                    throw new NotImplementedException();
+                    Walk(agent, baseNode, isStrict);
+                    break;
             }
         }
 
+
+        private static bool ContainsDuplicate([NotNull] IReadOnlyCollection<string> boundNames)
+        {
+            return new HashSet<string>(boundNames).Count != boundNames.Count;
+        }
 
         private static bool IsLabelledFunction(BaseNode statement)
         {

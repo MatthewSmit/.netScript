@@ -4,10 +4,16 @@ namespace NetScriptTest.intl402.NumberFormat.prototype
 {
     public sealed class Test_constructor : BaseTest
     {
-        [Fact(DisplayName = "/intl402/NumberFormat/prototype/constructor/11.3.1.js")]
-        public void Test_11_3_1_js()
+        [Fact(DisplayName = "/intl402/NumberFormat/prototype/constructor/prop-desc.js")]
+        public void Test_prop﹏desc_js()
         {
-            RunTest("intl402/NumberFormat/prototype/constructor/11.3.1.js");
+            RunTest("intl402/NumberFormat/prototype/constructor/prop-desc.js");
+        }
+
+        [Fact(DisplayName = "/intl402/NumberFormat/prototype/constructor/value.js")]
+        public void Test_value_js()
+        {
+            RunTest("intl402/NumberFormat/prototype/constructor/value.js");
         }
     }
 }

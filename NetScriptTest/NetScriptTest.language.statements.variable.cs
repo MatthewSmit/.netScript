@@ -826,6 +826,18 @@ namespace NetScriptTest.language.statements
             RunTest("language/statements/variable/fn-name-gen.js");
         }
 
+        [Fact(DisplayName = "/language/statements/variable/id-arguments-strict.js")]
+        public void Test_id﹏arguments﹏strict_js()
+        {
+            RunTest("language/statements/variable/id-arguments-strict.js");
+        }
+
+        [Fact(DisplayName = "/language/statements/variable/id-eval-strict.js")]
+        public void Test_id﹏eval﹏strict_js()
+        {
+            RunTest("language/statements/variable/id-eval-strict.js");
+        }
+
         [Fact(DisplayName = "/language/statements/variable/S12.2_A1.js")]
         public void Test_S12_2_A1_js()
         {

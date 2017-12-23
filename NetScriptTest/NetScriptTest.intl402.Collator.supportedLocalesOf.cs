@@ -4,28 +4,40 @@ namespace NetScriptTest.intl402.Collator
 {
     public sealed class Test_supportedLocalesOf : BaseTest
     {
-        [Fact(DisplayName = "/intl402/Collator/supportedLocalesOf/10.2.2_a.js")]
-        public void Test_10_2_2_a_js()
+        [Fact(DisplayName = "/intl402/Collator/supportedLocalesOf/basic.js")]
+        public void Test_basic_js()
         {
-            RunTest("intl402/Collator/supportedLocalesOf/10.2.2_a.js");
+            RunTest("intl402/Collator/supportedLocalesOf/basic.js");
         }
 
-        [Fact(DisplayName = "/intl402/Collator/supportedLocalesOf/10.2.2_b.js")]
-        public void Test_10_2_2_b_js()
+        [Fact(DisplayName = "/intl402/Collator/supportedLocalesOf/builtin.js")]
+        public void Test_builtin_js()
         {
-            RunTest("intl402/Collator/supportedLocalesOf/10.2.2_b.js");
+            RunTest("intl402/Collator/supportedLocalesOf/builtin.js");
         }
 
-        [Fact(DisplayName = "/intl402/Collator/supportedLocalesOf/10.2.2_L15.js")]
-        public void Test_10_2_2_L15_js()
+        [Fact(DisplayName = "/intl402/Collator/supportedLocalesOf/length.js")]
+        public void Test_length_js()
         {
-            RunTest("intl402/Collator/supportedLocalesOf/10.2.2_L15.js");
+            RunTest("intl402/Collator/supportedLocalesOf/length.js");
         }
 
         [Fact(DisplayName = "/intl402/Collator/supportedLocalesOf/name.js")]
         public void Test_name_js()
         {
             RunTest("intl402/Collator/supportedLocalesOf/name.js");
+        }
+
+        [Fact(DisplayName = "/intl402/Collator/supportedLocalesOf/prop-desc.js")]
+        public void Test_prop﹏desc_js()
+        {
+            RunTest("intl402/Collator/supportedLocalesOf/prop-desc.js");
+        }
+
+        [Fact(DisplayName = "/intl402/Collator/supportedLocalesOf/taint-Object-prototype.js")]
+        public void Test_taint﹏Object﹏prototype_js()
+        {
+            RunTest("intl402/Collator/supportedLocalesOf/taint-Object-prototype.js");
         }
     }
 }

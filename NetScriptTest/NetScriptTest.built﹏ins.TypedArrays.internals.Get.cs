@@ -40,6 +40,12 @@ namespace NetScriptTest.built﹏ins.TypedArrays.internals
             RunTest("built-ins/TypedArrays/internals/Get/indexed-value.js");
         }
 
+        [Fact(DisplayName = "/built-ins/TypedArrays/internals/Get/infinity-detached-buffer.js")]
+        public void Test_infinity﹏detached﹏buffer_js()
+        {
+            RunTest("built-ins/TypedArrays/internals/Get/infinity-detached-buffer.js");
+        }
+
         [Fact(DisplayName = "/built-ins/TypedArrays/internals/Get/key-is-not-canonical-index.js")]
         public void Test_key﹏is﹏not﹏canonical﹏index_js()
         {

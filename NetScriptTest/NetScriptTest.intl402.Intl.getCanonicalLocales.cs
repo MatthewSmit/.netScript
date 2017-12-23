@@ -4,10 +4,34 @@ namespace NetScriptTest.intl402.Intl
 {
     public sealed class Test_getCanonicalLocales : BaseTest
     {
+        [Fact(DisplayName = "/intl402/Intl/getCanonicalLocales/canonicalized-tags.js")]
+        public void Test_canonicalized﹏tags_js()
+        {
+            RunTest("intl402/Intl/getCanonicalLocales/canonicalized-tags.js");
+        }
+
+        [Fact(DisplayName = "/intl402/Intl/getCanonicalLocales/canonicalized-unicode-ext-seq.js")]
+        public void Test_canonicalized﹏unicode﹏ext﹏seq_js()
+        {
+            RunTest("intl402/Intl/getCanonicalLocales/canonicalized-unicode-ext-seq.js");
+        }
+
+        [Fact(DisplayName = "/intl402/Intl/getCanonicalLocales/descriptor.js")]
+        public void Test_descriptor_js()
+        {
+            RunTest("intl402/Intl/getCanonicalLocales/descriptor.js");
+        }
+
         [Fact(DisplayName = "/intl402/Intl/getCanonicalLocales/duplicates.js")]
         public void Test_duplicates_js()
         {
             RunTest("intl402/Intl/getCanonicalLocales/duplicates.js");
+        }
+
+        [Fact(DisplayName = "/intl402/Intl/getCanonicalLocales/elements-not-reordered.js")]
+        public void Test_elements﹏not﹏reordered_js()
+        {
+            RunTest("intl402/Intl/getCanonicalLocales/elements-not-reordered.js");
         }
 
         [Fact(DisplayName = "/intl402/Intl/getCanonicalLocales/error-cases.js")]
@@ -32,6 +56,12 @@ namespace NetScriptTest.intl402.Intl
         public void Test_has﹏property_js()
         {
             RunTest("intl402/Intl/getCanonicalLocales/has-property.js");
+        }
+
+        [Fact(DisplayName = "/intl402/Intl/getCanonicalLocales/invalid-tags.js")]
+        public void Test_invalid﹏tags_js()
+        {
+            RunTest("intl402/Intl/getCanonicalLocales/invalid-tags.js");
         }
 
         [Fact(DisplayName = "/intl402/Intl/getCanonicalLocales/length.js")]
@@ -68,6 +98,18 @@ namespace NetScriptTest.intl402.Intl
         public void Test_overriden﹏push_js()
         {
             RunTest("intl402/Intl/getCanonicalLocales/overriden-push.js");
+        }
+
+        [Fact(DisplayName = "/intl402/Intl/getCanonicalLocales/preferred-grandfathered.js")]
+        public void Test_preferred﹏grandfathered_js()
+        {
+            RunTest("intl402/Intl/getCanonicalLocales/preferred-grandfathered.js");
+        }
+
+        [Fact(DisplayName = "/intl402/Intl/getCanonicalLocales/preferred-variant.js")]
+        public void Test_preferred﹏variant_js()
+        {
+            RunTest("intl402/Intl/getCanonicalLocales/preferred-variant.js");
         }
 
         [Fact(DisplayName = "/intl402/Intl/getCanonicalLocales/returned-object-is-an-array.js")]

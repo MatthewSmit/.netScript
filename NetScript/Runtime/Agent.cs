@@ -1203,6 +1203,17 @@ namespace NetScript.Runtime
             return Call(function, value, arguments);
         }
 
+        internal void DeletePropertyOrThrow([NotNull] ScriptObject obj, ScriptValue property)
+        {
+            //https://tc39.github.io/ecma262/#sec-deletepropertyorthrow
+            Debug.Assert(IsPropertyKey(property));
+            var success = obj.Delete(property);
+            if (!success)
+            {
+                throw CreateTypeError();
+            }
+        }
+
         /// <summary>
         /// Returns the global object for the current Realm.
         /// </summary>
